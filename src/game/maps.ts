@@ -268,7 +268,7 @@ export const MAPS: Record<string, MapDef> = {
       'v..nnnn....nnnn....v',
       'vPP....PP......PP..v',
       'v..PP..nnnn..PP....v',
-      'vP.....nnnn.....pppv',
+      'vP.....nnnn.....pppp',
       'v..PP.......PP..nn.v',
       'vP....PPPP..nn..nn.v',
       'v..PP......nnnn....v',

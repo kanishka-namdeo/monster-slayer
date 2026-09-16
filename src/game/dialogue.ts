@@ -307,7 +307,7 @@ export const DIALOGUES: Record<string, DlgTree> = {
     peace: {
       speaker: 'AGNES',
       text: 'Ahh... the pond in summer... Bran, my love, I am coming... Your path is clear, Serpent. Take my cold blessing.',
-      action: 'flag:wraithPeace,flag:wraithDone,take:locket:1,maxhp:5,xp:30,crowns:90,save',
+      action: 'flag:wraithPeace,flag:wraithDone,questdone:q_wraith,take:locket:1,maxhp:5,xp:30,crowns:90,save',
       next: 'peaceEnd',
     },
     peaceEnd: {
@@ -320,7 +320,7 @@ export const DIALOGUES: Record<string, DlgTree> = {
       speaker: 'AGNES',
       text: 'Then cut, witcher. Grief has teeth...',
       choices: [
-        { label: 'Draw silver.', action: 'flag:wraithDestroy,flag:wraithDone,battle:wraith' },
+        { label: 'Draw silver.', action: 'flag:wraithDestroy,flag:wraithDone,questdone:q_wraith,battle:wraith' },
         { label: 'Wait. Not yet.', next: null },
       ],
     },
