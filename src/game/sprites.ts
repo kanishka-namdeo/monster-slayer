@@ -357,9 +357,11 @@ function buildTiles() {
     const cv = document.createElement('canvas');
     cv.width = 16; cv.height = 16;
     const g = cv.getContext('2d')!;
-    g.fillStyle = PAL[3];
+    // LIGHT plaster: one tone darker than the PAPER-toned grass so facades
+    // separate from the ground by VALUE (not just by outlines/shadows)
+    g.fillStyle = PAL[2];
     g.fillRect(0, 0, 16, 16);              // plaster
-    g.fillStyle = PAL[2];                  // plaster mottling
+    g.fillStyle = PAL[3];                  // plaster mottling (bright flecks)
     g.fillRect(4, 1, 2, 1); g.fillRect(10, 1, 1, 1); g.fillRect(1, 4, 1, 1);
     g.fillRect(12, 4, 2, 1); g.fillRect(6, 9, 2, 1); g.fillRect(2, 12, 1, 1); g.fillRect(13, 12, 2, 1);
     g.fillStyle = PAL[1];                  // timber beam course
@@ -388,8 +390,7 @@ function buildTiles() {
     g.fillRect(4, 6, 8, 1);
     g.fillStyle = PAL[3];
     g.fillRect(5, 4, 1, 1);                 // lit-pane glint
-    g.fillStyle = PAL[2];
-    g.fillRect(2, 10, 12, 1);               // sill
+    g.fillRect(2, 10, 12, 1);               // sill (paper — visible on LIGHT plaster)
   });
 
   // door: plank slab, vertical seams, lintel, iron knob, doorstep
@@ -403,8 +404,7 @@ function buildTiles() {
     g.fillRect(6, 4, 1, 10); g.fillRect(9, 4, 1, 10);    // plank seams
     g.fillStyle = PAL[3];
     g.fillRect(10, 8, 1, 1);                // iron knob
-    g.fillStyle = PAL[2];
-    g.fillRect(2, 14, 12, 1);               // doorstep
+    g.fillRect(2, 14, 12, 1);               // doorstep (paper — visible on LIGHT plaster)
   });
 
   // roof: thatch shingle courses — '2' straw, '1' course lines every 4px,
@@ -437,15 +437,15 @@ function buildTiles() {
     g.fillRect(5, 0, 1, 1); g.fillRect(13, 1, 1, 1);
     g.fillStyle = PAL[0];
     g.fillRect(0, 3, 16, 1);                // eave ink line
+    g.fillStyle = PAL[1];
+    g.fillRect(0, 4, 16, 1);                // shadow band (dark under LIGHT walls)
     g.fillStyle = PAL[2];
-    g.fillRect(0, 4, 16, 1);                // shadow band
-    g.fillStyle = PAL[3];
     g.fillRect(0, 5, 16, 1);                // wall base under dither
-    g.fillStyle = PAL[2];
+    g.fillStyle = PAL[1];
     for (let x = 0; x < 16; x += 2) g.fillRect(x, 5, 1, 1);  // 50% shadow dither
-    g.fillStyle = PAL[3];
-    g.fillRect(0, 6, 16, 10);               // wall under eave
     g.fillStyle = PAL[2];
+    g.fillRect(0, 6, 16, 10);               // wall under eave (LIGHT — matches facade)
+    g.fillStyle = PAL[3];
     g.fillRect(4, 7, 2, 1); g.fillRect(11, 7, 1, 1); g.fillRect(1, 10, 1, 1); g.fillRect(13, 12, 2, 1);
     TILES.roofedge = cv;
   }
