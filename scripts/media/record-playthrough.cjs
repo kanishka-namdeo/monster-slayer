@@ -27,6 +27,12 @@ const log = (s) => console.log(`[${((Date.now() - T0) / 1000).toFixed(1)}s] ${s}
 
 // silent state prep (off-camera, keeps the run flowing like an edited let's play)
 async function prep(page, fn) {
+  // always disarm stale dialog-end callbacks (e.g. training notices that
+  // force mode='skills') before teleporting the game state around
+  await page.evaluate(() => {
+    const g = window.__game;
+    if (g) g.afterDialogEnd = null;
+  });
   await page.evaluate(fn);
 }
 
@@ -55,6 +61,9 @@ async function prep(page, fn) {
   await sleep(2600);
   mark('title');
   await pressKey(page, 'a', 130); // NEW GAME
+  await page.waitForFunction(() => window.__game.mode === 'creation', null, { timeout: 10000, polling: 50 });
+  await sleep(1400);              // school select screen lingers on camera
+  await pressKey(page, 'a', 130); // SERPENT (default) -> intro
   await page.waitForFunction(() => window.__game.mode === 'intro', null, { timeout: 10000, polling: 50 });
   log('INTRO — story pages');
 
@@ -71,7 +80,7 @@ async function prep(page, fn) {
     null, { timeout: 10000, polling: 50 },
   );
   mark('world');
-  await flushDialog(page, 4, { typeMs: 1100 }); // arrival notice
+  await flushDialog(page, 8, { typeMs: 1100 }); // arrival notice
   await page.waitForFunction(() => window.__game.mode === 'world', null, { timeout: 8000, polling: 50 });
   log('arrived in Hollow Creek');
 
@@ -99,7 +108,7 @@ async function prep(page, fn) {
   );
   // if the wandering kid intercepted the press, flush and retry
   if (await page.evaluate(() => window.__game.mode) === 'dialog') {
-    await flushDialog(page, 4, { typeMs: 1000 });
+    await flushDialog(page, 8, { typeMs: 1000 });
     await pressKey(page, 'a', 130);
     await page.waitForFunction(() => window.__game.mode === 'board', null, { timeout: 8000, polling: 50 });
   }
@@ -108,10 +117,10 @@ async function prep(page, fn) {
 
   // read contract #1 — RATS IN THE REEDS (idx 0) and take it
   await pressKey(page, 'a', 120);
-  await flushDialog(page, 3, { typeMs: 1400 });
+  await flushDialog(page, 8, { typeMs: 1400 });
   await chooseOption(page, 0, { browseMs: 800 }); // TAKE CONTRACT
   await sleep(400);
-  await flushDialog(page, 3, { typeMs: 600 });
+  await flushDialog(page, 8, { typeMs: 600 });
   log('drowners contract taken');
 
   // re-open board and take THE WEEPING WIDOW contract.
@@ -136,7 +145,7 @@ async function prep(page, fn) {
   for (let i = 0; i < wraithIdx; i++) await pressKey(page, 'down', 90);
   await sleep(500);
   await pressKey(page, 'a', 120); // read wraith notice
-  await flushDialog(page, 3, { typeMs: 1500 });
+  await flushDialog(page, 8, { typeMs: 1500 });
   const noticeText = await page.evaluate(() =>
     window.__game.dialog ? window.__game.dialog.node.text.slice(0, 60) : '');
   if (!/WEEPS/i.test(noticeText)) {
@@ -146,7 +155,7 @@ async function prep(page, fn) {
   }
   await chooseOption(page, 0, { browseMs: 800 }); // TAKE CONTRACT
   await sleep(400);
-  await flushDialog(page, 3, { typeMs: 600 });
+  await flushDialog(page, 8, { typeMs: 600 });
   log('wraith contract taken');
   await pressKey(page, 'b', 110); // close board
   await sleep(500);
@@ -162,7 +171,7 @@ async function prep(page, fn) {
   await pressKey(page, 'up', 90); // face Bram (NPC blocks the tile — pure turn)
   await sleep(250);
   await pressKey(page, 'a', 130);
-  await flushDialog(page, 3, { typeMs: 1500 });
+  await flushDialog(page, 8, { typeMs: 1500 });
   await chooseOption(page, 0, { browseMs: 900 }); // "Work is work."
   await flushDialog(page, 6, { typeMs: 1300 });
   log('elder met');
@@ -184,15 +193,15 @@ async function prep(page, fn) {
   await pressKey(page, 'up', 90); // face the counter — Torv is behind it
   await sleep(250);
   await pressKey(page, 'a', 130);
-  await flushDialog(page, 3, { typeMs: 1500 });
+  await flushDialog(page, 8, { typeMs: 1500 });
   await chooseOption(page, 0, { browseMs: 800 }); // I'LL HUNT
-  await flushDialog(page, 5, { typeMs: 1300 });
+  await flushDialog(page, 8, { typeMs: 1300 });
   log('wolves contract accepted');
 
   // browse the forge shop
   await prep(page, () => { window.__game.player.crowns = 120; });
   await pressKey(page, 'a', 130); // talk again -> browse
-  await flushDialog(page, 3, { typeMs: 1300 });
+  await flushDialog(page, 8, { typeMs: 1300 });
   await chooseOption(page, 0, { browseMs: 700 }); // Show wares
   await page.waitForFunction(() => window.__game.mode === 'shop', null, { timeout: 8000, polling: 50 });
   await sleep(1200);
@@ -226,9 +235,9 @@ async function prep(page, fn) {
   await pressKey(page, 'up', 90); // face the counter — Mira is behind it
   await sleep(250);
   await pressKey(page, 'a', 130);
-  await flushDialog(page, 3, { typeMs: 1500 });
+  await flushDialog(page, 8, { typeMs: 1500 });
   await chooseOption(page, 1, { browseMs: 800 }); // "Later." -> browse node
-  await flushDialog(page, 3, { typeMs: 1300 });
+  await flushDialog(page, 8, { typeMs: 1300 });
   await chooseOption(page, 0, { browseMs: 800 }); // "Browse." -> shop
   await page.waitForFunction(() => window.__game.mode === 'shop', null, { timeout: 8000, polling: 50 });
   await sleep(1000);
@@ -236,16 +245,16 @@ async function prep(page, fn) {
   await sleep(900);
   await pressKey(page, 'a', 120); // SWALLOW
   await sleep(500);
-  await flushDialog(page, 3, { typeMs: 900 }); // bought notice (kicks to world)
+  await flushDialog(page, 8, { typeMs: 900 }); // bought notice (kicks to world)
   log('swallow bought');
 
   // buy NECRO OIL too (re-enter shop)
   await pressKey(page, 'up', 90); // still facing the counter
   await sleep(200);
   await pressKey(page, 'a', 130);
-  await flushDialog(page, 3, { typeMs: 1200 });
+  await flushDialog(page, 8, { typeMs: 1200 });
   await chooseOption(page, 1, { browseMs: 600 }); // Later. -> browse node
-  await flushDialog(page, 3, { typeMs: 1200 });
+  await flushDialog(page, 8, { typeMs: 1200 });
   await chooseOption(page, 0, { browseMs: 600 }); // Browse. -> shop
   await page.waitForFunction(() => window.__game.mode === 'shop', null, { timeout: 8000, polling: 50 });
   await sleep(800);
@@ -255,7 +264,7 @@ async function prep(page, fn) {
   await sleep(900);
   await pressKey(page, 'a', 120);
   await sleep(400);
-  await flushDialog(page, 3, { typeMs: 900 });
+  await flushDialog(page, 8, { typeMs: 900 });
   log('necro oil bought');
 
   // exit herbalist -> village east -> swamp
@@ -334,16 +343,27 @@ async function prep(page, fn) {
   await sleep(400);
   await pressKey(page, 'b', 110); // back to menu
   await sleep(600);
+  // SKILLS — training screen (menu item #5 of 7)
+  await pressKey(page, 'down', 90);
+  await pressKey(page, 'a', 120);
+  await sleep(1600);
+  await pressKey(page, 'b', 110); // back to menu
+  await sleep(600);
   // SAVE
   await pressKey(page, 'down', 90);
   await pressKey(page, 'a', 120);
   await sleep(400);
-  await flushDialog(page, 3, { typeMs: 1200 });
+  await flushDialog(page, 8, { typeMs: 1200 });
   await sleep(400);
   // CLOSE
   await pressKey(page, 'down', 90);
   await pressKey(page, 'a', 120);
   await sleep(500);
+  // make sure we really are back in the world (7-item menu, don't trust it)
+  for (let i = 0; i < 8 && await page.evaluate(() => window.__game.mode) !== 'world'; i++) {
+    await pressKey(page, 'b', 110);
+    await sleep(250);
+  }
   log('menu tour done');
 
   // ================= GRAVEYARD — the weeping widow =================
@@ -364,25 +384,25 @@ async function prep(page, fn) {
   await sleep(2400); // dark map banner + eerie music
 
   // talk to the weeping spirit
-  r = await walkTo(page, 7, 4);
+  r = await walkTo(page, 7, 4, { noEncounter: true });
   log(`walked to Agnes: ${r}`);
   await pressKey(page, 'up', 90);
   await sleep(500);
   await pressKey(page, 'a', 130);
-  await flushDialog(page, 3, { typeMs: 1600 });
+  await flushDialog(page, 8, { typeMs: 1600 });
   await chooseOption(page, 0, { browseMs: 900 }); // "Who never came home?"
-  await flushDialog(page, 5, { typeMs: 1400 });
+  await flushDialog(page, 8, { typeMs: 1400 });
   log('learned her name');
 
   // fetch the locket by the stones
-  r = await walkTo(page, 6, 3);
+  r = await walkTo(page, 6, 3, { noEncounter: true });
   log(`walked to locket: ${r}`);
-  await flushDialog(page, 3, { typeMs: 1100 });
-  await walkTo(page, 7, 4);
+  await flushDialog(page, 8, { typeMs: 1100 });
+  await walkTo(page, 7, 4, { noEncounter: true });
   await pressKey(page, 'up', 90);
   await sleep(400);
   await pressKey(page, 'a', 130);
-  await flushDialog(page, 3, { typeMs: 1600 });
+  await flushDialog(page, 8, { typeMs: 1600 });
   mark('moral-choice');
   await chooseOption(page, 0, { browseMs: 1100 }); // GIVE THE LOCKET
   await flushDialog(page, 6, { typeMs: 1500 });
@@ -426,7 +446,7 @@ async function prep(page, fn) {
     } : null);
     log(`bram node: ${JSON.stringify(d)}`);
   }
-  await flushDialog(page, 4, { typeMs: 1500 });
+  await flushDialog(page, 8, { typeMs: 1500 });
   {
     const d = await page.evaluate(() => window.__game.dialog ? {
       nodeId: window.__game.dialog.nodeId,
@@ -436,7 +456,7 @@ async function prep(page, fn) {
     log(`after flush: ${JSON.stringify(d)}`);
   }
   await chooseOption(page, 1, { browseMs: 900 }); // "I'LL KILL IT."
-  await flushDialog(page, 5, { typeMs: 1400 });
+  await flushDialog(page, 8, { typeMs: 1400 });
   log('main quest accepted — thorns cleared');
 
   // ================= OLDEWOOD → deep forest =================
@@ -485,7 +505,7 @@ async function prep(page, fn) {
   mark('werewolf');
   await pressKey(page, 'down', 90); // trigger tile
   await sleep(700);
-  await flushDialog(page, 3, { typeMs: 1600 });
+  await flushDialog(page, 8, { typeMs: 1600 });
   await chooseOption(page, 0, { browseMs: 800 }); // FIGHT.
   log('WEREWOLF battle');
   await fightBattle(page, [
@@ -515,7 +535,7 @@ async function prep(page, fn) {
     await sleep(600);
     await pressKey(page, 'down', 90);
     await sleep(700);
-    await flushDialog(page, 3, { typeMs: 1600 });
+    await flushDialog(page, 8, { typeMs: 1600 });
     await chooseOption(page, 0, { browseMs: 800 }); // FIGHT. (retry)
     await fightBattle(page, [
       { t: 'sign', v: 'igni' }, { t: 'silver' }, { t: 'sign', v: 'igni' },
@@ -545,18 +565,18 @@ async function prep(page, fn) {
   }
   await pressKey(page, 'down', 90); // trigger tile (7,10)
   await sleep(700);
-  await flushDialog(page, 3, { typeMs: 1700 });
+  await flushDialog(page, 8, { typeMs: 1700 });
   const leshText = await page.evaluate(() =>
     window.__game.dialog ? window.__game.dialog.node.text.slice(0, 40) : '');
   log(`leshen dialog: "${leshText}"`);
   if (!/crows|antlers/i.test(leshText)) {
     // something else intercepted (e.g. respawned far away) — re-approach once
-    await flushDialog(page, 3, { typeMs: 1000 });
+    await flushDialog(page, 8, { typeMs: 1000 });
     await prep(page, () => { window.__game.switchMap('deepforest', 7, 9, 'down'); });
     await sleep(500);
     await pressKey(page, 'down', 90);
     await sleep(700);
-    await flushDialog(page, 3, { typeMs: 1700 });
+    await flushDialog(page, 8, { typeMs: 1700 });
   }
   await chooseOption(page, 0, { browseMs: 800 }); // Time to hunt.
   log('LESHEN battle');

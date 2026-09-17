@@ -51,7 +51,9 @@ rotten truth in the Heart of Oldewood.
 | 🧪 **Alchemy & toxicity** | Swallow, Thunderbolt and White Honey potions, four blade oils, and a toxicity meter that punishes over-drinking |
 | 📜 **12 contracts & moral choices** | A notice board economy of quests — including the Weeping Widow, where you choose between mercy and coin |
 | 🎒 **Witcher's kit** | Bestiary, quest log, 4 shops, tiered gear reforging, save/continue |
-| 🎞️ **GB-feel animation pass** | Hand-dithered terrain with per-tile variants, water shores & foam, swaying flowers/reeds, bubbling cauldron, crawling thorns, NPC glide-walk, reeds rustle, dialog slide-open, encounter flash + ink fades, battle juice (HP drain, attack lunge, slash streaks, faint), pixel-perfect integer-scaled canvas |
+| 🏠 **Gen-1 style buildings** | Thatched shingle roofs with courses, stitches and a ridge cap, eave shadow dither, timber-framed plaster walls, cross-mullion windows with a lit pane, plank doors with lintels and steps, brick chimneys with drifting smoke, and **four hanging shop signs** (griffin, hammer, leaf, rune) that tell the identical facades apart |
+| 🎞️ **GB-feel animation pass** | Hand-dithered terrain with per-tile variants, water shores & foam, swaying flowers/reeds, bubbling cauldron, candle-flicker shrine, crawling thorns, hearth fire with rising sparks, NPC glide-walk with step-bob, reeds rustle, dialog slide-open, encounter flash + ink fades, battle juice (HP drain, attack lunge, slash streaks, faint), pixel-perfect integer-scaled canvas |
+| 🧙 **A witcher who reads as one** | White swept hair, cat eyes, a readable wolf medallion, pommels breaking the silhouette — and **X-crossed silver-over-steel scabbards** on the back view, a connected scabbard diagonal in profile, a true alternating-gait walk cycle, idle breathing/blinking, and a school-tinted scarf |
 | 🖥️ **Full DMG shell** | Play inside a lovingly over-engineered Game Boy: working D-pad, A/B, START/SELECT, battery LED and speaker grille |
 | 🎵 **All-original chiptune** | **16-track soundtrack** on an authentic 4-channel DMG-style engine (two pulse channels with duty cycles, wave bass, noise drums) + 20 sound effects — synthesized live, zero audio files |
 | 🖱️ **Keyboard, mouse & touch** | Arrows/WASD/Z/X/M on desktop, **full mouse support** (click-to-move with pathfinding, clickable menus, right-click cancel, wheel scroll), on-screen buttons on mobile |
@@ -63,12 +65,12 @@ on camera, recorded with the game's own synthesized soundtrack.
 
 | Chapter | Length | Watch |
 |---|---|---|
-| 🎞️ **Full playthrough** | 5:22 | [`playthrough-full.mp4`](docs/media/playthrough-full.mp4) |
-| 1 · Title & intro | 0:14 | [`chapter-1-title-and-intro.mp4`](docs/media/chapter-1-title-and-intro.mp4) |
-| 2 · Hollow Creek — board, elder, shops | 1:31 | [`chapter-2-hollow-creek.mp4`](docs/media/chapter-2-hollow-creek.mp4) |
-| 3 · First hunt — swamp battle & menus | 1:03 | [`chapter-3-first-hunt.mp4`](docs/media/chapter-3-first-hunt.mp4) |
-| 4 · The Weeping Widow — a moral choice | 0:33 | [`chapter-4-the-weeping-widow.mp4`](docs/media/chapter-4-the-weeping-widow.mp4) |
-| 5 · Heart of Oldewood — bosses & ending | 2:01 | [`chapter-5-heart-of-oldewood.mp4`](docs/media/chapter-5-heart-of-oldewood.mp4) |
+| 🎞️ **Full playthrough** | 7:24 | [`playthrough-full.mp4`](docs/media/playthrough-full.mp4) |
+| 1 · Title, school select & intro | 0:15 | [`chapter-1-title-and-intro.mp4`](docs/media/chapter-1-title-and-intro.mp4) |
+| 2 · Hollow Creek — board, elder, shops | 1:48 | [`chapter-2-hollow-creek.mp4`](docs/media/chapter-2-hollow-creek.mp4) |
+| 3 · First hunt — swamp battle & menus | 1:24 | [`chapter-3-first-hunt.mp4`](docs/media/chapter-3-first-hunt.mp4) |
+| 4 · The Weeping Widow — a moral choice | 0:42 | [`chapter-4-the-weeping-widow.mp4`](docs/media/chapter-4-the-weeping-widow.mp4) |
+| 5 · Heart of Oldewood — bosses & ending | 3:11 | [`chapter-5-heart-of-oldewood.mp4`](docs/media/chapter-5-heart-of-oldewood.mp4) |
 
 *(Click a clip — GitHub plays MP4s in the browser.)*
 
@@ -229,7 +231,7 @@ and zero audio files**.
 | Module | Lines* | Responsibility |
 |---|---|---|
 | [`engine.ts`](src/game/engine.ts) | 1,525 | State machine (16 modes), grid movement + camera, BFS click-to-walk, NPC wander + glide, encounters, warps, scene fades, save/load, endings |
-| [`sprites.ts`](src/game/sprites.ts) | 1,462 | Pixel-art tileset (45+ tiles, per-position variants, animated water/flowers/reeds/cauldron/shrine/thorns), witcher sprite (4 dirs × 2 frames), 12 NPCs |
+| [`sprites.ts`](src/game/sprites.ts) | 1,709 | Pixel-art tileset (55+ tiles incl. chimney/signs/hearth/crate/woodpile/haystack, per-position variants, animated water/flowers/reeds/cauldron/shrine/thorns/hearth/chimney), witcher sprite (4 dirs × 2 frames, alternating gait + X-scabbards), 12 NPCs |
 | [`engineMenus.ts`](src/game/engineMenus.ts) | 742 | START menu, bag, stats, contracts, training, bestiary, shops, notice board, ending + pointer hit-testing |
 | [`battle.ts`](src/game/battle.ts) | 783 | Turn-based combat: swords, oils, signs, Quen, toxicity, poison, crits, boss AI + battle juice (HP drain, lunge, faint) + pointer menus |
 | [`dialogue.ts`](src/game/dialogue.ts) | 726 | Branching dialogues with conditions, actions and Witcher-style choices |

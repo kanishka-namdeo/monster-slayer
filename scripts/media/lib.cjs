@@ -76,7 +76,15 @@ async function advDialog(page, { typeMs = null, timeout = 15000 } = {}) {
     const wait = typeMs !== null ? typeMs : Math.min(1200, 250 + len * 8);
     await sleep(wait);
     await page.evaluate(() => { if (window.__game.dialog) window.__game.dialog.charIdx = 1e9; });
-    await sleep(220);
+    await sleep(90); // a frame passes: last page auto-enters choosing
+    const st2 = await page.evaluate(() => {
+      const d = window.__game.dialog;
+      if (!d) return 'gone';
+      return d.choosing ? 'choosing' : 'text';
+    });
+    if (st2 === 'choosing') return 'choosing'; // pressing A now would auto-select!
+    if (st2 === 'gone') return true;
+    await sleep(130);
     await page.evaluate(() => window.__game.press('a'));
     await sleep(120);
     await page.evaluate(() => window.__game.release('a'));
@@ -152,7 +160,7 @@ function bfsStep(t) {
   const g = window.__game;
   const rows = g.mapDef.rows;
   const H = rows.length, W = rows[0].length;
-  const BLOCKED = new Set('TPfWwreuALKsctBbGgSz qL o~v#C'.split('').filter(c => c !== ' '));
+  const BLOCKED = new Set('TPfWwreuALKsctBbGgSzhHjJCXVZOUNqLo~v#CMYA'.split('').filter(c => c !== ' '));
   const blocked = (x, y) => {
     if (y < 0 || y >= H || x < 0 || x >= W) return true;
     const tch = rows[y][x];
@@ -187,13 +195,27 @@ function bfsStep(t) {
 // Walk to (tx,ty) on the current map, one tile at a time via real held input.
 // Retries transient no-path situations (wandering NPCs) before giving up.
 // Returns: 'arrived' | 'warped' (map changed) | 'battle' | 'no-path' | 'timeout'
-async function walkTo(page, tx, ty, { run = false, maxSteps = 90, retries = 5 } = {}) {
-  for (let retry = 0; retry < retries; retry++) {
-    const res = await walkToOnce(page, tx, ty, { run, maxSteps });
-    if (res !== 'no-path') return res;
-    await sleep(650); // let NPCs wander off the path
+async function walkTo(page, tx, ty, { run = false, maxSteps = 90, retries = 5, noEncounter = false } = {}) {
+  if (noEncounter) {
+    await page.evaluate(() => {
+      if (!window.__randOrig) window.__randOrig = Math.random;
+      Math.random = () => 0.999; // above the 0.14 encounter roll — no random battles
+    });
   }
-  return 'no-path';
+  try {
+    for (let retry = 0; retry < retries; retry++) {
+      const res = await walkToOnce(page, tx, ty, { run, maxSteps });
+      if (res !== 'no-path') return res;
+      await sleep(650); // let NPCs wander off the path
+    }
+    return 'no-path';
+  } finally {
+    if (noEncounter) {
+      await page.evaluate(() => {
+        if (window.__randOrig) { Math.random = window.__randOrig; window.__randOrig = null; }
+      });
+    }
+  }
 }
 
 async function walkToOnce(page, tx, ty, { run = false, maxSteps = 90 } = {}) {

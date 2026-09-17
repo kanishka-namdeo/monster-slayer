@@ -1118,7 +1118,9 @@ export class Game {
         const key = TILE_KEY[ch] ?? (TILES[ch] ? ch : 'grass');
         const asset = TILES[key] as HTMLCanvasElement | HTMLCanvasElement[] | undefined;
         if (Array.isArray(asset)) {
-          cv = asset[Math.floor(this.time / 400) % asset.length];
+          // GB tile cadence: 450ms standard; flowers/reeds sway slower (900ms)
+          const per = key === 'flowers' || key === 'reeds' ? 900 : 450;
+          cv = asset[Math.floor(this.time / per) % asset.length];
         } else if (asset) {
           const vars = TILE_VARIANTS[key];
           cv = vars ? vars[(tx * 31 + ty * 17 + ((tx * ty) & 3)) % vars.length] : asset;
@@ -1145,6 +1147,21 @@ export class Game {
           if (land(tx, ty + 1)) ctx.fillRect(sx + 9 - fo % 5, sy + 13, 2, 1);
           if (land(tx - 1, ty)) ctx.fillRect(sx + 1, sy + 4 + fo % 6, 1, 2);
           if (land(tx + 1, ty)) ctx.fillRect(sx + 13, sy + 8 - fo % 5, 1, 2);
+        } else if (ch === 'r') {
+          // roof ridge: ink cap + paper highlight along the topmost thatch row,
+          // ink edges where the roof block meets non-roof tiles
+          const roofish = (ax: number, ay: number) => {
+            const t = tileAt(def, ax, ay);
+            return t === 'r' || t === 'e' || t === 'C';
+          };
+          if (!roofish(tx, ty - 1)) {
+            ctx.fillStyle = C.INK;
+            ctx.fillRect(sx, sy, 16, 1);
+            ctx.fillStyle = C.PAPER;
+            ctx.fillRect(sx + 1, sy + 1, 14, 1);
+          }
+          if (!roofish(tx - 1, ty)) { ctx.fillStyle = C.INK; ctx.fillRect(sx, sy, 1, 16); }
+          if (!roofish(tx + 1, ty)) { ctx.fillStyle = C.INK; ctx.fillRect(sx + 15, sy, 1, 16); }
         } else if (ch === 'p' || ch === 'm') {
           // ragged path/mud edges where they meet grass
           const grassy = (ax: number, ay: number) => isGrassFamily(tileAt(def, ax, ay) ?? '');
@@ -1197,6 +1214,7 @@ export class Game {
         const k = 1 - n.mvT / 220;
         nx = Math.round((n.mvFrom.x + (n.x - n.mvFrom.x) * k) * TILE);
         ny = Math.round((n.mvFrom.y + (n.y - n.mvFrom.y) * k) * TILE);
+        oy += Math.floor((220 - n.mvT) / 110) % 2;   // 1px step bob while gliding
       }
       ctx.drawImage(spr, nx - camX, ny - camY + oy);
     }
@@ -1205,7 +1223,30 @@ export class Game {
     const frame = this.moving ? (this.stepFrame ? '1' : '0') : '0';
     const spr = PLAYER[`${this.player.dir}${frame}`] ?? PLAYER.down0;
     const bob = this.moving && this.stepFrame ? 1 : 0;
-    ctx.drawImage(spr, Math.round(pp.x) - camX, Math.round(pp.y) - camY + bob);
+    const px = Math.round(pp.x) - camX, py = Math.round(pp.y) - camY + bob;
+    ctx.drawImage(spr, px, py);
+    if (!this.moving) {
+      // idle breathing: chest reads 1px wider on the exhale half-cycle (~550ms)
+      if (Math.floor(this.time / 550) % 2 === 1) {
+        ctx.fillStyle = C.DARK;
+        ctx.fillRect(px + 4, py + 9, 1, 1);
+        ctx.fillRect(px + 11, py + 9, 1, 1);
+      }
+      // blink: cat eyes close for ~160ms every ~4.6s (front view only)
+      if (this.player.dir === 'down' && this.time % 4600 < 160) {
+        ctx.fillStyle = C.PAPER;
+        ctx.fillRect(px + 5, py + 3, 1, 1);
+        ctx.fillRect(px + 10, py + 3, 1, 1);
+      }
+    }
+    // school scarf tint at the collar (front + side views)
+    if (this.player.school) {
+      const SCARF: Record<string, string> = { serpent: C.LIGHT, wolf: C.PAPER, bear: C.INK, cat: C.LIGHT, griffin: C.PAPER };
+      ctx.fillStyle = SCARF[this.player.school] ?? C.LIGHT;
+      if (this.player.dir === 'down') ctx.fillRect(px + 6, py + 7, 4, 1);
+      else if (this.player.dir === 'left') ctx.fillRect(px + 5, py + 6, 2, 1);
+      else if (this.player.dir === 'right') ctx.fillRect(px + 9, py + 6, 2, 1);
+    }
 
     // dark tint for cursed places
     if (def.dark) {

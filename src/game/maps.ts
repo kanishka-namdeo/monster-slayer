@@ -4,8 +4,10 @@
 //  . grass   , flowers  T tree   P pine    f fence
 //  R reeds(enc)  n darkgrass(enc)  ~ water  o swampwater
 //  p path    m mud      = bridge  x bones(walk)
-//  W wall w window  r roof  e roofedge  D door(warp)
-//  F floor   # intwall  b bed  t table  c counter  s shelf
+//  W wall w window  r roof  e roofedge  D door(warp)  C chimney
+//  h inn sign  H smithy sign  j herbalist sign  J elder sign
+//  F floor   # intwall  V intwindow  Z picture  X hearth(2f fire)
+//  b bed  t table  c counter  s shelf  O crate  U woodpile  N haystack
 //  B board   g/G graves  u well   a anvil  l cauldron
 //  k barrel  K bookshelf  S shrine  z thorns  q rock  L stump
 //  v void(border)
@@ -53,7 +55,7 @@ export interface MapDef {
   dark?: boolean; // graveyard tint
 }
 
-const BLOCKED = new Set('TPfWwreuALKsctBbGgSz qL o~v#CMYA'.split('').filter(c => c !== ' '));
+const BLOCKED = new Set('TPfWwreuALKsctBbGgSzhHjJCXVZOUNqL o~v#MYA'.split('').filter(c => c !== ' '));
 
 export function tileAt(map: MapDef, x: number, y: number): string {
   if (y < 0 || y >= map.rows.length) return 'v';
@@ -81,20 +83,20 @@ export const MAPS: Record<string, MapDef> = {
       'TTTTTTTTTTppTTTTTTTTTTTT',
       'TTTTTTTTTTppTTTTTTTTTTTT',
       'T,........pp..........,T',
-      'T.rrrrr...pp...rrrrr...T',
+      'T.rrCrr...pp...rrCrr...T',
       'T.rrrrr...pp...rrrrr...T',
       'T.eeeee...pp...eeeee...T',
-      'T.WwDwW...pp...WwDwW...T',
-      'T...p.....pp.....p.....T',
-      'T...p.....pp.....p.....T',
+      'T.WJDwW...pp...WhDwW...T',
+      'T...p..O..pp.....p.~=~.T',
+      'T...p.....pp.....p.~~~.T',
       'T..ppppppppppppppppppppp',
-      'T...p..u..pp...B..p....T',
-      'T.rrrrr...pp...rrrrr...T',
+      'T.U.p..u..pp...B..p....T',
+      'T.rrCrr...pp...rrCrr...T',
       'T.rrrrr...pp...rrrrr...T',
       'T.eeeee...pp...eeeee...T',
-      'T.WwDwW...pp...WwDwW...T',
-      'T...p.....pp.....p.....T',
-      'T...p....,pp,....p..,..T',
+      'T.WHDwW...pp...WjDwW.N.T',
+      'T...p.....pp.....p..fffT',
+      'T...p....,pp,....p..,,.T',
       'TTTTTTTTTTTTTTTTTTTTTTTT',
     ],
     warps: [
@@ -119,8 +121,8 @@ export const MAPS: Record<string, MapDef> = {
     name: 'The Sleeping Griffin',
     music: 'inn',
     rows: [
-      '############',
-      '#FFFFFFbbFF#',
+      '##Z####V####',
+      '#FXFFFbbFF#',
       '#FkFFtFFFFF#',
       '#FFkFFFFFFF#',
       '#FFFcccFFFF#',
@@ -146,8 +148,8 @@ export const MAPS: Record<string, MapDef> = {
     name: "Torv's Forge",
     music: 'town',
     rows: [
-      '############',
-      '#FFFFFFFFFF#',
+      '####V#######',
+      '#FFFFFXFFF#',
       '#FFFFFFFaFF#',
       '#FcccFFFFFk#',
       '#FFFFFFFFFF#',
@@ -172,7 +174,7 @@ export const MAPS: Record<string, MapDef> = {
     name: "Mira's Hut",
     music: 'town',
     rows: [
-      '############',
+      '####V#######',
       '#FFFFFFFFFF#',
       '#FsFlFFsFFF#',
       '#FFFFFFFFFF#',
@@ -198,8 +200,8 @@ export const MAPS: Record<string, MapDef> = {
     name: "Elder's House",
     music: 'town',
     rows: [
-      '############',
-      '#KFFFFFFFKF#',
+      '##V##Z######',
+      '#KFXFFFFKF#',
       '#FFtFFtFFFF#',
       '#FFFFFFFFFF#',
       '#FFFFFFFFFF#',
@@ -337,15 +339,15 @@ export const MAPS: Record<string, MapDef> = {
     dark: true,
     rows: [
       'vvvvvvvvvvvvvvvv',
-      'vPP..PP..PP..PPv',
+      'vPP.PP...PP.PP.v',
       'v..nn..PP..nn..v',
-      'vPP....nn....PPv',
-      'v..PP..nn..PP..v',
+      'vP.....nn....PPv',
+      'v...PP.nn..PP..v',
       'vP....PP....P..v',
-      'v..PP......PP..v',
+      'v..PP.....PP...v',
       'vP....PP....nn.v',
       'v..PP......nn..v',
-      'vP..PP..PP..PP.v',
+      'vP..PP...PP.PP.v',
       'v....PP..PP....v',
       'v.....SSSS.....v',
       'vvvvppvvvvvvvvvv',
@@ -408,15 +410,15 @@ export const MAPS: Record<string, MapDef> = {
     rows: [
       'vvvvvvvvvvvvvvvvvvvv',
       'v.RRR..oo..RRR..RR.v',
-      'vRR..ooo...oo..RRR.v',
+      'vRR.ooo..o..o..RRR.v',
       'vR...oo..RR...o....v',
       'v.RR....oo...mmm..Rv',
       'v..o..RR....mm...RRv',
       '..RR.....LL......R.v',
-      'v..o..RR....mm...RRv',
-      'v.RR....oo...mmm..Rv',
+      'v..o...RR...mm..RR.v',
+      'v.RR...oo...mmm..R.v',
       'vR...oo..RR...o....v',
-      'vRR..ooo...oo..RRR.v',
+      'vRR...o..ooo.o..RR.v',
       'v.RRR..oo..RRR..RR.v',
       'vvvvvvvvvvvvvvvvvvvv',
     ],
