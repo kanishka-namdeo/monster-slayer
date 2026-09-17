@@ -42,16 +42,18 @@ rotten truth in the Heart of Oldewood.
 
 | | |
 |---|---|
-| 🗺️ **9 hand-built maps** | A village hub, four interiors, swamp, old-growth forest, weeping graveyard, and the dark heart of the wood |
-| 👹 **7 monsters to hunt** | Drowners, ghouls, wolves, water hags, a wraith, a werewolf miniboss, and the Leshen — each with bestiary lore |
-| ⚔️ **Pokémon-style battles** | Turn-based combat with **two swords**: steel for beasts of flesh, silver for monsters — plus crits, stuns, poison and shields |
-| 🔥 **4 witcher Signs** | IGNI (fire), AARD (telekinetic shock + stun), QUEN (damage shield), AXII (hex) — fueled by stamina |
-| 🧪 **Alchemy & toxicity** | Swallow, Thunderbolt and White Honey potions, three blade oils, and a toxicity meter that punishes over-drinking |
-| 📜 **Contracts & moral choices** | A notice board economy of quests — including the Weeping Widow, where you choose between mercy and coin |
-| 🎒 **Witcher's kit** | Bestiary, quest log, shop economy, gear reforging, save/continue |
+| 🗺️ **12 hand-built maps** | Hollow Creek village, four interiors, Mirelow Swamp, Oldewood, Weeping Graves, the Heart of Oldewood — plus the **Northern Reaches**: Fangtooth Pass, Crookback Bog, and ruined Kaer Serpen |
+| 👹 **16 monsters to hunt** | Drowners, ghouls, wolves, nekkers, endrega, foglets, noonwraiths, rotfiends, barghests, water hags, a wraith — plus five bosses: the Werewolf, the Royal Griffin, the Arachas, the Leshen, and the endgame **Katakan** |
+| 🏫 **5 witcher schools** | Choose your build at character creation: Serpent (balanced), Wolf (signs), Bear (tank), Cat (glass cannon), Griffin (hybrid) — each with stat mods and perks |
+| 📈 **Skill point training** | Every level grants a point — spend it on Vitality, Stamina, Swordplay or Armor in the TRAINING screen |
+| ⚔️ **Pokémon-style battles** | Turn-based combat with **two swords**: steel for beasts of flesh, silver for monsters — plus crits, stuns, poison, shields and a fifth monster class (insectoids) with its own oil |
+| 🔥 **4 witcher Signs** | IGNI (fire), AARD (telekinetic shock + stun), QUEN (damage shield), AXII (hex) — fueled by stamina, discounted by school |
+| 🧪 **Alchemy & toxicity** | Swallow, Thunderbolt and White Honey potions, four blade oils, and a toxicity meter that punishes over-drinking |
+| 📜 **12 contracts & moral choices** | A notice board economy of quests — including the Weeping Widow, where you choose between mercy and coin |
+| 🎒 **Witcher's kit** | Bestiary, quest log, 4 shops, tiered gear reforging, save/continue |
 | 🖥️ **Full DMG shell** | Play inside a lovingly over-engineered Game Boy: working D-pad, A/B, START/SELECT, battery LED and speaker grille |
-| 🎵 **All-original chiptune** | 7 looping tracks + 20 sound effects synthesized live in Web Audio — square, triangle and noise waves only |
-| 📱 **Keyboard & touch** | Arrows/WASD/Z/X on desktop, on-screen buttons on mobile |
+| 🎵 **All-original chiptune** | **16-track soundtrack** on an authentic 4-channel DMG-style engine (two pulse channels with duty cycles, wave bass, noise drums) + 20 sound effects — synthesized live, zero audio files |
+| 🖱️ **Keyboard, mouse & touch** | Arrows/WASD/Z/X/M on desktop, **full mouse support** (click-to-move with pathfinding, clickable menus, right-click cancel, wheel scroll), on-screen buttons on mobile |
 
 ## 🎬 Watch the playthrough
 
@@ -101,6 +103,36 @@ on camera, recorded with the game's own synthesized soundtrack.
 | ![Bestiary](docs/media/screenshots/10-bestiary.png) | ![Ending](docs/media/screenshots/15-ending.png) |
 | *Know your monster, know its weakness.* | *How Hollow Creek remembers you.* |
 
+## 🏔 The Northern Reaches
+
+*The v2 expansion: three new regions, three new bosses, and the ruins of the
+Serpent School itself.*
+
+| Choose your school | Train your witcher |
+|---|---|
+| ![Schools](docs/media/screenshots/20-school-select.png) | ![Training](docs/media/screenshots/24-training.png) |
+| *Five schools, five builds.* | *Spend level-up points your way.* |
+
+| Fangtooth Pass | Crookback Bog |
+|---|---|
+| ![Fangtooth](docs/media/screenshots/21-fangtooth.png) | ![Crookback](docs/media/screenshots/22-crookback.png) |
+| *Barghests on the scree, a griffin on the ridge.* | *Old Kettle trades in the deep mire.* |
+
+| Kaer Serpen | The endgame boss |
+|---|---|
+| ![Kaer Serpen](docs/media/screenshots/23-kaer-serpen.png) | ![Katakan](docs/media/screenshots/27-katakan.png) |
+| *The dead School keeps a pale ghost.* | *The Katakan wears witcher faces.* |
+
+<details>
+<summary><b>👹 More of the bestiary & the Royal Griffin</b></summary>
+
+| New bestiary | Royal Griffin |
+|---|---|
+| ![Bestiary](docs/media/screenshots/26-new-bestiary.png) | ![Griffin](docs/media/screenshots/25-griffin.png) |
+| *Barghest — ember-eyed hound of the pass.* | *Wings like torn sailcloth.* |
+
+</details>
+
 <details>
 <summary><b>🕹 The whole handheld, on desktop and mobile</b></summary>
 
@@ -114,18 +146,24 @@ on camera, recorded with the game's own synthesized soundtrack.
 
 | Input | Action |
 |---|---|
-| **Arrow keys / WASD** | Move (grid-based, camera follows) |
-| **Z** or **Space** | **A** — talk, confirm, read the board, advance text |
-| **X** | **B** — cancel · hold while moving to **run** |
+| **Arrow keys / WASD** | Move (grid-based, camera follows) · **click** any tile to auto-walk there |
+| **Z** / **Space** / **Click** | **A** — talk, confirm, read the board, advance text · **click an NPC** from any distance to walk over and talk |
+| **X** / **Right-click** | **B** — cancel · hold while moving to **run** |
 | **Enter** | **START** — open the witcher's menu |
-| **Shift** | **SELECT** — sound on/off |
+| **Shift** / **M** | **SELECT** — sound on/off |
+| **Mouse wheel** | Browse any list — menus, bestiary, shops, contracts |
 | **On-screen buttons** | Full touch controls on mobile |
+
+Every screen is fully playable by mouse alone or keyboard alone — full input
+parity, the way it should be.
 
 **Survival 101:** read the notice board, take contracts, and let the bestiary
 teach you which blade and which oil each monster fears. Hold **B** to run, talk
 to everyone twice, and remember — the tall reeds rustle before they strike.
 
 ## 🚀 Run it locally
+
+**Or don't — it's deployed: [monster-slayer-ivory.vercel.app](https://monster-slayer-ivory.vercel.app/).**
 
 ```bash
 # install
@@ -147,30 +185,56 @@ is a single client-side canvas application with localStorage saves.
 ```bash
 npm run typecheck   # strict TS, zero errors
 npm run lint        # eslint, clean
-npm run e2e         # 25-check browser E2E: title → intro → quests → battles → ending → save
+npm run e2e         # 59-check browser E2E: title → schools → quests → bosses → ending → save → mouse
 ```
 
 The E2E suite (`scripts/e2e-test.sh`) drives the real game through its full
-quest line — including the wraith peace path, both bosses, and the ending —
-using the same input API a physical controller would.
+quest line — the wraith peace path, all five bosses, the ending, save files,
+and the mouse/pointer layer — using the same input API a physical controller
+would.
+
+## 🎵 Soundtrack
+
+Sixteen original compositions on the 4-channel engine — every note placed by
+hand in tracker notation:
+
+| Scene | Track | Feel |
+|---|---|---|
+| Title | *The Witcher's Road* | E-minor overture, the game's main theme |
+| Hollow Creek | *Hollow Creek* | Warm C-major village air |
+| The Sleeping Griffin | *The Sleeping Griffin* | 138 BPM tavern jig |
+| Mirelow Swamp | *Mirelow* | Murky D-dorian crawl |
+| Oldewood | *Oldewood Path* | Adventurous D-minor march |
+| Weeping Graves | *Weeping Graves* | Sparse, mournful A-minor |
+| Fangtooth Pass | *Fangtooth Sky* | Windswept C-minor climb |
+| Kaer Serpen | *Kaer Serpen* | Fallen-majesty ruins theme |
+| Heart of Oldewood | *Beneath the Roots* | Low drone before the Leshen |
+| Battle | *Steel & Silver* | Driving A-phrygian |
+| Boss · Werewolf | *Moonblood* | Heavy D-minor |
+| Boss · Leshen | *Heart of Oldewood* | 168 BPM finale |
+| Victory | fanfare | Non-looping ta-da |
+| Defeat | sting | Descending game-over |
+| Ending | *The Serpentine Path* | Title-theme reprise, resolved to G major |
+| Shops | *Crowns & Curiosities* | Playful F-major |
 
 ## 🏗 Architecture
 
-The game is ~5,100 lines of dependency-free TypeScript. Every sprite, tile,
+The game is ~7,500 lines of dependency-free TypeScript. Every sprite, tile,
 font glyph and sound wave is generated in code — there are **zero art assets
 and zero audio files**.
 
 | Module | Lines* | Responsibility |
 |---|---|---|
-| [`engine.ts`](src/game/engine.ts) | 1,084 | State machine (14 modes), grid movement + camera, NPC wander, encounters, warps, save/load, endings |
-| [`sprites.ts`](src/game/sprites.ts) | 1,114 | Pixel-art tileset (35+ tiles incl. animated water), witcher sprite (4 dirs × 2 frames), 9 NPCs |
-| [`battle.ts`](src/game/battle.ts) | 644 | Turn-based combat: swords, oils, signs, Quen, toxicity, poison, crits, boss AI |
-| [`engineMenus.ts`](src/game/engineMenus.ts) | 531 | START menu, bag, stats, contracts, bestiary, shops, notice board, ending |
-| [`dialogue.ts`](src/game/dialogue.ts) | 418 | Branching dialogues with conditions, actions and Witcher-style choices |
-| [`maps.ts`](src/game/maps.ts) | 372 | 9 maps, warps, NPCs, pickups, encounter tables |
-| [`data.ts`](src/game/data.ts) | 233 | Monsters, signs, items, shops, quests |
-| [`monstersGfx.ts`](src/game/monstersGfx.ts) | 187 | 7 battle sprites (the Leshen is a 48px boss) |
-| [`audio.ts`](src/game/audio.ts) | 210 | Web Audio chiptune: 7 tracks + 20 SFX, live-synthesized |
+| [`engine.ts`](src/game/engine.ts) | 1,404 | State machine (16 modes), grid movement + camera, BFS click-to-walk, NPC wander, encounters, warps, save/load, endings |
+| [`sprites.ts`](src/game/sprites.ts) | 1,262 | Pixel-art tileset (40+ tiles incl. animated water), witcher sprite (4 dirs × 2 frames), 12 NPCs |
+| [`engineMenus.ts`](src/game/engineMenus.ts) | 712 | START menu, bag, stats, contracts, training, bestiary, shops, notice board, ending + pointer hit-testing |
+| [`battle.ts`](src/game/battle.ts) | 714 | Turn-based combat: swords, oils, signs, Quen, toxicity, poison, crits, boss AI + pointer menus |
+| [`dialogue.ts`](src/game/dialogue.ts) | 726 | Branching dialogues with conditions, actions and Witcher-style choices |
+| [`audio.ts`](src/game/audio.ts) | 728 | 4-channel DMG-style chiptune engine: 16 tracks + 20 SFX, live-synthesized |
+| [`maps.ts`](src/game/maps.ts) | 490 | 12 maps, warps, NPCs, pickups, encounter tables |
+| [`data.ts`](src/game/data.ts) | 422 | Monsters, signs, items, schools, shops, quests |
+| [`monstersGfx.ts`](src/game/monstersGfx.ts) | 391 | 16 battle sprites (bosses are 48px) |
+| [`page.tsx`](src/app/page.tsx) | 313 | DMG device shell, keyboard + mouse + touch input layer |
 | [`font.ts`](src/game/font.ts) | 174 | Hand-rolled 5×7 bitmap font (~90 glyphs) |
 | [`render.ts`](src/game/render.ts) | 89 | GB window frames, HP bars, cursors |
 | [`constants.ts`](src/game/constants.ts) | 62 | The 4-shade DMG palette + tuning |

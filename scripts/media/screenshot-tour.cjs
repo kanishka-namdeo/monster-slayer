@@ -42,8 +42,13 @@ async function enterWorld(page, prep) {
   await pressKey(page, 'start', 120); // menu appears
   await snap(page, '01-title', { wait: 900 });
 
+  // ---------- 2. school select (character creation) ----------
+  await pressKey(page, 'a', 100); // NEW GAME -> creation
+  await page.waitForFunction(() => window.__game.mode === 'creation', null, { timeout: 8000, polling: 50 });
+  await snap(page, '20-school-select', { wait: 400 });
+  await pressKey(page, 'a', 100); // SERPENT (default) -> intro
+
   // ---------- 2. intro ----------
-  await pressKey(page, 'a', 100); // NEW GAME -> intro
   await page.waitForFunction(() => window.__game.mode === 'intro', null, { timeout: 8000, polling: 50 });
   await snap(page, '02-intro', { wait: 2600 }); // partially typed story
 
@@ -100,11 +105,20 @@ async function enterWorld(page, prep) {
     const g = window.__game;
     const p = g.player;
     p.lvl = 4; p.xp = 120; p.hp = 31; p.maxHp = 37; p.sta = 14; p.maxSta = 16;
-    p.atk = 9; p.def = 5; p.crowns = 132; p.tox = 3;
-    p.oil = { specter: 0, necro: 6, beast: 0 };
+    p.atk = 9; p.def = 5; p.crowns = 132; p.tox = 3; p.skillPoints = 2;
+    p.oil = { specter: 0, necro: 6, beast: 0, insectoid: 0 };
     g.bagIdx = -1; // stats page
   });
   await snap(page, '08-stats', { wait: 300 });
+
+  // ---------- 8b. training screen ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.player.skillPoints = 3;
+    g.skillsIdx = 2; // SWORDPLAY
+    g.mode = 'skills';
+  });
+  await snap(page, '24-training', { wait: 300 });
 
   // ---------- 9. contracts ----------
   await page.evaluate(() => {
@@ -120,11 +134,19 @@ async function enterWorld(page, prep) {
   // ---------- 10. bestiary entry ----------
   await page.evaluate(() => {
     const g = window.__game;
-    g.bestiary = { drowner: true, ghoul: true, wolf: true };
+    g.bestiary = { drowner: true, ghoul: true, wolf: true, barghest: true, nekker: true, endrega: true };
     g.bestIdx = 0; g.bestPage = 1;
     g.mode = 'bestiary';
   });
   await snap(page, '10-bestiary', { wait: 300 });
+
+  // ---------- 10b. new bestiary page (barghest) ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.bestIdx = 3; // barghest
+    g.mode = 'bestiary'; g.bestPage = 1;
+  });
+  await snap(page, '26-new-bestiary', { wait: 300 });
 
   // ---------- 11-13. battle scenes ----------
   await page.evaluate(() => {
@@ -171,6 +193,32 @@ async function enterWorld(page, prep) {
   );
   await snap(page, '14-boss-leshen', { wait: 400 });
 
+  // ---------- 14b. royal griffin boss (Fangtooth Pass) ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.mode = 'world'; g.battle = null;
+    g.player.hp = 60; g.player.sta = 14;
+    g.startBattle('griffin', 9);
+  });
+  await page.waitForFunction(
+    () => window.__game.battle && window.__game.battle.phase === 'menu',
+    null, { timeout: 8000, polling: 40 },
+  );
+  await snap(page, '25-griffin', { wait: 400 });
+
+  // ---------- 14c. katakan superboss (Kaer Serpen) ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.mode = 'world'; g.battle = null;
+    g.player.hp = 55; g.player.sta = 12; g.player.oil.specter = 8;
+    g.startBattle('katakan', 10);
+  });
+  await page.waitForFunction(
+    () => window.__game.battle && window.__game.battle.phase === 'menu',
+    null, { timeout: 8000, polling: 40 },
+  );
+  await snap(page, '27-katakan', { wait: 400 });
+
   // ---------- 15. ending chronicle ----------
   await page.evaluate(() => {
     const g = window.__game;
@@ -192,6 +240,32 @@ async function enterWorld(page, prep) {
     g.switchMap('graveyard', 7, 4, 'up');
   });
   await snap(page, '16-graveyard', { wait: 500 }); // banner + dark tint
+
+  // ---------- 16b. Fangtooth Pass ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.mode = 'world';
+    g.switchMap('fangs', 9, 12, 'up');
+  });
+  await snap(page, '21-fangtooth', { wait: 500 });
+
+  // ---------- 16c. Crookback Bog (Kettle visible) ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.mode = 'world';
+    g.switchMap('bog', 9, 6, 'right');
+    g.player.x = 9; g.player.y = 6; g.player.dir = 'right';
+  });
+  await snap(page, '22-crookback', { wait: 500 });
+
+  // ---------- 16d. Kaer Serpen ruins (the Pale Witcher) ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.mode = 'world';
+    g.switchMap('ruins', 8, 11, 'up');
+    g.player.x = 6; g.player.y = 10; g.player.dir = 'left';
+  });
+  await snap(page, '23-kaer-serpen', { wait: 500 });
 
   // ---------- 17-18. device shell shots ----------
   await page.evaluate(() => {
