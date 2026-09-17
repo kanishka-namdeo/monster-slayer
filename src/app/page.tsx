@@ -50,8 +50,9 @@ export default function Home() {
 
     const game = new Game();
     gameRef.current = game;
-    // debug/testing hook
-    (window as unknown as { __game?: Game }).__game = game;
+    // debug/testing hooks
+    (window as unknown as { __game?: Game; __audio?: typeof audio }).__game = game;
+    (window as unknown as { __game?: Game; __audio?: typeof audio }).__audio = audio;
 
     const down = (e: KeyboardEvent) => {
       const btn = KEYMAP[e.key];
@@ -240,7 +241,29 @@ export default function Home() {
       </section>
 
       <footer className="mt-6 text-[10px] text-zinc-600 text-center max-w-[430px]">
-        A fan-made homage to The Witcher and classic monster-catching handhelds. Not affiliated with CD Projekt Red or Nintendo.
+        <p>
+          A fan-made homage to The Witcher and classic monster-catching handhelds. Not affiliated with CD Projekt Red or Nintendo.
+        </p>
+        <p className="mt-2">
+          Play online:{' '}
+          <a
+            className="text-[#9bbc0f] hover:text-[#b9dc1f] underline decoration-dotted underline-offset-2"
+            href="https://monster-slayer-ivory.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            monster-slayer-ivory.vercel.app
+          </a>
+          {' · '}
+          <a
+            className="text-zinc-500 hover:text-zinc-300 underline decoration-dotted underline-offset-2"
+            href="https://github.com/kanishka-namdeo/monster-slayer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </p>
       </footer>
     </main>
   );

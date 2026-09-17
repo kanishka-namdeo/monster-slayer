@@ -243,7 +243,7 @@ export class Game {
           if (q) { q.active = false; q.done = true; }
           break;
         }
-        case 'shop': this.shopId = a; this.shopTab = 0; this.shopIdx = 0; this.mode = 'shop'; break;
+        case 'shop': this.shopId = a; this.shopTab = 0; this.shopIdx = 0; this.mode = 'shop'; audio.playMusic('shop'); break;
         case 'rest': {
           this.player.hp = this.player.maxHp;
           this.player.sta = this.player.maxSta;
@@ -255,7 +255,7 @@ export class Game {
         case 'heal': this.player.hp = this.player.maxHp; this.player.sta = this.player.maxSta; break;
         case 'battle': this.startBattle(a, a === 'werewolf' ? 8 : a === 'leshen' ? 10 : 7, true); break;
         case 'board': this.mode = 'board'; this.boardIdx = 0; break;
-        case 'end': this.afterDialogEnd = () => { this.mode = 'ending'; this.endingPage = 0; this.endingT = 0; audio.playMusic('title'); }; break;
+        case 'end': this.afterDialogEnd = () => { this.mode = 'ending'; this.endingPage = 0; this.endingT = 0; audio.playMusic('ending'); }; break;
         case 'save': this.save(); break;
         case 'maxhp': {
           const n = parseInt(a, 10);
@@ -423,7 +423,7 @@ export class Game {
     const isBoss = boss || !!MONSTERS[monId].boss;
     this.battle = new Battle(this, monId, lvl);
     if (isBoss) this.battle.boss = true;
-    audio.playMusic(isBoss ? 'boss' : 'battle');
+    audio.playMusic(monId === 'leshen' ? 'finalboss' : isBoss ? 'boss' : 'battle');
   }
 
   countKill(id: string) {
@@ -450,7 +450,7 @@ export class Game {
     if (result === 'defeat') {
       this.mode = 'gameover';
       this.gameoverT = 0;
-      audio.stopMusic();
+      audio.playMusic('gameover');
       return;
     }
     // quest progress notices
@@ -478,7 +478,7 @@ export class Game {
       this.startNotice(
         'The forest exhales. Crows scatter into a bright sky. The rot recedes from Hollow Creek.',
         undefined,
-        () => { this.mode = 'ending'; this.endingPage = 0; this.endingT = 0; audio.playMusic('title'); },
+        () => { this.mode = 'ending'; this.endingPage = 0; this.endingT = 0; audio.playMusic('ending'); },
       );
       return;
     }
@@ -880,7 +880,7 @@ export class Game {
     switch (this.mode) {
       case 'boot':
         this.bootT += dt;
-        if (this.bootT > 1600) { this.mode = 'title'; this.titleT = 0; }
+        if (this.bootT > 1600) { this.mode = 'title'; this.titleT = 0; audio.playMusic('title'); }
         break;
       case 'title':
         this.titleT += dt;
@@ -978,6 +978,7 @@ export class Game {
       if (this.introPage >= pages.length) {
         this.mode = 'world';
         this.mapBannerT = 2000;
+        audio.playMusic(this.mapDef.music);
         this.startNotice('Hollow Creek. The notice BOARD by the well lists contracts. The ELDER keeps the coin.');
       }
     }

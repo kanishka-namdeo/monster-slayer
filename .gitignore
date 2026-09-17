@@ -50,3 +50,4 @@ next-env.d.ts
 Caddyfile
 /scripts/shots
 /scripts/media/out
+tool-results/

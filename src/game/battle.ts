@@ -348,6 +348,7 @@ export class Battle {
   buildRewards() {
     const def = MONSTERS[this.monId];
     const p = this.host.player;
+    audio.playMusic('victory');
     this.msgs.push({ text: `You slew the ${this.monName}!`, sfx: 'levelup' });
     this.host.countKill(this.monId);
     p.xp += def.xp;

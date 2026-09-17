@@ -117,7 +117,7 @@ export const MAPS: Record<string, MapDef> = {
   // ================= INN =================
   inn: {
     name: 'The Sleeping Griffin',
-    music: 'town',
+    music: 'inn',
     rows: [
       '############',
       '#FFFFFFbbFF#',
@@ -222,7 +222,7 @@ export const MAPS: Record<string, MapDef> = {
   // ================= SWAMP =================
   swamp: {
     name: 'Mirelow Swamp',
-    music: 'field',
+    music: 'swamp',
     rows: [
       'vvvvvvvvvvvvvvvvvvvv',
       'v..RRRR....oo...RRRv',
@@ -260,7 +260,7 @@ export const MAPS: Record<string, MapDef> = {
   // ================= FOREST =================
   forest: {
     name: 'Oldewood',
-    music: 'field',
+    music: 'forest',
     rows: [
       'vvvvvvvvzzvvvvvvvvvv',
       'vPP..PP....PP..PPPPv',
@@ -296,7 +296,7 @@ export const MAPS: Record<string, MapDef> = {
   // ================= GRAVEYARD =================
   graveyard: {
     name: 'Weeping Graves',
-    music: 'eerie',
+    music: 'graveyard',
     dark: true,
     rows: [
       'vvvvvvvvvvvvvv',
@@ -329,7 +329,7 @@ export const MAPS: Record<string, MapDef> = {
   // ================= DEEP FOREST =================
   deepforest: {
     name: 'Heart of Oldewood',
-    music: 'eerie',
+    music: 'cave',
     dark: true,
     rows: [
       'vvvvvvvvvvvvvvvv',

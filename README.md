@@ -10,11 +10,13 @@ Take contracts in the village of Hollow Creek. Cull drowners in the reeds, lay a
 grieving wraith to rest, and walk into the heart of the wood to face the thing
 that wears a crown of antlers.
 
-[![Play in Browser](https://img.shields.io/badge/play-in%20browser-9bbc0f?style=flat-square&labelColor=0f380f)](#-run-it-locally)
+[![Play on Vercel](https://img.shields.io/badge/%E2%96%B6%20play-online-monster--slayer--ivory.vercel.app-9bbc0f?style=for-the-badge&logo=vercel&labelColor=0f380f)](https://monster-slayer-ivory.vercel.app/)
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-306230?style=flat-square&labelColor=0f380f)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16-8bac0f?style=flat-square&labelColor=0f380f)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-8bac0f?style=flat-square&labelColor=0f380f)](https://www.typescriptlang.org)
-[![E2E](https://img.shields.io/badge/E2E-25%2F25%20passing-9bbc0f?style=flat-square&labelColor=0f380f)](#-testing)
+[![E2E](https://img.shields.io/badge/E2E-30%2B%20checks-9bbc0f?style=flat-square&labelColor=0f380f)](#%EF%B8%8F-testing)
+[![Deployed on Vercel](https://img.shields.io/badge/deployed%20on-Vercel-000000?style=flat-square&logo=vercel)](https://monster-slayer-ivory.vercel.app/)
 
 *Steel for beasts. Silver for monsters. Crowns for the witcher.*
 

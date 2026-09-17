@@ -288,12 +288,12 @@ function updateShop(g: Game) {
     const opts = ['BUY', 'SELL', 'LEAVE'];
     if (J.has('up')) { g.shopIdx = (g.shopIdx + 2) % 3; audio.sfx('blip'); }
     if (J.has('down')) { g.shopIdx = (g.shopIdx + 1) % 3; audio.sfx('blip'); }
-    if (J.has('b')) { g.mode = 'world'; audio.sfx('cancel'); return; }
+    if (J.has('b')) { g.mode = 'world'; audio.playMusic(g.mapDef.music); audio.sfx('cancel'); return; }
     if (J.has('a')) {
       audio.sfx('confirm');
       if (g.shopIdx === 0) { g.shopTab = 1; g.shopIdx = 0; }
       else if (g.shopIdx === 1) { g.shopTab = 2; g.shopIdx = 0; }
-      else g.mode = 'world';
+      else { g.mode = 'world'; audio.playMusic(g.mapDef.music); }
     }
     return;
   }
@@ -465,6 +465,7 @@ function updateEnding(g: Game) {
       g.mode = 'title';
       g.titleStarted = false;
       g.titleT = 0;
+      audio.playMusic('title');
     }
   }
 }

@@ -79,6 +79,19 @@ agent-browser reload >/dev/null
 waitmode title 80
 R=$(q "window.__game.mode"); check "title reached" '"title"' "$R"
 
+# music: scheduler active + correct title track
+MN=0; MT=0
+while [ $MT -lt 40 ]; do
+  MN=$(q "window.__audio.activeNoteCount" | tr -d '"')
+  case "$MN" in ''|*[!0-9]*) MN=0;; esac
+  [ "$MN" -gt 0 ] && break
+  sleep 0.25; MT=$((MT+1))
+done
+if [ "$MN" -gt 0 ]; then PASS=$((PASS+1)); echo "PASS $((STEP+1)): music scheduler active ($MN notes)"; STEP=$((STEP+1));
+else FAIL=$((FAIL+1)); echo "FAIL $((STEP+1)): music scheduler idle"; STEP=$((STEP+1)); fi
+R=$(q "window.__audio.currentTrack"); check "title track" '"title"' "$R"
+R=$(q "window.__audio.trackList.join(',')"); check "soundtrack registered" 'finalboss' "$R"
+
 echo "=== new game ==="
 tap start 0.3
 tap a 0.3
@@ -90,6 +103,8 @@ for i in $(seq 1 16); do tap a 0.35; done
 waitmode world 20 || true
 for i in $(seq 1 4); do adv; done   # close notice
 R=$(q "window.__game.mode"); check "world reached" '"world"' "$R"
+R=$(q "window.__audio.currentTrack + '|' + window.__game.mapDef.music")
+check "world music matches map" 'town|town' "$R"
 
 echo "=== bram intro ==="
 resetscene
@@ -170,6 +185,7 @@ choose 0    # FIGHT.
 waitmode battle 15
 R=$(q "window.__game.battle ? window.__game.battle.monId : 'none'")
 check "ww battle" 'werewolf' "$R"
+R=$(q "window.__audio.currentTrack"); check "boss battle music" '"boss"' "$R"
 # deterministically win via dev hook (real code path: attack -> victory -> rewards)
 q "window.__game.debugWinBattle()" >/dev/null
 waitmode world 120 || true
@@ -188,6 +204,7 @@ choose 0    # TIME TO HUNT
 waitmode battle 15
 R=$(q "window.__game.battle ? window.__game.battle.monId : 'none'")
 check "lesh battle" 'leshen' "$R"
+R=$(q "window.__audio.currentTrack"); check "finalboss music" '"finalboss"' "$R"
 q "window.__game.debugWinBattle()" >/dev/null
 T=0
 while [ $T -lt 90 ]; do
@@ -196,9 +213,15 @@ while [ $T -lt 90 ]; do
   sleep 0.4
   T=$((T+1))
 done
-R=$(q "'lesshen=' + window.__game.flags.leshenDone + ' mode=' + window.__game.mode")
+R=$(q "'lesshen=' + window.__game.flags.leshenDone + ' mode=' + window.__game.mode + ' track=' + window.__audio.currentTrack")
 check "leshenDone" 'lesshen=true' "$R"
-for i in $(seq 1 6); do tap a 0.4; done
+check "map music restored" 'track=cave' "$R"
+tap a 0.4   # finish notice text
+tap a 0.4   # close notice -> ending
+sleep 0.3
+R=$(q "window.__game.mode + ' ' + window.__audio.currentTrack")
+check "ending reached" 'ending ending' "$R"
+for i in $(seq 1 5); do tap a 0.4; done
 R=$(q "window.__game.mode")
 check "post-ending state" '.' "$R"
 
