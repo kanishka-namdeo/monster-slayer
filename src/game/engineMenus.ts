@@ -659,17 +659,19 @@ export function pointerOverlay(g: Game, x: number, y: number, btn: 'a' | 'b') {
 }
 
 // ---------------- ending ----------------
-function updateEnding(g: Game) {
+function updateEnding(g: Game, dt: number) {
   const J = g.just;
-  g.endingT += 16;
+  g.endingT += dt; // wall-clock (was frame-count: ran 2x fast on 120Hz displays)
   if (J.has('a') || J.has('start')) {
     audio.sfx('confirm');
     g.endingPage++;
     if (g.endingPage > 2) {
-      g.mode = 'title';
-      g.titleStarted = false;
-      g.titleT = 0;
-      audio.playMusic('title');
+      g.startFade(() => {
+        g.mode = 'title';
+        g.titleStarted = false;
+        g.titleT = 0;
+        audio.playMusic('title');
+      });
     }
   }
 }
@@ -720,7 +722,7 @@ export function updateOverlayMode(g: Game, _dt: number) {
     case 'skills': updateSkills(g); break;
     case 'shop': updateShop(g); break;
     case 'board': updateBoard(g); break;
-    case 'ending': updateEnding(g); break;
+    case 'ending': updateEnding(g, _dt); break;
     default: break;
   }
 }

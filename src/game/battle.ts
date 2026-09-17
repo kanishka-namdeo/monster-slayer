@@ -54,6 +54,13 @@ interface Msg {
   sfx?: string;
 }
 
+/** linear approach for smooth HP drain */
+function approach(cur: number, target: number, step: number): number {
+  if (cur < target) return Math.min(target, cur + step);
+  if (cur > target) return Math.max(target, cur - step);
+  return cur;
+}
+
 export class Battle {
   monId: string;
   monName: string;
@@ -82,9 +89,13 @@ export class Battle {
   introT = 0;
   animT = 0;
   shakeT = 0;
-  tick = 0;
   time = 0;
   doneResult: 'victory' | 'defeat' | 'fled' | null = null;
+
+  // presentation state
+  dispMonHp = 0; dispPhp = 0;   // bars drain toward the real values
+  faintT = 0;                   // enemy faint: sink + blink + fade
+  monDead = false;
 
   constructor(public host: BattleHost, monId: string, lvl: number) {
     const def = MONSTERS[monId];
@@ -108,6 +119,9 @@ export class Battle {
     this.pdef = p.def + p.armorLvl * 2;
     this.plvl = p.lvl;
     this.ptox = p.tox;
+
+    this.dispMonHp = this.monMaxHp;
+    this.dispPhp = this.php;
 
     this.msgs = [{ text: APPEAR[monId] ?? `A ${def.name} appears!`, sfx: 'encounter' }];
     this.afterQueue = 'menu';
@@ -255,6 +269,8 @@ export class Battle {
   }
 
   queueVictory() {
+    this.monDead = true;
+    this.faintT = 720;
     this.msgs.push({ text: `${this.monName} collapses into the mud!`, sfx: 'faint', anim: 'monhit' });
     this.afterQueue = 'victory';
   }
@@ -451,8 +467,13 @@ export class Battle {
 
   update(dt: number, input: InputState) {
     this.time += dt;
-    this.tick += dt;
     if (this.animT > 0) this.animT -= dt;
+    if (this.faintT > 0) this.faintT -= dt;
+    // bars drain at a pace that empties a full bar in ~1.1s
+    const mrate = Math.max(18, this.monMaxHp / 1.1);
+    const prate = Math.max(14, this.pmaxHp / 1.2);
+    this.dispMonHp = approach(this.dispMonHp, this.monHp, mrate * dt / 1000);
+    this.dispPhp = approach(this.dispPhp, this.php, prate * dt / 1000);
     const J = input.just;
     const press = (b: string) => J.has(b);
 
@@ -527,7 +548,10 @@ export class Battle {
         if (press('a') || press('b')) this.charIdx = full;
       } else {
         this.msgHold += dt;
-        if (this.msgHold > 480 || press('a')) {
+        // intermediate lines flow at reading pace; the final line of a chain
+        // lingers a little longer (A always skips ahead)
+        const isLast = this.msgs.length === 1;
+        if (this.msgHold > (isLast ? 1400 : 900) || press('a')) {
           this.msgs.shift();
           if (this.msgs.length === 0) {
             this.drainQueue();
@@ -595,6 +619,12 @@ export class Battle {
     // backdrop
     ctx.fillStyle = C.DARK;
     ctx.fillRect(0, 0, W, H);
+    // enemy backdrop card (Gen-1 style): a bright panel so DARK-filled
+    // monsters (leshen, katakan...) read against it, not against the sky
+    ctx.fillStyle = C.PAPER;
+    ctx.fillRect(100, 0, 60, 52);
+    ctx.fillStyle = C.INK;
+    ctx.fillRect(99, 0, 1, 52);
     // ground bands
     ctx.fillStyle = C.LIGHT;
     ctx.fillRect(0, 52, W, 8);
@@ -607,27 +637,61 @@ export class Battle {
       oy = Math.round(Math.cos(this.time / 12));
     }
 
-    // monster sprite (top right)
+    // monster sprite (top right) — one shared feet line at y=51 (the top of
+    // the ground bands): mobs 32px at y=20, bosses 48px at y=4 flush right.
+    // (y>=56 is forbidden: the player info box covers x80-155 from y56 down.)
     const spr = MONSTER_GFX[this.monId];
     if (spr) {
-      let mx = 116, my = 18;
+      const boss = spr.width > 40;
+      const baseX = boss ? 110 : 116;
+      const baseY = boss ? 4 : 20;
+      let mx = baseX, my = baseY;
       if (this.phase === 'intro') {
         const t = Math.min(1, this.introT / 500);
-        mx = 116 + Math.round((1 - t) * 60);
+        mx = baseX + Math.round((1 - t) * 60);
       }
-      const hide = this.animT > 0 && this.curAnim === 'monhit' && Math.floor(this.time / 70) % 2 === 0;
-      if (!hide) {
+      let skip = this.animT > 0 && this.curAnim === 'monhit' && Math.floor(this.time / 70) % 2 === 0;
+      let alpha = 1;
+      let sink = 0;
+      if (this.monDead) {
+        if (this.faintT <= 0) skip = true;                 // gone for good
+        else {
+          sink = Math.floor((720 - this.faintT) / 45);      // sinks 1px / 45ms
+          if (Math.floor(this.faintT / 80) % 2 === 0) skip = true;
+          if (this.faintT < 200) alpha = this.faintT / 200; // final fade-out
+        }
+      }
+      if (!skip) {
+        // contact shadow on the ground band, a little wider than the sprite
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = C.INK;
+        ctx.fillRect(mx - 2 + ox, 52 + oy, spr.width + 4, 2);
+        ctx.globalAlpha = alpha;
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(spr, mx + ox, my + oy);
+        ctx.drawImage(spr, mx + ox, my + oy + sink);
+        ctx.globalAlpha = 1;
+      }
+      // slash streaks over the foe during the first instants of a hit
+      if (this.curAnim === 'monhit' && this.animT > 330) {
+        ctx.fillStyle = C.INK;
+        ctx.fillRect(mx + 6 + ox, 26 + oy, 1, 8);
+        ctx.fillRect(mx + 11 + ox, 22 + oy, 1, 10);
+        ctx.fillRect(mx + 16 + ox, 26 + oy, 1, 8);
       }
     }
 
-    // player back sprite (bottom left, scaled 2x)
+    // player back sprite (bottom left, scaled 2x) — lunge on attack
     const hideP = this.animT > 0 && this.curAnim === 'playerhit' && Math.floor(this.time / 70) % 2 === 0;
     if (!hideP) {
+      const lunge = this.animT > 300 && this.curAnim === 'monhit' ? 6 : 0;
+      // ground shadow under the witcher
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = C.INK;
+      ctx.fillRect(16 + ox, 88 + oy, 28, 2);
+      ctx.globalAlpha = 1;
       ctx.imageSmoothingEnabled = false;
       const pspr = PLAYER.up0;
-      ctx.drawImage(pspr, 14 + ox, 58 + oy, 32, 32);
+      ctx.drawImage(pspr, 14 + ox + lunge, 58 + oy, 32, 32);
     }
 
     if (this.curAnim === 'flash' && this.animT > 0) {
@@ -644,13 +708,13 @@ export class Battle {
     const nameMax = Math.max(4, Math.floor((lvlX - 8 - 4) / 6));
     drawText(ctx, this.monName.slice(0, nameMax), 8, 9, C.INK);
     drawTextRight(ctx, lvlTxt, 90, 9, C.INK);
-    drawBar(ctx, 8, 19, 80, this.monHp / this.monMaxHp, 'HP');
+    drawBar(ctx, 8, 19, 80, this.dispMonHp / this.monMaxHp, 'HP');
 
     // player info box (labels left of bars, status row inside the frame)
     drawWindow(ctx, 80, 56, 76, 40);
     drawText(ctx, 'VESK', 84, 59, C.INK);
     drawTextRight(ctx, `L${this.plvl}`, 150, 59, C.INK);
-    drawBar(ctx, 84, 68, 66, this.php / this.pmaxHp, 'HP');
+    drawBar(ctx, 84, 68, 66, this.dispPhp / this.pmaxHp, 'HP');
     drawBar(ctx, 84, 78, 66, this.psta / this.pmaxSta, 'STA');
     if (this.quenTurns > 0) drawText(ctx, 'QUEN', 84, 87, C.DARK);
     if (this.poison > 0) drawText(ctx, 'PSN', 114, 87, C.DARK);
@@ -710,12 +774,10 @@ export class Battle {
       const shown = this.curMsg.slice(0, Math.floor(this.charIdx));
       const lines = wrapText(shown, 138);
       lines.slice(0, 4).forEach((l, i) => drawText(ctx, l, 8, 103 + i * 10, C.INK));
-      if (this.charIdx >= this.curMsg.length && this.msgs.length === 1 && Math.floor(this.time / 300) % 2 === 0) {
+      if (this.charIdx >= this.curMsg.length && Math.floor(this.time / 300) % 2 === 0) {
         drawText(ctx, '▼', 149, 133, C.INK);
       }
     }
 
-    // anim timer decay
-    if (this.animT > 0) this.animT = Math.max(0, this.animT);
   }
 }

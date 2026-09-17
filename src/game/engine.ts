@@ -4,7 +4,7 @@
 //        bestiary,shop,battle,gameover,ending
 // ============================================================
 import { C, SCREEN_W, SCREEN_H, TILE, WALK_MS, RUN_MS, ENCOUNTER_RATE, BASE_STATS, SAVE_KEY, TOX_MAX } from './constants';
-import { ensureSprites, TILES, TILE_KEY, PLAYER, NPCS } from './sprites';
+import { ensureSprites, TILES, TILE_KEY, TILE_VARIANTS, PLAYER, NPCS } from './sprites';
 import { ensureMonsterGfx, MONSTER_GFX } from './monstersGfx';
 import { MAPS, tileAt, isBlocked, isEncounterTile } from './maps';
 import type { MapDef } from './maps';
@@ -41,6 +41,7 @@ interface NpcRuntime {
   sprite: string; wander?: number; dialogue: string;
   requires?: string; hideFlag?: string;
   moveT: number; waitT: number; bob: number;
+  mvFrom: { x: number; y: number } | null; mvT: number;
 }
 
 interface PickupRuntime {
@@ -93,6 +94,9 @@ export class Game {
   mapBannerT = 0;
   medallionT = 0;
   fadeT = 0; fadeDir = 0; fadeCb: (() => void) | null = null;
+  flashT = 0;            // encounter / save invert-flash (ms remaining)
+  rustleT = 0;           // tall-grass rustle (ms remaining)
+  rustleX = 0; rustleY = 0;
   battle: Battle | null = null;
   postBattleNotice = '';
   afterDialogEnd: (() => void) | null = null;
@@ -106,6 +110,7 @@ export class Game {
     choosing: boolean;
     notice: boolean;
     page: number;
+    openT: number;
   } | null = null;
 
   constructor() {
@@ -322,6 +327,7 @@ export class Game {
     const def = MAPS[map];
     this.npcs = def.npcs.map((n) => ({
       ...n, hx: n.x, hy: n.y, moveT: 0, waitT: 500 + Math.random() * 1500, bob: Math.random() * 6,
+      mvFrom: null, mvT: 0,
     }));
     this.pickups = def.pickups.map((p) => ({ ...p }));
   }
@@ -463,7 +469,9 @@ export class Game {
         case 'heal': this.player.hp = this.player.maxHp; this.player.sta = this.player.maxSta; break;
         case 'battle': {
           const lvl = a === 'werewolf' ? 8 : a === 'leshen' ? 10 : a === 'griffin' ? 9 : a === 'arachas' ? 9 : a === 'katakan' ? 10 : 7;
-          this.startBattle(a, lvl, true);
+          // let the intro node's text be read before the flash-and-fade into battle
+          if (this.dialog) this.afterDialogEnd = () => this.startBattle(a, lvl, true);
+          else this.startBattle(a, lvl, true);
           break;
         }
         case 'board': this.mode = 'board'; this.boardIdx = 0; break;
@@ -511,7 +519,8 @@ export class Game {
     const tree = DIALOGUES[treeId];
     const node = tree?.[nodeId];
     if (!node) { this.dialog = null; this.finishDialog(); return; }
-    this.dialog = { tree: treeId, nodeId, node, charIdx: 0, choiceIdx: 0, choosing: false, notice: false, page: 0 };
+    const wasDialog = this.mode === 'dialog';
+    this.dialog = { tree: treeId, nodeId, node, charIdx: 0, choiceIdx: 0, choosing: false, notice: false, page: 0, openT: wasDialog ? 120 : 0 };
     this.runAction(node.action);
     const m: string = this.mode;
     if (m !== 'dialog' && m !== 'battle' && m !== 'shop' && m !== 'board' && m !== 'ending') {
@@ -523,7 +532,7 @@ export class Game {
     const node: DlgNode = { text, choices, next: null };
     DIALOGUES.__notice = { start: node };
     this.afterDialogEnd = onEnd ?? null;
-    this.dialog = { tree: '__notice', nodeId: 'start', node, charIdx: 0, choiceIdx: 0, choosing: false, notice: true, page: 0 };
+    this.dialog = { tree: '__notice', nodeId: 'start', node, charIdx: 0, choiceIdx: 0, choosing: false, notice: true, page: 0, openT: this.mode === 'dialog' ? 120 : 0 };
     this.mode = 'dialog';
   }
 
@@ -546,6 +555,7 @@ export class Game {
   updateDialog(dt: number) {
     const d = this.dialog;
     if (!d || !d.node) { this.finishDialog(); return; }
+    if (d.openT < 120) d.openT = Math.min(120, d.openT + dt);
     const node = d.node;
     const { pages } = this.dialogPages(node);
     const pageText = (pages[d.page] ?? []).join(' ');
@@ -612,9 +622,11 @@ export class Game {
     // world behind
     this.renderWorld(ctx);
 
-    // dialog box (bottom of screen, 4 text lines or speaker + 3)
-    const boxY = 96;
+    // dialog box slides up from the bottom edge (Gen-1 style, 120ms)
+    const k = Math.min(1, (d.openT ?? 120) / 120);
+    const boxY = 96 + Math.round((1 - k) * 48);
     drawWindow(ctx, 2, boxY, 156, 48);
+    if (k < 1) return; // text appears once the box seats
     const { pages } = this.dialogPages(node);
     const pageLines = pages[Math.min(d.page, pages.length - 1)] ?? [];
     const shown = pageLines.join(' ').slice(0, Math.floor(d.charIdx));
@@ -650,11 +662,16 @@ export class Game {
     this.cancelAutoWalk();
     this.bestiary[monId] = true;
     this.dialog = null;
-    this.mode = 'battle';
-    const isBoss = boss || !!MONSTERS[monId].boss;
-    this.battle = new Battle(this, monId, lvl);
-    if (isBoss) this.battle.boss = true;
-    audio.playMusic(monId === 'leshen' ? 'finalboss' : isBoss ? 'boss' : 'battle');
+    const begin = () => {
+      this.mode = 'battle';
+      const isBoss = boss || !!MONSTERS[monId].boss;
+      this.battle = new Battle(this, monId, lvl);
+      if (isBoss) this.battle.boss = true;
+      audio.playMusic(monId === 'leshen' ? 'finalboss' : isBoss ? 'boss' : 'battle');
+    };
+    // classic encounter flash, then ink fade into the battle scene
+    this.flashT = 180;
+    this.startFade(begin);
   }
 
   countKill(id: string) {
@@ -725,18 +742,22 @@ export class Game {
     }
     if (monId === 'leshen') {
       this.flags.leshenDone = true;
-      this.mode = 'world';
-      audio.playMusic(this.mapDef.music);
-      this.startNotice(
-        'The forest exhales. Crows scatter into a bright sky. The rot recedes from Hollow Creek.',
-        undefined,
-        () => { this.mode = 'ending'; this.endingPage = 0; this.endingT = 0; audio.playMusic('ending'); },
-      );
+      this.startFade(() => {
+        this.mode = 'world';
+        audio.playMusic(this.mapDef.music);
+        this.startNotice(
+          'The forest exhales. Crows scatter into a bright sky. The rot recedes from Hollow Creek.',
+          undefined,
+          () => { this.mode = 'ending'; this.endingPage = 0; this.endingT = 0; audio.playMusic('ending'); },
+        );
+      });
       return;
     }
-    this.mode = 'world';
-    audio.playMusic(this.mapDef.music);
-    if (note) this.startNotice(note);
+    this.startFade(() => {
+      this.mode = 'world';
+      audio.playMusic(this.mapDef.music);
+      if (note) this.startNotice(note);
+    });
   }
 
   // ================= save / load =================
@@ -754,6 +775,7 @@ export class Game {
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
       audio.sfx('save');
+      this.flashT = 200;
     } catch { /* storage unavailable */ }
   }
 
@@ -822,6 +844,9 @@ export class Game {
   updateWorld(dt: number) {
     const p = this.player;
     const J = this.just;
+
+    // frozen while a scene fade is in flight (battle start / door / victory)
+    if (this.fadeDir !== 0) return;
 
     // auto-walk (mouse click-to-move)
     if (this.autoDir && this.moving) { this.held.delete(this.autoDir); this.autoDir = null; }
@@ -903,6 +928,11 @@ export class Game {
           p.x = nx; p.y = ny;
           this.stepFrame = !this.stepFrame;
           audio.sfx('step');
+          // stepping into tall grass / reeds / scree: rustle
+          if (isEncounterTile(tileAt(this.mapDef, nx, ny))) {
+            this.rustleT = 280;
+            this.rustleX = nx; this.rustleY = ny;
+          }
         }
       }
     } else {
@@ -956,12 +986,12 @@ export class Game {
 
   onStepEnd() {
     const p = this.player;
-    // warps
+    // warps - door sfx, then ink fade covers the map switch
     const w = this.mapDef.warps.find((w0) => w0.x === p.x && w0.y === p.y);
     if (w) {
       if (w.requires && !this.getFlag(w.requires)) return;
       audio.sfx('door');
-      this.switchMap(w.to, w.tx, w.ty, w.dir);
+      this.startFade(() => this.switchMap(w.to, w.tx, w.ty, w.dir));
       return;
     }
     // pickups
@@ -1029,6 +1059,7 @@ export class Game {
   updateNpcs(dt: number) {
     for (const n of this.npcs) {
       if (!this.npcVisible(n)) continue;
+      if (n.mvT > 0) n.mvT = Math.max(0, n.mvT - dt);
       if (n.wander) {
         n.waitT -= dt;
         if (n.waitT <= 0 && !this.moving) {
@@ -1040,6 +1071,8 @@ export class Game {
           const p = this.player;
           const notPlayer = !(nx === p.x && ny === p.y);
           if (withinHome && notPlayer && !this.blockedForPlayer(nx, ny) && !isEncounterTile(tileAt(this.mapDef, nx, ny))) {
+            n.mvFrom = { x: n.x, y: n.y };
+            n.mvT = 220;
             n.x = nx; n.y = ny;
           }
         }
@@ -1070,22 +1103,71 @@ export class Game {
     ctx.fillStyle = C.INK;
     ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
 
-    // tiles
-    const animFrame = Math.floor(this.time / 450) % 2;
+    // tiles — animated arrays cycle, everything else picks a stable
+    // per-position variant so terrain never reads as one repeated stamp
     const x0 = Math.max(0, Math.floor(camX / TILE));
     const y0 = Math.max(0, Math.floor(camY / TILE));
     const x1 = Math.min(def.rows[0].length - 1, x0 + Math.ceil(SCREEN_W / TILE) + 1);
     const y1 = Math.min(def.rows.length - 1, y0 + Math.ceil(SCREEN_H / TILE) + 1);
+    const isWater = (c: string) => c === '~' || c === 'o';
+    const isGrassFamily = (c: string) => c === '.' || c === ',';
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
         const ch = tileAt(def, tx, ty);
         let cv: HTMLCanvasElement | undefined;
         const key = TILE_KEY[ch] ?? (TILES[ch] ? ch : 'grass');
         const asset = TILES[key] as HTMLCanvasElement | HTMLCanvasElement[] | undefined;
-        if (Array.isArray(asset)) cv = asset[animFrame];
-        else cv = asset;
+        if (Array.isArray(asset)) {
+          cv = asset[Math.floor(this.time / 400) % asset.length];
+        } else if (asset) {
+          const vars = TILE_VARIANTS[key];
+          cv = vars ? vars[(tx * 31 + ty * 17 + ((tx * ty) & 3)) % vars.length] : asset;
+        }
         if (!cv) cv = TILES.grass as HTMLCanvasElement;
-        ctx.drawImage(cv, tx * TILE - camX, ty * TILE - camY);
+        const sx = tx * TILE - camX;
+        const sy = ty * TILE - camY;
+        ctx.drawImage(cv, sx, sy);
+
+        // water shoreline: ink edge + foam glints where water meets land
+        if (isWater(ch)) {
+          const land = (ax: number, ay: number) => {
+            const t = tileAt(def, ax, ay);
+            return t !== undefined && t !== '~' && t !== 'o' && t !== 'v';
+          };
+          ctx.fillStyle = C.INK;
+          if (land(tx, ty - 1)) ctx.fillRect(sx, sy, 16, 1);
+          if (land(tx, ty + 1)) ctx.fillRect(sx, sy + 15, 16, 1);
+          if (land(tx - 1, ty)) ctx.fillRect(sx, sy, 1, 16);
+          if (land(tx + 1, ty)) ctx.fillRect(sx + 15, sy, 1, 16);
+          const fo = (tx * 5 + ty * 3) % 7;
+          ctx.fillStyle = C.PAPER;
+          if (land(tx, ty - 1)) ctx.fillRect(sx + 2 + fo, sy + 1, 2, 1);
+          if (land(tx, ty + 1)) ctx.fillRect(sx + 9 - fo % 5, sy + 13, 2, 1);
+          if (land(tx - 1, ty)) ctx.fillRect(sx + 1, sy + 4 + fo % 6, 1, 2);
+          if (land(tx + 1, ty)) ctx.fillRect(sx + 13, sy + 8 - fo % 5, 1, 2);
+        } else if (ch === 'p' || ch === 'm') {
+          // ragged path/mud edges where they meet grass
+          const grassy = (ax: number, ay: number) => isGrassFamily(tileAt(def, ax, ay) ?? '');
+          const j = (tx * 7 + ty * 13) % 8;
+          ctx.fillStyle = ch === 'p' ? C.LIGHT : C.PAPER;
+          if (grassy(tx, ty - 1)) { ctx.fillRect(sx + 2 + j, sy, 1, 1); ctx.fillRect(sx + 9 - j % 4, sy, 1, 1); }
+          if (grassy(tx, ty + 1)) { ctx.fillRect(sx + 4 + j % 5, sy + 15, 1, 1); ctx.fillRect(sx + 12 - j % 6, sy + 15, 1, 1); }
+          if (grassy(tx - 1, ty)) { ctx.fillRect(sx, sy + 3 + j % 6, 1, 1); }
+          if (grassy(tx + 1, ty)) { ctx.fillRect(sx + 15, sy + 8 - j % 5, 1, 1); }
+        }
+      }
+    }
+
+    // tall-grass rustle flecks when the player just stepped in
+    if (this.rustleT > 0 && Math.floor(this.time / 80) % 2 === 0) {
+      const rx = this.rustleX * TILE - camX;
+      const ry = this.rustleY * TILE - camY;
+      if (rx > -16 && ry > -16 && rx < SCREEN_W && ry < SCREEN_H) {
+        ctx.fillStyle = C.LIGHT;
+        ctx.fillRect(rx + 3, ry - 2, 1, 1); ctx.fillRect(rx + 9, ry - 3, 1, 1);
+        ctx.fillRect(rx + 13, ry - 1, 1, 1); ctx.fillRect(rx + 6, ry + 2, 1, 1);
+        ctx.fillStyle = C.INK;
+        ctx.fillRect(rx + 5, ry - 4, 1, 1); ctx.fillRect(rx + 12, ry - 5, 1, 1);
       }
     }
 
@@ -1103,20 +1185,27 @@ export class Game {
       }
     }
 
-    // npcs
+    // npcs - wanderers glide between tiles instead of teleporting
     for (const n of this.npcs) {
       if (!this.npcVisible(n)) continue;
       const spr = NPCS[n.sprite];
       if (!spr) continue;
       let oy = 0;
       if (n.sprite === 'ghost') oy = Math.round(Math.sin(n.bob) * 2);
-      ctx.drawImage(spr, n.x * TILE - camX, n.y * TILE - camY + oy);
+      let nx = n.x * TILE, ny = n.y * TILE;
+      if (n.mvT > 0 && n.mvFrom) {
+        const k = 1 - n.mvT / 220;
+        nx = Math.round((n.mvFrom.x + (n.x - n.mvFrom.x) * k) * TILE);
+        ny = Math.round((n.mvFrom.y + (n.y - n.mvFrom.y) * k) * TILE);
+      }
+      ctx.drawImage(spr, nx - camX, ny - camY + oy);
     }
 
-    // player
+    // player - whole-pixel motion (no subpixel smear) + 1px step bob
     const frame = this.moving ? (this.stepFrame ? '1' : '0') : '0';
     const spr = PLAYER[`${this.player.dir}${frame}`] ?? PLAYER.down0;
-    ctx.drawImage(spr, pp.x - camX, pp.y - camY);
+    const bob = this.moving && this.stepFrame ? 1 : 0;
+    ctx.drawImage(spr, Math.round(pp.x) - camX, Math.round(pp.y) - camY + bob);
 
     // dark tint for cursed places
     if (def.dark) {
@@ -1163,6 +1252,7 @@ export class Game {
 
   // ================= fade =================
   startFade(cb: () => void) {
+    if (this.fadeDir !== 0) { cb(); return; } // already fading: switch under cover
     this.fadeDir = 1;
     this.fadeT = 0;
     this.fadeCb = cb;
@@ -1173,6 +1263,8 @@ export class Game {
     this.time += dt;
     if (this.mapBannerT > 0) this.mapBannerT -= dt;
     if (this.medallionT > 0) this.medallionT -= dt;
+    if (this.flashT > 0) this.flashT -= dt;
+    if (this.rustleT > 0) this.rustleT -= dt;
 
     switch (this.mode) {
       case 'boot':
@@ -1210,6 +1302,12 @@ export class Game {
     }
 
     this.render(ctx);
+
+    // encounter / save flash: 2-frame paper invert blink
+    if (this.flashT > 0 && Math.floor(this.flashT / 60) % 2 === 0) {
+      ctx.fillStyle = C.PAPER;
+      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+    }
 
     // fade overlay
     if (this.fadeDir !== 0) {
@@ -1419,9 +1517,9 @@ export class Game {
     ctx.fillStyle = C.INK;
     ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
     const t = Math.min(1, this.gameoverT / 500);
-    if (t >= 1) {
-      drawText(ctx, 'You black out...', 46, 60, C.PAPER);
-      if (this.gameoverT > 1500) drawText(ctx, 'The world smells of iron.', 24, 80, C.DARK);
-    }
+    ctx.globalAlpha = t;
+    drawText(ctx, 'You black out...', 46, 60, C.PAPER);
+    ctx.globalAlpha = 1;
+    if (this.gameoverT > 1500) drawText(ctx, 'The world smells of iron.', 24, 80, C.DARK);
   }
 }

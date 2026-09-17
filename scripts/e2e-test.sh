@@ -27,6 +27,16 @@ waitmode() { # waitmode <mode> [timeout_quarters]
   return 1
 }
 
+waitbattle() { # wait until a battle object exists (starts under the fade)
+  local t=0
+  while [ $t -lt 40 ]; do
+    R=$(q "window.__game.battle ? 'yes' : 'no'")
+    [ "$R" = '"yes"' ] && return 0
+    sleep 0.15; t=$((t+1))
+  done
+  return 1
+}
+
 waitchoose() { # wait until dialog is choosing (or gone)
   local t=0
   while [ $t -lt 40 ]; do
@@ -230,8 +240,8 @@ R=$(q "window.__audio.currentTrack"); check "finalboss music" '"finalboss"' "$R"
 q "window.__game.debugWinBattle()" >/dev/null
 T=0
 while [ $T -lt 90 ]; do
-  R=$(q "window.__game.flags.leshenDone")
-  [ "$R" = "true" ] && break
+  R=$(q "window.__game.flags.leshenDone + '|' + window.__game.mode")
+  echo "$R" | grep -q 'true|"world"' && break
   sleep 0.4
   T=$((T+1))
 done
@@ -273,6 +283,7 @@ check "kaer serpen reached" 'ruins Kaer' "$R"
 echo "=== northern reaches: monsters & oil ==="
 q "window.__game.mode='world'" >/dev/null
 q "window.__game.startBattle('endrega', 6)" >/dev/null
+waitbattle
 R=$(q "window.__game.battle ? window.__game.battle.monId + ' ' + window.__game.battle.monType : 'none'")
 check "endrega battle" 'endrega INSECTOID' "$R"
 q "window.__game.inv.insectoil=1; window.__game.battle.useItemBattle('insectoil'); 'ok'" >/dev/null
@@ -287,7 +298,9 @@ check "post-battle world music" 'world' "$R"
 echo "=== northern reaches: bosses ==="
 q "window.__game.mode='world'; window.__game.quests.q_griffin.active=true; 'ok'" >/dev/null
 q "window.__game.startBattle('griffin', 9, true)" >/dev/null
+waitbattle
 R=$(q "window.__game.battle ? window.__game.battle.monId : 'none'"); check "griffin boss" 'griffin' "$R"
+sleep 0.5
 R=$(q "window.__audio.currentTrack"); check "griffin boss music" '"boss"' "$R"
 q "window.__game.debugWinBattle()" >/dev/null
 waitmode world 60 || true
@@ -296,6 +309,7 @@ adv # close victory notice if any
 
 q "window.__game.mode='world'; window.__game.flags.leshanDone=true; window.__game.quests.q_katakan.active=true; window.__game.player.oil.specter=8; 'ok'" >/dev/null
 q "window.__game.startBattle('katakan', 10, true)" >/dev/null
+waitbattle
 R=$(q "window.__game.battle ? window.__game.battle.monId : 'none'"); check "katakan boss" 'katakan' "$R"
 q "window.__game.debugWinBattle()" >/dev/null
 waitmode world 60 || true

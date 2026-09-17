@@ -80,17 +80,29 @@ export function drawMenuList(
   });
 }
 
-/** big title text: draws each glyph then pixel-doubles via temp canvas */
+/** big title text: cached, pixel-doubled glyphs (zero per-frame allocation) */
+const bigGlyphCache = new Map<string, HTMLCanvasElement>();
 export function drawTitleText(ctx: CanvasRenderingContext2D, text: string, cx: number, y: number, k: number, color: string) {
   const w = (text.length * 6 - 1) * k;
   let x = Math.round(cx - w / 2);
   for (const ch of text) {
-    const cv = document.createElement('canvas');
-    cv.width = 5; cv.height = 7;
-    const g = cv.getContext('2d')!;
-    drawText(g, ch, 0, 0, color);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(cv, 0, 0, 5, 7, x, y, 5 * k, 7 * k);
+    if (ch !== ' ') {
+      const key = ch + '|' + color + '|' + k;
+      let cv = bigGlyphCache.get(key);
+      if (!cv) {
+        const tmp = document.createElement('canvas');
+        tmp.width = 5; tmp.height = 7;
+        drawText(tmp.getContext('2d')!, ch, 0, 0, color);
+        cv = document.createElement('canvas');
+        cv.width = 5 * k; cv.height = 7 * k;
+        const g = cv.getContext('2d')!;
+        g.imageSmoothingEnabled = false;
+        g.drawImage(tmp, 0, 0, cv.width, cv.height);
+        bigGlyphCache.set(key, cv);
+      }
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(cv, x, y);
+    }
     x += 6 * k;
   }
 }

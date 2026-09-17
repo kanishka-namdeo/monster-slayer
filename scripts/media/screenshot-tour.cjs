@@ -227,7 +227,7 @@ async function enterWorld(page, prep) {
   // ---------- 14. final boss ----------
   await page.evaluate(() => {
     const g = window.__game;
-    g.mode = 'world';
+    g.mode = 'world'; g.battle = null;
     g.player.lvl = 9; g.player.hp = 68; g.player.maxHp = 90; g.player.sta = 16;
     g.startBattle('leshen', 10);
   });

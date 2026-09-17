@@ -51,6 +51,7 @@ rotten truth in the Heart of Oldewood.
 | 🧪 **Alchemy & toxicity** | Swallow, Thunderbolt and White Honey potions, four blade oils, and a toxicity meter that punishes over-drinking |
 | 📜 **12 contracts & moral choices** | A notice board economy of quests — including the Weeping Widow, where you choose between mercy and coin |
 | 🎒 **Witcher's kit** | Bestiary, quest log, 4 shops, tiered gear reforging, save/continue |
+| 🎞️ **GB-feel animation pass** | Hand-dithered terrain with per-tile variants, water shores & foam, swaying flowers/reeds, bubbling cauldron, crawling thorns, NPC glide-walk, reeds rustle, dialog slide-open, encounter flash + ink fades, battle juice (HP drain, attack lunge, slash streaks, faint), pixel-perfect integer-scaled canvas |
 | 🖥️ **Full DMG shell** | Play inside a lovingly over-engineered Game Boy: working D-pad, A/B, START/SELECT, battery LED and speaker grille |
 | 🎵 **All-original chiptune** | **16-track soundtrack** on an authentic 4-channel DMG-style engine (two pulse channels with duty cycles, wave bass, noise drums) + 20 sound effects — synthesized live, zero audio files |
 | 🖱️ **Keyboard, mouse & touch** | Arrows/WASD/Z/X/M on desktop, **full mouse support** (click-to-move with pathfinding, clickable menus, right-click cancel, wheel scroll), on-screen buttons on mobile |
@@ -221,24 +222,24 @@ hand in tracker notation:
 
 ## 🏗 Architecture
 
-The game is ~7,500 lines of dependency-free TypeScript. Every sprite, tile,
+The game is ~8,000 lines of dependency-free TypeScript. Every sprite, tile,
 font glyph and sound wave is generated in code — there are **zero art assets
 and zero audio files**.
 
 | Module | Lines* | Responsibility |
 |---|---|---|
-| [`engine.ts`](src/game/engine.ts) | 1,404 | State machine (16 modes), grid movement + camera, BFS click-to-walk, NPC wander, encounters, warps, save/load, endings |
-| [`sprites.ts`](src/game/sprites.ts) | 1,262 | Pixel-art tileset (40+ tiles incl. animated water), witcher sprite (4 dirs × 2 frames), 12 NPCs |
-| [`engineMenus.ts`](src/game/engineMenus.ts) | 712 | START menu, bag, stats, contracts, training, bestiary, shops, notice board, ending + pointer hit-testing |
-| [`battle.ts`](src/game/battle.ts) | 714 | Turn-based combat: swords, oils, signs, Quen, toxicity, poison, crits, boss AI + pointer menus |
+| [`engine.ts`](src/game/engine.ts) | 1,525 | State machine (16 modes), grid movement + camera, BFS click-to-walk, NPC wander + glide, encounters, warps, scene fades, save/load, endings |
+| [`sprites.ts`](src/game/sprites.ts) | 1,462 | Pixel-art tileset (45+ tiles, per-position variants, animated water/flowers/reeds/cauldron/shrine/thorns), witcher sprite (4 dirs × 2 frames), 12 NPCs |
+| [`engineMenus.ts`](src/game/engineMenus.ts) | 742 | START menu, bag, stats, contracts, training, bestiary, shops, notice board, ending + pointer hit-testing |
+| [`battle.ts`](src/game/battle.ts) | 783 | Turn-based combat: swords, oils, signs, Quen, toxicity, poison, crits, boss AI + battle juice (HP drain, lunge, faint) + pointer menus |
 | [`dialogue.ts`](src/game/dialogue.ts) | 726 | Branching dialogues with conditions, actions and Witcher-style choices |
 | [`audio.ts`](src/game/audio.ts) | 728 | 4-channel DMG-style chiptune engine: 16 tracks + 20 SFX, live-synthesized |
 | [`maps.ts`](src/game/maps.ts) | 490 | 12 maps, warps, NPCs, pickups, encounter tables |
 | [`data.ts`](src/game/data.ts) | 422 | Monsters, signs, items, schools, shops, quests |
-| [`monstersGfx.ts`](src/game/monstersGfx.ts) | 391 | 16 battle sprites (bosses are 48px) |
-| [`page.tsx`](src/app/page.tsx) | 313 | DMG device shell, keyboard + mouse + touch input layer |
+| [`monstersGfx.ts`](src/game/monstersGfx.ts) | 402 | 16 battle sprites (bosses are true 48px, with backdrop card grounding) |
+| [`page.tsx`](src/app/page.tsx) | 333 | DMG device shell, keyboard + mouse + touch input layer, integer-scaled pixel-perfect canvas |
 | [`font.ts`](src/game/font.ts) | 183 | Hand-rolled 5×7 bitmap font (~90 glyphs) + word-wrap & pagination |
-| [`render.ts`](src/game/render.ts) | 99 | GB window frames, HP bars (labels never overdrawn), right-aligned text |
+| [`render.ts`](src/game/render.ts) | 113 | GB window frames, HP bars (labels never overdrawn), right-aligned text, cached big-glyph titles |
 | [`constants.ts`](src/game/constants.ts) | 62 | The 4-shade DMG palette + tuning |
 
 *\*plus the DMG device shell UI in [`page.tsx`](src/app/page.tsx).*

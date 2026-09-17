@@ -61,11 +61,38 @@ function texTile(base: string, seed: number, dots: { color: string; n: number }[
   return cv;
 }
 
+/** Hand-placed texture tile: base fill + explicit pixel stamps [x,y,w,h,color].
+ *  Ordered, deliberate dithering in the classic GB tradition (no random speckle). */
+function handTile(base: string, stamps: Array<[number, number, number, number, string]>): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  cv.width = 16; cv.height = 16;
+  const g = cv.getContext('2d')!;
+  g.fillStyle = PAL[base as keyof typeof PAL];
+  g.fillRect(0, 0, 16, 16);
+  for (const [x, y, w, h, color] of stamps) {
+    g.fillStyle = PAL[color as keyof typeof PAL];
+    g.fillRect(x, y, w, h);
+  }
+  return cv;
+}
+
+/** Pixel-exact copy of a tile canvas, for stamping variants. */
+function cloneTile(src: HTMLCanvasElement): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  cv.width = src.width; cv.height = src.height;
+  const g = cv.getContext('2d')!;
+  g.imageSmoothingEnabled = false;
+  g.drawImage(src, 0, 0);
+  return cv;
+}
+
 // ------------------------------------------------------------
 // TILES (char → canvas). Animated tiles get frame arrays.
 // ------------------------------------------------------------
 export const TILES: Record<string, HTMLCanvasElement | HTMLCanvasElement[]> = {};
-export const TILE_ANIM = ['water', 'swampw'];
+/** Deterministic per-position terrain variants (GB-style repetition breaker).
+ *  Engine picks via a stable (tx,ty) hash so the pattern never flickers. */
+export const TILE_VARIANTS: Record<string, HTMLCanvasElement[]> = {};
 
 /** map char → TILES key */
 export const TILE_KEY: Record<string, string> = {
@@ -81,55 +108,88 @@ export const TILE_KEY: Record<string, string> = {
 };
 
 function buildTiles() {
-  TILES.grass = texTile('3', 11, [{ color: '2', n: 9 }, { color: '1', n: 3 }]);
+  // grass: hand-placed tufts (ordered GB dithering — no random speckle)
+  const grassA = handTile('3', [
+    [3, 5, 1, 2, '2'], [5, 5, 1, 2, '2'], [4, 4, 1, 1, '2'],
+    [10, 10, 1, 2, '2'], [12, 10, 1, 2, '2'], [11, 9, 1, 1, '2'],
+    [7, 2, 2, 1, '2'], [14, 7, 1, 2, '2'],
+    [1, 8, 1, 1, '1'], [13, 2, 1, 1, '1'], [6, 13, 1, 1, '1'], [2, 12, 1, 1, '1'],
+  ]);
+  const grassB = handTile('3', [
+    [2, 3, 2, 1, '2'], [11, 6, 2, 1, '2'], [5, 12, 2, 1, '2'],
+    [8, 1, 2, 1, '2'], [13, 9, 2, 1, '2'],
+    [4, 8, 1, 1, '1'], [14, 13, 1, 1, '1'], [7, 15, 1, 1, '1'],
+  ]);
+  const grassC = handTile('3', [
+    [6, 6, 1, 2, '2'], [12, 12, 1, 2, '2'], [14, 8, 1, 1, '2'], [9, 3, 1, 1, '2'],
+    [2, 13, 1, 1, '1'], [4, 1, 1, 1, '1'],
+  ]);
+  TILES.grass = grassA;
+  TILE_VARIANTS.grass = [grassA, grassA, grassB, grassC];
 
-  // flowers: grass base + hand blooms
-  const fl = texTile('3', 11, [{ color: '2', n: 9 }, { color: '1', n: 3 }]);
-  {
-    const g = fl.getContext('2d')!;
+  // flowers: grass base + hand plus-blooms, 2-frame sway
+  const flowersFrame = (dx: number) => {
+    const cv = cloneTile(grassA);
+    const g = cv.getContext('2d')!;
+    const blooms: [number, number][] = [[4, 4], [11, 10], [7, 13]];
     g.fillStyle = PAL[0];
-    const blooms = [[3, 3], [4, 4], [3, 5], [2, 4], [10, 9], [11, 10], [10, 11], [12, 10], [6, 12], [7, 12], [5, 12], [8, 12], [13, 2], [14, 3], [13, 4]];
-    for (const [x, y] of blooms) g.fillRect(x, y, 1, 1);
+    for (const [cx, cy] of blooms) {
+      g.fillRect(cx + dx, cy - 1, 1, 1);
+      g.fillRect(cx - 1 + dx, cy, 1, 1);
+      g.fillRect(cx + 1 + dx, cy, 1, 1);
+      g.fillRect(cx + dx, cy + 1, 1, 1);
+    }
     g.fillStyle = PAL[2];
-    g.fillRect(3, 4, 1, 1); g.fillRect(11, 10, 1, 1); g.fillRect(6, 11, 1, 1);
-  }
-  TILES.flowers = fl;
+    for (const [cx, cy] of blooms) g.fillRect(cx + dx, cy, 1, 1);
+    return cv;
+  };
+  TILES.flowers = [flowersFrame(0), flowersFrame(1)];
 
-  // reeds (encounter tile): grass base + tall blades
-  const reeds = texTile('3', 21, [{ color: '2', n: 6 }]);
-  {
-    const g = reeds.getContext('2d')!;
-    g.fillStyle = PAL[1];
+  // reeds (encounter tile): grass base + tall blades, 2-frame sway
+  const reedsFrame = (shift: number) => {
+    const cv = cloneTile(grassA);
+    const g = cv.getContext('2d')!;
     const blades: [number, number, number][] = [[2, 5, 8], [4, 3, 10], [6, 6, 7], [8, 4, 9], [10, 6, 8], [12, 3, 10], [14, 5, 8]];
     for (const [x, y, len] of blades) {
+      // top 3 rows bend with the wind, the rest stays anchored
       g.fillStyle = PAL[1];
-      g.fillRect(x, y, 1, len);
+      g.fillRect(x + shift, y, 1, 3);
+      g.fillRect(x, y + 3, 1, len - 3);
       g.fillStyle = PAL[0];
-      g.fillRect(x + 1, y + 2, 1, len - 2);
+      g.fillRect(x + 1 + shift, y + 2, 1, 1);
+      g.fillRect(x + 1, y + 3, 1, Math.max(1, len - 5));
       g.fillStyle = PAL[2];
       g.fillRect(x - 1, y + 1, 1, 3);
     }
     g.fillStyle = PAL[0];
-    g.fillRect(3, 2, 1, 4); g.fillRect(9, 1, 1, 5); g.fillRect(13, 2, 1, 4);
-  }
-  TILES.reeds = reeds;
+    g.fillRect(3 + shift, 2, 1, 4); g.fillRect(9 + shift, 1, 1, 5); g.fillRect(13 + shift, 2, 1, 4);
+    return cv;
+  };
+  TILES.reeds = [reedsFrame(0), reedsFrame(1)];
 
-  // dark grass (forest encounter): base 2 + ink blades
-  const dg = texTile('2', 31, [{ color: '1', n: 10 }]);
-  {
-    const g = dg.getContext('2d')!;
-    g.fillStyle = PAL[0];
-    const blades: [number, number, number][] = [[2, 6, 7], [5, 4, 9], [8, 7, 6], [11, 5, 8], [14, 6, 7], [12, 2, 4], [6, 2, 3]];
+  // dark grass (forest encounter): clean base + ink blades, 2 variants
+  const darkGrassTile = (blades: [number, number, number][]) => {
+    const cv = document.createElement('canvas');
+    cv.width = 16; cv.height = 16;
+    const g = cv.getContext('2d')!;
+    g.fillStyle = PAL[2];
+    g.fillRect(0, 0, 16, 16);
     for (const [x, y, len] of blades) {
+      g.fillStyle = PAL[0];
       g.fillRect(x, y, 1, len);
       g.fillStyle = PAL[1];
       g.fillRect(x + 1, y + 1, 1, len - 2);
-      g.fillStyle = PAL[0];
     }
-  }
-  TILES.darkgrass = dg;
+    return cv;
+  };
+  TILES.darkgrass = darkGrassTile([[2, 6, 7], [5, 4, 9], [8, 7, 6], [11, 5, 8], [14, 6, 7], [12, 2, 4], [6, 2, 3]]);
+  TILE_VARIANTS.darkgrass = [
+    TILES.darkgrass as HTMLCanvasElement,
+    TILES.darkgrass as HTMLCanvasElement,
+    darkGrassTile([[3, 5, 8], [6, 3, 9], [9, 8, 5], [13, 4, 7], [11, 9, 6], [4, 11, 4]]),
+  ];
 
-  // water: 2 frames
+  // water: 3 frames (traveling glints)
   const waterFrame = (off: number) => {
     const cv = document.createElement('canvas');
     cv.width = 16; cv.height = 16;
@@ -147,7 +207,7 @@ function buildTiles() {
     }
     return cv;
   };
-  TILES.water = [waterFrame(0), waterFrame(2)];
+  TILES.water = [waterFrame(0), waterFrame(2), waterFrame(4)];
 
   // swamp water: murkier
   const swampFrame = (off: number) => {
@@ -166,10 +226,30 @@ function buildTiles() {
     }
     return cv;
   };
-  TILES.swampw = [swampFrame(0), swampFrame(2)];
+  TILES.swampw = [swampFrame(0), swampFrame(2), swampFrame(4)];
 
-  TILES.path = texTile('3', 41, [{ color: '2', n: 14 }, { color: '1', n: 6 }]);
-  TILES.mud = texTile('2', 51, [{ color: '1', n: 14 }, { color: '3', n: 4 }]);
+  // path: worn dirt with ruts and pebbles (hand-placed)
+  const pathA = handTile('3', [
+    [3, 5, 2, 1, '2'], [10, 11, 2, 1, '2'], [6, 2, 2, 1, '2'], [12, 7, 2, 1, '2'],
+    [7, 3, 1, 1, '1'], [12, 8, 1, 1, '1'], [5, 13, 1, 1, '1'], [1, 10, 1, 1, '1'],
+  ]);
+  const pathB = handTile('3', [
+    [6, 8, 3, 1, '2'], [9, 1, 2, 1, '2'], [2, 12, 2, 1, '2'],
+    [13, 4, 1, 1, '1'], [1, 6, 1, 1, '1'], [14, 13, 1, 1, '1'],
+  ]);
+  TILES.path = pathA;
+  TILE_VARIANTS.path = [pathA, pathA, pathB];
+  // mud: wet hollows (light base + dark streaks + dry patches)
+  const mudA = handTile('2', [
+    [2, 3, 3, 1, '1'], [9, 8, 3, 1, '1'], [4, 13, 3, 1, '1'], [13, 5, 2, 1, '1'], [6, 10, 2, 1, '1'],
+    [12, 11, 1, 1, '3'], [1, 7, 1, 1, '3'],
+  ]);
+  const mudB = handTile('2', [
+    [6, 6, 2, 1, '1'], [12, 10, 2, 1, '1'], [3, 2, 2, 1, '1'], [9, 14, 2, 1, '1'],
+    [3, 10, 1, 1, '3'], [10, 2, 1, 1, '3'], [14, 7, 1, 1, '3'],
+  ]);
+  TILES.mud = mudA;
+  TILE_VARIANTS.mud = [mudA, mudA, mudB];
   TILES.cavefloor = texTile('2', 61, [{ color: '1', n: 10 }, { color: '0', n: 4 }]);
 
   // tree (round, classic GB)
@@ -195,6 +275,17 @@ function buildTiles() {
     g.fillStyle = PAL[3];
     g.fillRect(0, 13, 3, 1); g.fillRect(0, 14, 3, 2); g.fillRect(13, 13, 3, 1); g.fillRect(13, 14, 3, 2);
     g.fillRect(0, 12, 2, 1); g.fillRect(14, 12, 2, 1);
+  }
+
+  // tree variant: canopy highlights shifted (breaks border repetition)
+  {
+    const t2 = cloneTile(TILES.tree as HTMLCanvasElement);
+    const g = t2.getContext('2d')!;
+    g.fillStyle = PAL[2];
+    g.fillRect(5, 3, 1, 1); g.fillRect(10, 3, 1, 1); g.fillRect(4, 6, 1, 1); g.fillRect(11, 6, 1, 1);
+    g.fillStyle = PAL[3];
+    g.fillRect(6, 2, 1, 1); g.fillRect(9, 2, 1, 1); g.fillRect(3, 5, 1, 1); g.fillRect(12, 5, 1, 1);
+    TILE_VARIANTS.tree = [TILES.tree as HTMLCanvasElement, TILES.tree as HTMLCanvasElement, t2];
   }
 
   // pine (forest tree)
@@ -641,25 +732,43 @@ function buildTiles() {
     TILES.void = cv;
   }
 
-  // cauldron (herbalist)
-  TILES.cauldron = makeSprite(mirror([
-    '................'.slice(0, 8),
+  // cauldron (herbalist) — one solid pot, 2-frame bubbling
+  const cauldronFrame = (phase: number) => makeSprite(mirror(phase === 0 ? [
+    '........',
     '..00....',
     '.0220...',
     '022220..',
     '0222220.',
     '00000000',
-    '.011110',
-    '.012210',
-    '.012210',
-    '.011110',
-    '.011110',
-    '..00000.',
-    '.........'.slice(0, 8),
-    '.........'.slice(0, 8),
-    '.........'.slice(0, 8),
-    '.........'.slice(0, 8),
+    '.0111111',
+    '.0122221',
+    '.0122221',
+    '.0111111',
+    '.0111111',
+    '..000000',
+    '........',
+    '........',
+    '........',
+    '........',
+  ] : [
+    '.......3',
+    '....00..',
+    '...0220.',
+    '..022220',
+    '.0222220',
+    '00000000',
+    '.0111111',
+    '.0122221',
+    '.0122221',
+    '.0111111',
+    '.0111111',
+    '..000000',
+    '........',
+    '........',
+    '........',
+    '........',
   ], 8), 16, 16);
+  TILES.cauldron = [cauldronFrame(0), cauldronFrame(1)];
 
   // anvil (smith)
   TILES.anvil = makeSprite(mirror([
@@ -681,24 +790,24 @@ function buildTiles() {
     '.........'.slice(0, 8),
   ], 8), 16, 16);
 
-  // barrel (inn)
+  // barrel (inn) — solid staved body (seam bug fixed)
   TILES.barrel = makeSprite(mirror([
-    '................'.slice(0, 8),
+    '........',
     '..000000',
     '..022220',
     '..020020',
-    '0022222'.slice(0, 8),
-    '0022222'.slice(0, 8),
-    '0022222'.slice(0, 8),
-    '0022222'.slice(0, 8),
-    '0022222'.slice(0, 8),
-    '0022222'.slice(0, 8),
-    '0022222'.slice(0, 8),
+    '..022222',
+    '..022222',
+    '..022222',
+    '..022222',
+    '..022222',
+    '..022222',
+    '..022222',
     '..020020',
     '..022220',
     '..000000',
-    '.........'.slice(0, 8),
-    '.........'.slice(0, 8),
+    '........',
+    '........',
   ], 8), 16, 16);
 
   // bookshelf (elder)
@@ -721,8 +830,8 @@ function buildTiles() {
     '0000000000000000',
   ]);
 
-  // thorns (deep forest gate)
-  TILES.thorns = makeSprite([
+  // thorns (deep forest gate) — 2-frame crawl
+  const thornsRows = [
     '0000000000000000',
     '0100100100010010',
     '0011011001100110',
@@ -739,27 +848,48 @@ function buildTiles() {
     '0011001100100110',
     '0000100100010010',
     '0000000000000000',
-  ]);
+  ];
+  TILES.thorns = [
+    makeSprite(thornsRows),
+    makeSprite([thornsRows[15], ...thornsRows.slice(0, 15)]),
+  ];
 
-  // shrine stone (leshen arena)
-  TILES.shrine = makeSprite(mirror([
-    '...00000',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '..022222',
-    '.0022222',
-    '.0002222',
-    '.2222222',
-    '.2222222',
-  ], 8), 16, 16);
+  // shrine stone (leshen arena) — carved spiral + votive candle, 2-frame flicker
+  const shrineFrame = (flicker: number) => {
+    const cv = makeSprite(mirror([
+      '...00000',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '..022222',
+      '.0022222',
+      '.0002222',
+      '.2222222',
+      '.2222222',
+    ], 8), 16, 16);
+    const g = cv.getContext('2d')!;
+    // concentric carved spiral
+    g.fillStyle = PAL[0];
+    g.fillRect(6, 5, 4, 1); g.fillRect(6, 8, 4, 1);
+    g.fillRect(6, 5, 1, 4); g.fillRect(9, 5, 1, 4);
+    g.fillStyle = PAL[3];
+    g.fillRect(7, 6, 2, 2);
+    // votive candle flame + wick
+    g.fillStyle = PAL[3];
+    if (flicker === 0) g.fillRect(7, 2, 2, 2);
+    else { g.fillRect(7, 2, 1, 2); g.fillRect(8, 2, 1, 1); }
+    g.fillStyle = PAL[0];
+    g.fillRect(7, 4, 2, 1);
+    return cv;
+  };
+  TILES.shrine = [shrineFrame(0), shrineFrame(1)];
 
   // rock
   TILES.rock = makeSprite(mirror([
@@ -800,6 +930,17 @@ function buildTiles() {
     '0222222222222220',
     '0000000000000000',
   ]);
+  // mountain variant: dark ridge line instead of snow (breaks picket-fence walls)
+  {
+    const m2 = cloneTile(TILES.mountain as HTMLCanvasElement);
+    const g = m2.getContext('2d')!;
+    g.fillStyle = PAL[1];
+    g.fillRect(7, 0, 2, 1); g.fillRect(7, 3, 2, 1); g.fillRect(7, 6, 2, 1);
+    g.fillRect(7, 9, 2, 1); g.fillRect(6, 12, 2, 1); g.fillRect(6, 13, 2, 1);
+    g.fillStyle = PAL[3];
+    g.fillRect(8, 4, 2, 1); g.fillRect(10, 7, 2, 1);
+    TILE_VARIANTS.mountain = [TILES.mountain as HTMLCanvasElement, TILES.mountain as HTMLCanvasElement, m2];
+  }
 
   // scree (encounter tile): grass + scattered stones
   const scree = texTile('3', 31, [{ color: '2', n: 10 }, { color: '1', n: 4 }]);
@@ -811,6 +952,16 @@ function buildTiles() {
     for (const [x, y] of [[2, 3], [9, 7], [13, 11], [6, 12], [11, 2]] as [number, number][]) g.fillRect(x, y, 1, 1);
   }
   TILES.scree = scree;
+  {
+    const s2 = cloneTile(grassA);
+    const g = s2.getContext('2d')!;
+    g.fillStyle = PAL[1];
+    const stones: [number, number][] = [[5, 4], [6, 4], [5, 5], [10, 8], [11, 8], [2, 11], [8, 12], [13, 3], [3, 7]];
+    for (const [x, y] of stones) g.fillRect(x, y, 1, 1);
+    g.fillStyle = PAL[2];
+    for (const [x, y] of [[5, 4], [10, 8], [2, 11], [13, 3]] as [number, number][]) g.fillRect(x, y, 1, 1);
+    TILE_VARIANTS.scree = [scree, s2];
+  }
 
   // ruined wall (Kaer Serpen)
   TILES.ruinwall = makeSprite([
@@ -832,11 +983,18 @@ function buildTiles() {
     '1111111111111111',
   ]);
 
-  // cracked stone floor
-  const cf = texTile('2', 41, [{ color: '3', n: 14 }, { color: '1', n: 5 }]);
-  {
-    const g = cf.getContext('2d')!;
-    g.fillStyle = PAL[0] as string;
+  // cracked stone floor: ordered 25% checker + hand cracks, 2 variants
+  const crackFloorTile = (phase: number) => {
+    const cv = document.createElement('canvas');
+    cv.width = 16; cv.height = 16;
+    const g = cv.getContext('2d')!;
+    g.fillStyle = PAL[2];
+    g.fillRect(0, 0, 16, 16);
+    g.fillStyle = PAL[3];
+    for (let y = 0; y < 16; y += 2) {
+      for (let x = (y / 2 + phase) % 2; x < 16; x += 2) g.fillRect(x, y, 1, 1);
+    }
+    g.fillStyle = PAL[0];
     g.fillRect(0, 0, 16, 1);
     g.fillRect(0, 8, 16, 1);
     g.fillRect(5, 0, 1, 8);
@@ -845,8 +1003,10 @@ function buildTiles() {
     g.fillRect(10, 3, 1, 3);
     g.fillRect(2, 10, 1, 4);
     g.fillRect(2, 13, 4, 1);
-  }
-  TILES.crackfloor = cf;
+    return cv;
+  };
+  TILES.crackfloor = crackFloorTile(0);
+  TILE_VARIANTS.crackfloor = [crackFloorTile(0), crackFloorTile(1)];
 
   // dark archway
   TILES.arch = makeSprite([
@@ -885,7 +1045,7 @@ function buildPlayer() {
     '....0333',
     '.00.0111',
     '.0301111',
-    '.0301121',
+    '.0301111',
     '.00.1111',
     '...02222',
     '....0111',
@@ -903,7 +1063,7 @@ function buildPlayer() {
     '....0333',
     '.00.0111',
     '.0301111',
-    '.0301121',
+    '.0301111',
     '.00.1111',
     '...02222',
     '....0111',
@@ -992,6 +1152,14 @@ function buildPlayer() {
   PLAYER.up1 = makeSprite(up1);
   PLAYER.left0 = makeSprite(left0);
   PLAYER.left1 = makeSprite(left1);
+  // silver scabbard diagonal on side views (stamped before the flip so right views inherit it)
+  for (const cv of [PLAYER.left0, PLAYER.left1]) {
+    const g = cv.getContext('2d')!;
+    g.fillStyle = PAL[2];
+    g.fillRect(11, 8, 1, 1); g.fillRect(12, 9, 1, 1); g.fillRect(13, 10, 1, 1);
+    g.fillStyle = PAL[3];
+    g.fillRect(14, 11, 1, 1);
+  }
   // right = flipped left
   for (const f of ['0', '1']) {
     const src = PLAYER['left' + f];
@@ -1002,6 +1170,14 @@ function buildPlayer() {
     g.scale(-1, 1);
     g.drawImage(src, 0, 0);
     PLAYER['right' + f] = cv;
+  }
+  // witcher medallion (wolf-head) on the chest — stamped post-mirror on front/back views
+  for (const cv of [PLAYER.down0, PLAYER.down1, PLAYER.up0, PLAYER.up1]) {
+    const g = cv.getContext('2d')!;
+    g.fillStyle = PAL[2];
+    g.fillRect(7, 9, 2, 1);
+    g.fillStyle = PAL[1];
+    g.fillRect(7, 10, 2, 1);
   }
 }
 
@@ -1250,6 +1426,30 @@ function buildNpcs() {
     '.....3..',
     '........',
   ], 8));
+
+  // hunter: bow slung across the back (differentiates from the elder)
+  {
+    const g = (NPCS.hunter as HTMLCanvasElement).getContext('2d')!;
+    g.fillStyle = PAL[0];
+    g.fillRect(11, 6, 1, 1); g.fillRect(12, 7, 1, 1); g.fillRect(13, 8, 1, 1); g.fillRect(14, 9, 1, 1);
+    g.fillStyle = PAL[3];
+    g.fillRect(12, 8, 1, 1);
+  }
+  // villager man: flat cap brim (differentiates from the smith)
+  {
+    const g = (NPCS.man as HTMLCanvasElement).getContext('2d')!;
+    g.fillStyle = PAL[0];
+    g.fillRect(5, 1, 6, 1);
+    g.fillRect(4, 2, 8, 1);
+  }
+  // smith: hammer resting at his side
+  {
+    const g = (NPCS.smith as HTMLCanvasElement).getContext('2d')!;
+    g.fillStyle = PAL[0];
+    g.fillRect(12, 7, 3, 2);
+    g.fillStyle = PAL[1];
+    g.fillRect(13, 9, 1, 4);
+  }
 }
 
 let built = false;

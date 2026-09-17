@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Game } from '@/game/engine';
 import { audio } from '@/game/audio';
+import { TILES, TILE_VARIANTS, PLAYER, NPCS } from '@/game/sprites';
+import { MONSTER_GFX } from '@/game/monstersGfx';
 
 const KEYMAP: Record<string, string> = {
   ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
@@ -54,6 +56,7 @@ export default function Home() {
     // debug/testing hooks
     (window as unknown as { __game?: Game; __audio?: typeof audio }).__game = game;
     (window as unknown as { __game?: Game; __audio?: typeof audio }).__audio = audio;
+    (window as unknown as { __gfx?: unknown }).__gfx = { TILES, TILE_VARIANTS, PLAYER, NPCS, MONSTER_GFX };
 
     const down = (e: KeyboardEvent) => {
       const btn = KEYMAP[e.key];
@@ -141,6 +144,23 @@ export default function Home() {
     gameRef.current?.wheel(e.deltaY);
   };
 
+  // pixel-perfect presentation: snap the canvas to an integer scale of 160x144
+  // (fractional scales leave uneven 2px/3px pixel columns on vertical lines)
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const wrap = c.parentElement;
+    if (!wrap) return;
+    const snap = () => {
+      const s = Math.max(1, Math.floor(wrap.clientWidth / 160));
+      c.style.width = `${160 * s}px`;
+      c.style.height = `${144 * s}px`;
+    };
+    snap();
+    window.addEventListener('resize', snap);
+    return () => window.removeEventListener('resize', snap);
+  }, []);
+
   return (
     <main className="min-h-screen flex flex-col items-center bg-zinc-950 text-zinc-200 py-8 px-4"
       style={{ backgroundImage: 'radial-gradient(ellipse at 50% -10%, rgba(139,172,15,0.14), transparent 55%)' }}>
@@ -174,8 +194,8 @@ export default function Home() {
                 ref={canvasRef}
                 width={160}
                 height={144}
-                className="block w-full h-auto cursor-crosshair touch-none"
-                style={{ imageRendering: 'pixelated', aspectRatio: '160 / 144' }}
+                className="block mx-auto cursor-crosshair touch-none"
+                style={{ imageRendering: 'pixelated' }}
                 aria-label="Monster Slayer game screen — click to move and interact, right-click to cancel"
                 onClick={onCanvasClick}
                 onContextMenu={onCanvasContext}

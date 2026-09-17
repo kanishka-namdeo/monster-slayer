@@ -19,22 +19,22 @@ function scaleUp(src: HTMLCanvasElement, k: number): HTMLCanvasElement {
 export const MONSTER_GFX: Record<string, HTMLCanvasElement> = {};
 
 function buildMonsters() {
-  // ---- DROWNER: hunched fish-fiend, side eyes, claws
+  // ---- DROWNER: hunched fish-fiend, glinting eyes, dark belly band
   MONSTER_GFX.drowner = scaleUp(makeSprite(mirror([
     '.....000',
     '...00222',
-    '..022232',
-    '..022232',
     '..022222',
-    '.0222332',
+    '..023322',
+    '..022222',
+    '..022202',
+    '..022222',
+    '.0221111',
+    '.0221111',
     '.0222222',
-    '.0222222',
     '022.0222',
     '022.0222',
-    '022.0222',
-    '032.0222',
+    '023.0222',
     '.3..0222',
-    '.....022',
     '....0322',
     '.....00.',
   ], 8)), 2);
@@ -99,22 +99,22 @@ function buildMonsters() {
     '....3..3',
   ], 8)), 2);
 
-  // ---- WATER HAG: bulbous swamp crone
+  // ---- WATER HAG: bulbous swamp crone with hooked arms and ragged hem
   MONSTER_GFX.waterhag = scaleUp(makeSprite(mirror([
     '.....000',
     '....0111',
     '...01111',
     '..011011',
-    '..010301',
-    '..011011',
+    '..013301',
+    '..011110',
     '..011110',
     '.0111111',
-    '.0111111',
+    '.01.0111',
+    '.01.0111',
+    '.3..0111',
     '01111111',
-    '01111211',
     '01111111',
-    '01111111',
-    '03111111',
+    '03110111',
     '.3.01111',
     '...01100',
   ], 8)), 2);
@@ -165,7 +165,7 @@ function buildMonsters() {
     '...0110.011.',
     '...0110..01.',
     '...0000..00.',
-  ], 12)), 2);
+  ], 12), 24, 24), 2);
 
   // ---- NEKKER: hunched swamp imp with a huge mouth
   MONSTER_GFX.nekker = scaleUp(makeSprite(mirror([
@@ -207,29 +207,40 @@ function buildMonsters() {
     '........',
   ], 8)), 2);
 
-  // ---- FOGLET: mist-cloaked deceiver, cold lantern glow
-  MONSTER_GFX.foglet = scaleUp(makeSprite(mirror([
-    '....0000',
-    '...02222',
-    '..022322',
-    '..022222',
-    '...02222',
-    '..022222',
-    '..022222',
-    '..022322',
-    '..022222',
-    '...02222',
-    '...0.222',
-    '..2..022',
-    '.2...022',
-    '.....02.',
-    '....2..0',
-    '........',
-  ], 8)), 2);
+  // ---- FOGLET: mist-cloaked deceiver, hollow eyes, ground-fog hem, hanging lantern
+  {
+    const f = makeSprite(mirror([
+      '....0000',
+      '...02222',
+      '..022022',
+      '..022022',
+      '...02222',
+      '..022222',
+      '..022222',
+      '..022322',
+      '..022222',
+      '...02222',
+      '...0.222',
+      '..2..022',
+      '.2...022',
+      '.222.022',
+      '2222..0.',
+      '..22....',
+    ], 8), 16, 16);
+    const g = f.getContext('2d')!;
+    // the false lantern it uses to lure travelers
+    g.fillStyle = PAL[0];
+    g.fillRect(13, 10, 1, 1);
+    g.fillRect(12, 11, 1, 2); g.fillRect(14, 11, 1, 2);
+    g.fillRect(13, 13, 1, 1);
+    g.fillStyle = PAL[3];
+    g.fillRect(13, 11, 1, 2);
+    MONSTER_GFX.foglet = scaleUp(f, 2);
+  }
 
-  // ---- NOONWRAITH: sun-haloed specter bride
+  // ---- NOONWRAITH: sun-haloed specter bride (continuous sun-disk halo)
   MONSTER_GFX.noonwraith = scaleUp(makeSprite(mirror([
-    '..3333..',
+    '..333333',
     '...000..',
     '..02222.',
     '..023032',
@@ -247,33 +258,33 @@ function buildMonsters() {
     '........',
   ], 8)), 2);
 
-  // ---- ROTFIEND: bloated carrion-eater, ribs exposed
+  // ---- ROTFIEND: bloated carrion-eater, 3D ribcage, toxic gas flanks
   MONSTER_GFX.rotfiend = scaleUp(makeSprite(mirror([
     '.....000',
     '....0222',
     '...02222',
     '...02302',
     '...02222',
-    '....0222',
-    '...02222',
-    '..020202',
-    '..022222',
-    '..020202',
-    '..022222',
+    '3...0222',
+    '.3.02222',
+    '..010101',
+    '.0222222',
+    '..010101',
+    '.0222222',
     '..022222',
     '...02222',
     '...02.20',
-    '...00.00',
+    '..0.00.0',
     '........',
   ], 8)), 2);
 
-  // ---- BARGHEST: ember-eyed spectral hound (side view)
+  // ---- BARGHEST: ember-eyed spectral hound (side view), ember mane, open jaw
   MONSTER_GFX.barghest = scaleUp(makeSprite([
     '................',
     '...0.0..........',
     '..0110..000.....',
-    '..01100013300...',
-    '...01311111110..',
+    '0.01100013300...',
+    '0..01313131310..',
     '...01031111110..',
     '....0111111110..',
     '00...011111110..',
@@ -287,7 +298,7 @@ function buildMonsters() {
     '................',
   ]), 2);
 
-  // ---- ARACHAS: armored bog spider matriarch (24x24, half=12)
+  // ---- ARACHAS: armored bog spider matriarch (24x24, half=12) — fangs + silk
   MONSTER_GFX.arachas = scaleUp(makeSprite(mirror([
     '............',
     '.....0..0...',
@@ -298,7 +309,7 @@ function buildMonsters() {
     '..0.022222.0',
     '.0..0222220.',
     '.0.022232220',
-    '0..022222222',
+    '0..022002222',
     '0.0222222222',
     '0.0221222222',
     '.02211222112',
@@ -309,28 +320,28 @@ function buildMonsters() {
     '.....022220.',
     '......0220..',
     '.......00...',
+    '.......02...',
+    '........2...',
     '............',
     '............',
-    '............',
-    '............',
-  ], 12)), 2);
+  ], 12), 24, 24), 2);
 
-  // ---- ROYAL GRIFFIN: wings spread over the pass (24x24, half=12)
+  // ---- ROYAL GRIFFIN: wings spread over the pass (24x24, half=12) — beaked
   MONSTER_GFX.griffin = scaleUp(makeSprite(mirror([
-    '..........0.',
+    '..........00',
     '.........011',
     '........0111',
     '........0131',
-    '.......01111',
-    '.......01111',
-    '..00...01111',
+    '.......01113',
+    '.......01113',
+    '..00...01113',
     '.0220..01111',
     '022220.01111',
-    '022222001111',
+    '021221001111',
     '022222201111',
-    '022222011111',
+    '021212011111',
     '.02220111111',
-    '.02201111111',
+    '.02101111111',
     '..0011111111',
     '...011111111',
     '...011111111',
@@ -341,7 +352,7 @@ function buildMonsters() {
     '.....0...00.',
     '............',
     '............',
-  ], 12)), 2);
+  ], 12), 24, 24), 2);
 
   // ---- KATAKAN: bat-faced higher vampire (24x24, half=12)
   MONSTER_GFX.katakan = scaleUp(makeSprite(mirror([
@@ -369,7 +380,7 @@ function buildMonsters() {
     '....011.011.',
     '....00..00..',
     '............',
-  ], 12)), 2);
+  ], 12), 24, 24), 2);
 }
 
 let built = false;
