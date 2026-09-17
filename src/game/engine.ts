@@ -8,7 +8,7 @@ import { ensureSprites, TILES, TILE_KEY, PLAYER, NPCS } from './sprites';
 import { ensureMonsterGfx, MONSTER_GFX } from './monstersGfx';
 import { MAPS, tileAt, isBlocked, isEncounterTile } from './maps';
 import type { MapDef } from './maps';
-import { ITEMS, QUESTS, MONSTERS, xpForLevel } from './data';
+import { ITEMS, QUESTS, MONSTERS, xpForLevel, SCHOOLS, schoolById } from './data';
 import { DIALOGUES } from './dialogue';
 import type { DlgNode, DlgChoice } from './dialogue';
 import { audio } from './audio';
@@ -18,8 +18,8 @@ import { drawText, wrapText } from './font';
 import { updateOverlayMode, renderOverlayMode } from './engineMenus';
 
 export type Mode =
-  | 'boot' | 'title' | 'intro' | 'world' | 'dialog' | 'board' | 'menu'
-  | 'bag' | 'quests' | 'bestiary' | 'shop' | 'battle' | 'gameover' | 'ending';
+  | 'boot' | 'title' | 'creation' | 'intro' | 'world' | 'dialog' | 'board' | 'menu'
+  | 'bag' | 'quests' | 'skills' | 'bestiary' | 'shop' | 'battle' | 'gameover' | 'ending';
 
 export interface PlayerState {
   x: number; y: number; dir: 'up' | 'down' | 'left' | 'right';
@@ -27,6 +27,7 @@ export interface PlayerState {
   atk: number; def: number; lvl: number; xp: number;
   crowns: number; tox: number;
   swordLvl: number; armorLvl: number;
+  school: string; skillPoints: number;
   oil: { specter: number; necro: number; beast: number; insectoid: number };
 }
 
@@ -61,6 +62,7 @@ export class Game {
     atk: BASE_STATS.atk, def: BASE_STATS.def,
     lvl: 1, xp: 0, crowns: 25, tox: 0,
     swordLvl: 0, armorLvl: 0,
+    school: 'serpent', skillPoints: 0,
     oil: { specter: 0, necro: 0, beast: 0, insectoid: 0 },
   };
   moving = false;
@@ -80,6 +82,7 @@ export class Game {
   // UI state
   menuIdx = 0; bagIdx = 0; questIdx = 0; bestIdx = 0; bestPage = 0;
   shopTab = 0; shopIdx = 0; boardIdx = 0; shopId = '';
+  creationIdx = 0; skillsIdx = 0;
   introPage = 0; introChar = 0;
   titleIdx = 0; titleT = 0; titleStarted = false;
   endingPage = 0; endingT = 0;
@@ -567,6 +570,7 @@ export class Game {
       this.collected = d.collected ?? {};
       this.moving = false;
       if (this.player.oil && this.player.oil.insectoid === undefined) this.player.oil.insectoid = 0;
+      if (!this.player.school) { this.player.school = 'serpent'; this.player.skillPoints = this.player.skillPoints ?? 0; }
       this.loadNpcs(this.map);
       this.applyMapOverrides();
       this.mode = 'world';
@@ -578,19 +582,22 @@ export class Game {
     }
   }
 
-  newGame() {
+  newGame(schoolId = 'serpent') {
+    const sc = schoolById(schoolId);
     this.map = 'village';
     this.player = {
       x: 10, y: 8, dir: 'down',
-      hp: BASE_STATS.hp, maxHp: BASE_STATS.hp,
-      sta: BASE_STATS.sta, maxSta: BASE_STATS.sta,
-      atk: BASE_STATS.atk, def: BASE_STATS.def,
+      hp: BASE_STATS.hp + sc.hp, maxHp: BASE_STATS.hp + sc.hp,
+      sta: BASE_STATS.sta + sc.sta, maxSta: BASE_STATS.sta + sc.sta,
+      atk: BASE_STATS.atk + sc.atk, def: BASE_STATS.def + sc.def,
       lvl: 1, xp: 0, crowns: 25, tox: 0,
       swordLvl: 0, armorLvl: 0,
+      school: sc.id, skillPoints: 0,
       oil: { specter: 0, necro: 0, beast: 0, insectoid: 0 },
     };
     this.flags = {};
     this.inv = { swallow: 1 };
+    if (sc.startItem) this.inv[sc.startItem] = (this.inv[sc.startItem] ?? 0) + 1;
     this.bestiary = {};
     this.kills = {};
     this.collected = {};
@@ -948,6 +955,9 @@ export class Game {
         this.titleT += dt;
         this.updateTitle();
         break;
+      case 'creation':
+        this.updateCreation();
+        break;
       case 'intro':
         this.updateIntro(dt);
         break;
@@ -1018,16 +1028,56 @@ export class Game {
       if (hasSave && this.titleIdx === 1) {
         if (this.load()) return;
       }
-      this.newGame();
+      this.mode = 'creation';
+      this.creationIdx = 0;
+    }
+  }
+
+  updateCreation() {
+    const J = this.just;
+    const n = SCHOOLS.length;
+    if (J.has('up')) { this.creationIdx = (this.creationIdx + n - 1) % n; audio.sfx('blip'); }
+    if (J.has('down')) { this.creationIdx = (this.creationIdx + 1) % n; audio.sfx('blip'); }
+    if (J.has('b')) {
+      audio.sfx('cancel');
+      this.mode = 'title';
+      this.titleIdx = 0;
+      return;
+    }
+    if (J.has('a') || J.has('start')) {
+      audio.sfx('confirm');
+      this.newGame(SCHOOLS[this.creationIdx].id);
+    }
+  }
+
+  renderCreation(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = C.INK;
+    ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+    drawTitleText(ctx, 'CHOOSE YOUR', SCREEN_W / 2, 12, 1, C.PAPER);
+    drawTitleText(ctx, 'SCHOOL', SCREEN_W / 2, 24, 1, C.PAPER);
+    const listY = 40;
+    SCHOOLS.forEach((s, i) => {
+      const y = listY + i * 11;
+      drawText(ctx, s.name, 36, y, i === this.creationIdx ? C.INK : C.DARK);
+      if (i === this.creationIdx) drawCursor(ctx, 26, y, C.INK);
+    });
+    const sel = SCHOOLS[this.creationIdx];
+    drawDarkWindow(ctx, 2, 100, 156, 42);
+    wrapText(sel.blurb, 150).forEach((line, i) => {
+      drawText(ctx, line, 6, 106 + i * 10, C.PAPER);
+    });
+    if (Math.floor(this.time / 400) % 2 === 0) {
+      drawText(ctx, 'A: TRAIN  B: BACK', 34, 90, C.LIGHT);
     }
   }
 
   updateIntro(dt: number) {
     const J = this.just;
+    const scName = schoolById(this.player.school).name;
     const pages = [
       'The year is 1273. The war has burned the Northern kingdoms, and the roads crawl with everything war leaves behind.',
       'Only witchers walk toward the monsters. Mutants of dead Schools, two swords on their backs and none dug for them yet.',
-      'You are VESK of the School of the Serpent. Your medallion hums. Hollow Creek has posted work.',
+      `You are VESK of the School of the ${scName}. Your medallion hums. Hollow Creek has posted work.`,
     ];
     const text = pages[this.introPage];
     if (this.introChar < text.length) {
@@ -1064,6 +1114,7 @@ export class Game {
     switch (this.mode) {
       case 'boot': this.renderBoot(ctx); break;
       case 'title': this.renderTitle(ctx); break;
+      case 'creation': this.renderCreation(ctx); break;
       case 'intro': this.renderIntro(ctx); break;
       case 'world': this.renderWorld(ctx); break;
       case 'dialog': this.renderDialog(ctx); break;

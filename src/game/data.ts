@@ -299,6 +299,48 @@ export const GEAR = {
   armor2: { name: 'SCALE HAUBERK', desc: 'Defense +2 more. Needs 2 shadow pelts.', price: 100, stat: 'def', amount: 2 },
 };
 
+// ---------------- SCHOOLS ----------------
+export interface SchoolDef {
+  id: string;
+  name: string;
+  blurb: string;
+  hp: number; sta: number; atk: number; def: number;
+  signDiscount?: number; // stamina cost reduction for signs
+  startItem?: string;
+}
+
+export const SCHOOLS: SchoolDef[] = [
+  {
+    id: 'serpent', name: 'SERPENT',
+    blurb: 'THE BALANCED PATH. +1 ATK, +1 DEF. Venoms and antidotes sit light in the blood.',
+    hp: 0, sta: 0, atk: 1, def: 1,
+  },
+  {
+    id: 'wolf', name: 'WOLF',
+    blurb: 'SIGNS COME EASY. +4 STA, signs cost 1 less stamina.',
+    hp: 0, sta: 4, atk: 0, def: 0, signDiscount: 1,
+  },
+  {
+    id: 'bear', name: 'BEAR',
+    blurb: 'OUTLAST THEM. +10 HP, +1 DEF.',
+    hp: 10, sta: 0, atk: 0, def: 1,
+  },
+  {
+    id: 'cat', name: 'CAT',
+    blurb: 'FAST AND MEAN. +2 ATK. Kill it before it bites.',
+    hp: 0, sta: 0, atk: 2, def: 0,
+  },
+  {
+    id: 'griffin', name: 'GRIFFIN',
+    blurb: 'STORM-CALLER. +2 STA, +1 ATK, signs cost 1 less stamina.',
+    hp: 0, sta: 2, atk: 1, def: 0, signDiscount: 1,
+  },
+];
+
+export function schoolById(id: string): SchoolDef {
+  return SCHOOLS.find((s) => s.id === id) ?? SCHOOLS[0];
+}
+
 // ---------------- QUESTS ----------------
 export interface QuestDef {
   id: string;

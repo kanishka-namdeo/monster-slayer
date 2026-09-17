@@ -5,7 +5,7 @@ import type { Game } from './engine';
 import { C, SCREEN_W, SCREEN_H, TOX_MAX } from './constants';
 import { drawWindow, drawDarkWindow, drawCursor, drawTitleText } from './render';
 import { drawText, wrapText } from './font';
-import { ITEMS, QUESTS, SHOPS, GEAR, MONSTERS, MON_TYPES_INFO, xpForLevel } from './data';
+import { ITEMS, QUESTS, SHOPS, GEAR, MONSTERS, MON_TYPES_INFO, xpForLevel, schoolById } from './data';
 import { BOARD_ENTRIES } from './dialogue';
 import { audio } from './audio';
 
@@ -24,7 +24,7 @@ function moveIdx(g: Game, len: number, key: string): boolean {
 }
 
 // ---------------- main menu ----------------
-const MENU_ITEMS = ['WITCHER', 'BAG', 'CONTRACTS', 'BESTIARY', 'SAVE', 'CLOSE'];
+const MENU_ITEMS = ['WITCHER', 'BAG', 'CONTRACTS', 'BESTIARY', 'SKILLS', 'SAVE', 'CLOSE'];
 
 function updateMenu(g: Game) {
   const J = g.just;
@@ -38,6 +38,7 @@ function updateMenu(g: Game) {
       case 'BAG': g.mode = 'bag'; g.bagIdx = 0; break;
       case 'CONTRACTS': g.mode = 'quests'; g.questIdx = 0; break;
       case 'BESTIARY': g.mode = 'bestiary'; g.bestIdx = 0; g.bestPage = 0; break;
+      case 'SKILLS': g.mode = 'skills'; g.skillsIdx = 0; break;
       case 'SAVE':
         g.save();
         g.startNotice('The chronicle of Vesk is written. (Game saved)');
@@ -136,22 +137,23 @@ function renderBag(g: Game, ctx: CanvasRenderingContext2D) {
 function renderStats(g: Game, ctx: CanvasRenderingContext2D) {
   g.renderWorld(ctx);
   const p = g.player;
+  const sc = schoolById(p.school);
   drawWindow(ctx, 2, 2, 156, 140);
-  drawText(ctx, 'VESK OF THE SERPENT', 8, 8, C.INK);
+  drawText(ctx, `VESK OF THE ${sc.name}`, 8, 8, C.INK);
   drawText(ctx, `LEVEL    ${p.lvl}`, 10, 22, C.INK);
   drawText(ctx, `HP       ${p.hp}/${p.maxHp}`, 10, 32, C.INK);
   drawText(ctx, `STAMINA  ${p.sta}/${p.maxSta}`, 10, 42, C.INK);
-  drawText(ctx, `ATTACK   ${p.atk}${p.swordLvl ? '+3' : ''}`, 10, 52, C.INK);
-  drawText(ctx, `DEFENSE  ${p.def}${p.armorLvl ? '+2' : ''}`, 10, 62, C.INK);
+  drawText(ctx, `ATTACK   ${p.atk}${p.swordLvl ? '+' + p.swordLvl * 3 : ''}`, 10, 52, C.INK);
+  drawText(ctx, `DEFENSE  ${p.def}${p.armorLvl ? '+' + p.armorLvl * 2 : ''}`, 10, 62, C.INK);
   drawText(ctx, `TOXICITY ${p.tox}/${TOX_MAX}${p.tox > 6 ? ' !' : ''}`, 10, 72, C.INK);
   drawText(ctx, `CROWNS   ${p.crowns}`, 10, 82, C.INK);
   const next = p.lvl < 10 ? xpForLevel(p.lvl + 1) : xpForLevel(10);
   drawText(ctx, `XP       ${p.xp}/${next}`, 10, 92, C.INK);
-  drawText(ctx, `SWORD    SILVER${p.swordLvl ? ' +1' : ''}`, 10, 104, C.INK);
-  drawText(ctx, `ARMOR    NONE${p.armorLvl ? '/LEATHER' : ''}`, 10, 114, C.INK);
-  const oils = [p.oil.specter ? 'SPECTER ' : '', p.oil.necro ? 'NECRO ' : '', p.oil.beast ? 'BEAST' : ''].filter(Boolean).join(' ');
-  drawText(ctx, oils ? `OILS: ${oils}` : 'OILS: none', 10, 126, C.DARK);
-  drawText(ctx, 'B: back', 110, 132, C.DARK);
+  drawText(ctx, `SKILL PTS ${p.skillPoints}${p.skillPoints > 0 ? ' - TRAIN!' : ''}`, 10, 104, p.skillPoints > 0 ? C.INK : C.DARK);
+  drawText(ctx, `SWORD    SILVER${p.swordLvl ? ' +' + p.swordLvl : ''}`, 10, 114, C.INK);
+  drawText(ctx, `ARMOR    NONE${p.armorLvl ? '/LEATHER' : ''}${p.armorLvl > 1 ? '/SCALE' : ''}`, 10, 124, C.INK);
+  const oils = [p.oil.specter ? 'SPECTER ' : '', p.oil.necro ? 'NECRO ' : '', p.oil.beast ? 'BEAST' : '', p.oil.insectoid ? ' INSECT' : ''].filter(Boolean).join(' ');
+  drawText(ctx, oils ? `OILS: ${oils}` : 'OILS: none', 10, 134, C.DARK);
 }
 
 // ---------------- quests ----------------
@@ -246,6 +248,65 @@ function renderBestiary(g: Game, ctx: CanvasRenderingContext2D) {
     lines.slice(0, 6).forEach((l, i) => drawText(ctx, l, 8, 66 + i * 10, C.INK));
     drawText(ctx, 'A/B: back', 100, 132, C.DARK);
   }
+}
+
+// ---------------- skills ----------------
+const SKILL_OPTIONS: { key: string; label: string; desc: string }[] = [
+  { key: 'vit', label: 'VITALITY', desc: 'Max HP +3. A dead witcher hunts nothing.' },
+  { key: 'sta', label: 'STAMINA', desc: 'Max STA +2. More signs per fight.' },
+  { key: 'atk', label: 'SWORDPLAY', desc: 'Attack +1. The fast road through a fight.' },
+  { key: 'def', label: 'ARMOR', desc: 'Defense +1. Outlast the big ones.' },
+];
+
+function updateSkills(g: Game) {
+  const J = g.just;
+  const n = SKILL_OPTIONS.length + 1; // + DONE
+  if (J.has('up')) { g.skillsIdx = (g.skillsIdx + n - 1) % n; audio.sfx('blip'); }
+  if (J.has('down')) { g.skillsIdx = (g.skillsIdx + 1) % n; audio.sfx('blip'); }
+  if (J.has('b') || J.has('start')) { g.mode = 'menu'; g.menuIdx = 4; audio.sfx('cancel'); return; }
+  if (J.has('a')) {
+    if (g.skillsIdx >= SKILL_OPTIONS.length) { g.mode = 'menu'; g.menuIdx = 4; audio.sfx('confirm'); return; }
+    const p = g.player;
+    if (p.skillPoints <= 0) {
+      audio.sfx('cancel');
+      g.startNotice('No skill points. Levels grant them - go earn one.', undefined, () => { g.mode = 'skills'; });
+      return;
+    }
+    const opt = SKILL_OPTIONS[g.skillsIdx];
+    p.skillPoints--;
+    if (opt.key === 'vit') { p.maxHp += 3; p.hp += 3; }
+    if (opt.key === 'sta') { p.maxSta += 2; p.sta += 2; }
+    if (opt.key === 'atk') p.atk += 1;
+    if (opt.key === 'def') p.def += 1;
+    audio.sfx('levelup');
+    const gain = opt.key === 'vit' ? 'HP+3' : opt.key === 'sta' ? 'STA+2' : opt.key === 'atk' ? 'ATK+1' : 'DEF+1';
+    g.startNotice(`${opt.label} trained! ${gain} (${p.skillPoints} point${p.skillPoints === 1 ? '' : 's'} left)`, undefined, () => { g.mode = 'skills'; });
+  }
+}
+
+function renderSkills(g: Game, ctx: CanvasRenderingContext2D) {
+  g.renderWorld(ctx);
+  ctx.fillStyle = 'rgba(15,56,15,0.92)';
+  ctx.fillRect(0, 0, 160, 144);
+  drawTitleText(ctx, 'TRAINING', 80, 10, 1, C.PAPER);
+  const sc = schoolById(g.player.school);
+  drawText(ctx, `SCHOOL: ${sc.name}`, 14, 26, C.LIGHT);
+  drawText(ctx, `POINTS: ${g.player.skillPoints}`, 96, 26, g.player.skillPoints > 0 ? C.PAPER : C.DARK);
+  SKILL_OPTIONS.forEach((o, i) => {
+    const y = 40 + i * 14;
+    drawText(ctx, o.label, 22, y, i === g.skillsIdx ? C.INK : C.DARK);
+    if (i === g.skillsIdx) drawCursor(ctx, 12, y, C.INK);
+  });
+  const sel = SKILL_OPTIONS[g.skillsIdx];
+  if (sel) {
+    wrapText(sel.desc, 148).forEach((line, i) => {
+      drawText(ctx, line, 6, 102 + i * 10, C.PAPER);
+    });
+  }
+  const doneY = 40 + SKILL_OPTIONS.length * 14;
+  drawText(ctx, 'DONE', 22, doneY, g.skillsIdx === SKILL_OPTIONS.length ? C.INK : C.DARK);
+  if (g.skillsIdx === SKILL_OPTIONS.length) drawCursor(ctx, 12, doneY, C.INK);
+  drawText(ctx, 'A:TRAIN B:BACK', 38, 136, C.LIGHT);
 }
 
 // ---------------- shop ----------------
@@ -512,6 +573,7 @@ export function updateOverlayMode(g: Game, _dt: number) {
     case 'bag': updateBag(g); break;
     case 'quests': updateQuests(g); break;
     case 'bestiary': updateBestiary(g); break;
+    case 'skills': updateSkills(g); break;
     case 'shop': updateShop(g); break;
     case 'board': updateBoard(g); break;
     case 'ending': updateEnding(g); break;
@@ -525,6 +587,7 @@ export function renderOverlayMode(g: Game, ctx: CanvasRenderingContext2D) {
     case 'bag': renderBag(g, ctx); break;
     case 'quests': renderQuests(g, ctx); break;
     case 'bestiary': renderBestiary(g, ctx); break;
+    case 'skills': renderSkills(g, ctx); break;
     case 'shop': renderShop(g, ctx); break;
     case 'board': renderBoard(g, ctx); break;
     case 'ending': renderEnding(g, ctx); break;

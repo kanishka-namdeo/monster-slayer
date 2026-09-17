@@ -1,7 +1,7 @@
 // ============================================================
 // Battle system: Pokémon-style turn battles, witcher flavor
 // ============================================================
-import { MONSTERS, SIGNS, ITEMS, xpForLevel } from './data';
+import { MONSTERS, SIGNS, ITEMS, xpForLevel, schoolById } from './data';
 import type { MonType } from './data';
 import { MONSTER_GFX } from './monstersGfx';
 import { PLAYER } from './sprites';
@@ -21,6 +21,7 @@ export interface BattleHost {
     hp: number; maxHp: number; sta: number; maxSta: number;
     atk: number; def: number; lvl: number; xp: number; tox: number;
     swordLvl: number; armorLvl: number;
+    school: string; skillPoints: number;
     oil: { specter: number; necro: number; beast: number; insectoid: number };
   };
   countKill(id: string): void;
@@ -168,13 +169,14 @@ export class Battle {
 
   castSign(id: string) {
     const s = SIGNS.find((x) => x.id === id)!;
-    if (this.psta < s.cost) {
+    const cost = Math.max(1, s.cost - (schoolById(this.host.player.school).signDiscount ?? 0));
+    if (this.psta < cost) {
       this.msgs.push({ text: 'Not enough STAMINA!', sfx: 'cancel' });
       this.afterQueue = 'menu';
       this.flush();
       return;
     }
-    this.psta -= s.cost;
+    this.psta -= cost;
     if (id === 'igni') {
       let dmg = 6 + this.plvl * 2 + Math.floor(Math.random() * 3);
       if (this.monType === 'CURSED') dmg = Math.round(dmg * 1.5);
@@ -372,11 +374,12 @@ export class Battle {
     while (p.lvl < 10 && p.xp >= xpForLevel(p.lvl + 1)) {
       p.lvl++;
       p.maxHp += 5; p.maxSta += 2; p.atk += 1; p.def += 1;
+      p.skillPoints = (p.skillPoints ?? 0) + 1;
       this.php = p.maxHp; this.pmaxHp = p.maxHp;
       this.psta = p.maxSta; this.pmaxSta = p.maxSta;
       this.patK_up();
       this.msgs.push({ text: `LEVEL UP! You are now level ${p.lvl}!`, sfx: 'levelup' });
-      this.msgs.push({ text: 'HP+5 STA+2 ATK+1 DEF+1. Fully restored!' });
+      this.msgs.push({ text: 'HP+5 STA+2 ATK+1 DEF+1. +1 SKILL POINT - train in the menu!' });
     }
     this.afterQueue = 'done-victory';
     this.flush();

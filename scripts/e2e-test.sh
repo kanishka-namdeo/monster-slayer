@@ -95,6 +95,9 @@ R=$(q "window.__audio.trackList.join(',')"); check "soundtrack registered" 'fina
 echo "=== new game ==="
 tap start 0.3
 tap a 0.3
+waitmode creation 20
+R=$(q "window.__game.mode"); check "school select screen" '"creation"' "$R"
+tap a 0.3   # SERPENT (default)
 waitmode intro 20
 R=$(q "window.__game.mode"); check "intro" '"intro"' "$R"
 
@@ -285,6 +288,24 @@ R=$(q "window.__game.dialog ? window.__game.dialog.node.speaker : 'none'")
 check "shade speaks" 'PALE WITCHER' "$R"
 R=$(q "Object.keys(window.__game.quests).length")
 check "quests registered" '1[2-9]' "$R"
+
+echo "=== schools & skills ==="
+q "window.__game.newGame('bear'); window.__game.mode='world'; 'ok'" >/dev/null
+R=$(q "window.__game.player.school + ' ' + window.__game.player.maxHp + ' ' + window.__game.player.def + ' ' + window.__game.player.atk")
+check "bear school stats" 'bear 42 3 6' "$R"
+q "window.__game.newGame('griffin'); window.__game.mode='world'; 'ok'" >/dev/null
+R=$(q "window.__game.player.school + ' ' + window.__game.player.maxSta + ' ' + window.__game.player.atk")
+check "griffin school stats" 'griffin 14 7' "$R"
+q "window.__game.player.skillPoints=2; window.__game.mode='menu'; window.__game.menuIdx=4; 'ok'" >/dev/null
+tap a 0.3
+R=$(q "window.__game.mode"); check "skills screen" '"skills"' "$R"
+tap a 0.4    # train VITALITY
+sleep 0.2
+tap a 0.4    # dismiss notice
+sleep 0.3
+R=$(q "window.__game.mode + ' ' + window.__game.player.skillPoints + ' ' + window.__game.player.maxHp")
+check "vitality trained" 'skills 1 35' "$R"
+tap b 0.2    # back to menu
 
 echo ""
 echo "RESULT: $PASS passed, $FAIL failed"
