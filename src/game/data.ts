@@ -14,6 +14,8 @@ export interface MonMove {
 export interface MonsterDef {
   id: string;
   name: string;
+  /** shorter name for the battle HUD when the full name won't fit */
+  battleName?: string;
   type: MonType;
   hp: number;
   atk: number;
@@ -174,7 +176,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
     lore: 'The mother of the bog - an armored spider grown vast on nekker meat, camouflaged in corpses and moss. Its venom melts leather. INSECTOID OIL, then fire.',
   },
   griffin: {
-    id: 'griffin', name: 'ROYAL GRIFFIN', type: 'BEAST',
+    id: 'griffin', name: 'ROYAL GRIFFIN', battleName: 'R. GRIFFIN', type: 'BEAST',
     hp: 85, atk: 13, def: 4, xp: 100, boss: true,
     moves: [
       { name: 'TALON DIVE', mult: 1.2, weight: 5 },

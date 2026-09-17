@@ -185,13 +185,15 @@ is a single client-side canvas application with localStorage saves.
 ```bash
 npm run typecheck   # strict TS, zero errors
 npm run lint        # eslint, clean
-npm run e2e         # 59-check browser E2E: title → schools → quests → bosses → ending → save → mouse
+npm run e2e         # 66-check browser E2E: title → schools → quests → bosses → ending → save → mouse → text pagination
 ```
 
 The E2E suite (`scripts/e2e-test.sh`) drives the real game through its full
 quest line — the wraith peace path, all five bosses, the ending, save files,
 and the mouse/pointer layer — using the same input API a physical controller
-would.
+would. Every string in the game is also width-audited against its box
+geometry (`scripts/font-audit.cjs`), and long texts paginate instead of
+clipping — no font is ever cut off or overflown anywhere in the game.
 
 ## 🎵 Soundtrack
 
@@ -235,8 +237,8 @@ and zero audio files**.
 | [`data.ts`](src/game/data.ts) | 422 | Monsters, signs, items, schools, shops, quests |
 | [`monstersGfx.ts`](src/game/monstersGfx.ts) | 391 | 16 battle sprites (bosses are 48px) |
 | [`page.tsx`](src/app/page.tsx) | 313 | DMG device shell, keyboard + mouse + touch input layer |
-| [`font.ts`](src/game/font.ts) | 174 | Hand-rolled 5×7 bitmap font (~90 glyphs) |
-| [`render.ts`](src/game/render.ts) | 89 | GB window frames, HP bars, cursors |
+| [`font.ts`](src/game/font.ts) | 183 | Hand-rolled 5×7 bitmap font (~90 glyphs) + word-wrap & pagination |
+| [`render.ts`](src/game/render.ts) | 99 | GB window frames, HP bars (labels never overdrawn), right-aligned text |
 | [`constants.ts`](src/game/constants.ts) | 62 | The 4-shade DMG palette + tuning |
 
 *\*plus the DMG device shell UI in [`page.tsx`](src/app/page.tsx).*

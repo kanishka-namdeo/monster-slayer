@@ -3,8 +3,8 @@
 // ============================================================
 import type { Game } from './engine';
 import { C, SCREEN_W, SCREEN_H, TOX_MAX } from './constants';
-import { drawWindow, drawDarkWindow, drawCursor, drawTitleText } from './render';
-import { drawText, wrapText } from './font';
+import { drawWindow, drawDarkWindow, drawCursor, drawTitleText, drawTextRight } from './render';
+import { drawText, wrapText, textWidth, paginateLines } from './font';
 import { ITEMS, QUESTS, SHOPS, GEAR, MONSTERS, MON_TYPES_INFO, xpForLevel, schoolById } from './data';
 import { BOARD_ENTRIES } from './dialogue';
 import { audio } from './audio';
@@ -51,11 +51,11 @@ function updateMenu(g: Game) {
 function renderMenu(g: Game, ctx: CanvasRenderingContext2D) {
   g.renderWorld(ctx);
   const h = MENU_ITEMS.length * 11 + 12;
-  drawWindow(ctx, 92, 4, 64, h);
+  drawWindow(ctx, 86, 4, 70, h);
   MENU_ITEMS.forEach((it, i) => {
     const y = 10 + i * 11;
-    drawText(ctx, it, 106, y, C.INK);
-    if (i === g.menuIdx) drawCursor(ctx, 98, y, C.INK);
+    drawText(ctx, it, 100, y, C.INK);
+    if (i === g.menuIdx) drawCursor(ctx, 92, y, C.INK);
   });
 }
 
@@ -140,20 +140,28 @@ function renderStats(g: Game, ctx: CanvasRenderingContext2D) {
   const sc = schoolById(p.school);
   drawWindow(ctx, 2, 2, 156, 140);
   drawText(ctx, `VESK OF THE ${sc.name}`, 8, 8, C.INK);
-  drawText(ctx, `LEVEL    ${p.lvl}`, 10, 22, C.INK);
-  drawText(ctx, `HP       ${p.hp}/${p.maxHp}`, 10, 32, C.INK);
-  drawText(ctx, `STAMINA  ${p.sta}/${p.maxSta}`, 10, 42, C.INK);
-  drawText(ctx, `ATTACK   ${p.atk}${p.swordLvl ? '+' + p.swordLvl * 3 : ''}`, 10, 52, C.INK);
-  drawText(ctx, `DEFENSE  ${p.def}${p.armorLvl ? '+' + p.armorLvl * 2 : ''}`, 10, 62, C.INK);
-  drawText(ctx, `TOXICITY ${p.tox}/${TOX_MAX}${p.tox > 6 ? ' !' : ''}`, 10, 72, C.INK);
-  drawText(ctx, `CROWNS   ${p.crowns}`, 10, 82, C.INK);
   const next = p.lvl < 10 ? xpForLevel(p.lvl + 1) : xpForLevel(10);
-  drawText(ctx, `XP       ${p.xp}/${next}`, 10, 92, C.INK);
-  drawText(ctx, `SKILL PTS ${p.skillPoints}${p.skillPoints > 0 ? ' - TRAIN!' : ''}`, 10, 104, p.skillPoints > 0 ? C.INK : C.DARK);
-  drawText(ctx, `SWORD    SILVER${p.swordLvl ? ' +' + p.swordLvl : ''}`, 10, 114, C.INK);
-  drawText(ctx, `ARMOR    NONE${p.armorLvl ? '/LEATHER' : ''}${p.armorLvl > 1 ? '/SCALE' : ''}`, 10, 124, C.INK);
-  const oils = [p.oil.specter ? 'SPECTER ' : '', p.oil.necro ? 'NECRO ' : '', p.oil.beast ? 'BEAST' : '', p.oil.insectoid ? ' INSECT' : ''].filter(Boolean).join(' ');
-  drawText(ctx, oils ? `OILS: ${oils}` : 'OILS: none', 10, 134, C.DARK);
+  drawText(ctx, `LEVEL ${p.lvl}  XP ${p.xp}/${next}`, 10, 19, C.INK);
+  drawText(ctx, `HP ${p.hp}/${p.maxHp}    STA ${p.sta}/${p.maxSta}`, 10, 30, C.INK);
+  drawText(ctx, `ATTACK   ${p.atk}${p.swordLvl ? '+' + p.swordLvl * 3 : ''}`, 10, 41, C.INK);
+  drawText(ctx, `DEFENSE  ${p.def}${p.armorLvl ? '+' + p.armorLvl * 2 : ''}`, 10, 52, C.INK);
+  drawText(ctx, `TOXICITY ${p.tox}/${TOX_MAX}${p.tox > 6 ? ' !' : ''}`, 10, 63, C.INK);
+  drawText(ctx, `CROWNS   ${p.crowns}`, 10, 74, C.INK);
+  drawText(ctx, `SKILL PTS ${p.skillPoints}${p.skillPoints > 0 ? ' - TRAIN!' : ''}`, 10, 85, p.skillPoints > 0 ? C.INK : C.DARK);
+  drawText(ctx, `SWORD    SILVER${p.swordLvl ? ' +' + p.swordLvl : ''}`, 10, 96, C.INK);
+  drawText(ctx, `ARMOR    ${p.armorLvl > 1 ? 'SCALE' : p.armorLvl ? 'LEATHER' : 'NONE'}`, 10, 107, C.INK);
+  const oils = [
+    p.oil.specter ? 'SPECTER' : '',
+    p.oil.necro ? 'NECRO' : '',
+    p.oil.beast ? 'BEAST' : '',
+    p.oil.insectoid ? 'INSECT' : '',
+  ].filter(Boolean).join(', ');
+  if (oils) {
+    drawText(ctx, 'OILS', 10, 118, C.DARK);
+    wrapText(oils, 90).slice(0, 2).forEach((l, i) => drawText(ctx, l, 58, 118 + i * 11, C.DARK));
+  } else {
+    drawText(ctx, 'OILS     none', 10, 118, C.DARK);
+  }
 }
 
 // ---------------- quests ----------------
@@ -207,11 +215,30 @@ function bestList(g: Game): string[] {
   return Object.keys(MONSTERS).filter((id) => g.bestiary[id]);
 }
 
+/** detail body lines: type, weakness, lore — paginated 10 lines per page */
+function bestiaryBody(m: { type: keyof typeof MON_TYPES_INFO; lore: string }): string[] {
+  return [
+    `TYPE: ${m.type}`,
+    '',
+    'WEAKNESS:',
+    ...wrapText(MON_TYPES_INFO[m.type], 130),
+    '',
+    ...wrapText(m.lore, 144),
+  ];
+}
+
 function updateBestiary(g: Game) {
   const J = g.just;
   const list = bestList(g);
   if (g.bestPage > 0) {
-    if (J.has('b') || J.has('a')) { g.bestPage = 0; audio.sfx('cancel'); }
+    if (J.has('b')) { g.bestPage = 0; audio.sfx('cancel'); return; }
+    if (J.has('a')) {
+      audio.sfx('blip');
+      g.bestPage++;
+      const m = MONSTERS[list[Math.min(g.bestIdx, list.length - 1)]];
+      const pages = paginateLines(bestiaryBody(m), 10).length;
+      if (g.bestPage > pages) g.bestPage = 1; // wrap back to first detail page
+    }
     return;
   }
   if (J.has('up') && list.length) { g.bestIdx = (g.bestIdx + list.length - 1) % list.length; audio.sfx('blip'); }
@@ -226,7 +253,7 @@ function renderBestiary(g: Game, ctx: CanvasRenderingContext2D) {
   if (g.bestPage === 0) {
     drawWindow(ctx, 2, 2, 156, 58);
     drawText(ctx, 'BESTIARY', 60, 8, C.INK);
-    if (list.length === 0) drawText(ctx, 'Nothing slain, nothing learned.', 8, 26, C.INK);
+    if (list.length === 0) drawText(ctx, 'Nothing slain yet.', 8, 26, C.INK);
     list.slice(0, 3).forEach((id, i) => {
       const m = MONSTERS[id];
       const y = 22 + i * 11;
@@ -234,19 +261,19 @@ function renderBestiary(g: Game, ctx: CanvasRenderingContext2D) {
       if (i === g.bestIdx) drawCursor(ctx, 6, y, C.INK);
     });
     if (list.length > 3) drawText(ctx, `+${list.length - 3} more`, 100, 44, C.DARK);
-    drawText(ctx, `A: read   B: back`, 34, 66, C.DARK);
+    drawText(ctx, 'A: read   B: back', 34, 66, C.DARK);
   } else {
     const id = list[Math.min(g.bestIdx, list.length - 1)];
     const m = MONSTERS[id];
     drawWindow(ctx, 2, 2, 156, 140);
     drawText(ctx, m.name, 8, 8, C.INK);
-    drawText(ctx, `TYPE: ${m.type}`, 8, 20, C.INK);
-    drawText(ctx, 'WEAKNESS:', 8, 32, C.INK);
-    const w = wrapText(MON_TYPES_INFO[m.type], 130);
-    w.slice(0, 2).forEach((l, i) => drawText(ctx, l, 14, 42 + i * 10, C.INK));
-    const lines = wrapText(m.lore, 144);
-    lines.slice(0, 6).forEach((l, i) => drawText(ctx, l, 8, 66 + i * 10, C.INK));
-    drawText(ctx, 'A/B: back', 100, 132, C.DARK);
+    const pages = paginateLines(bestiaryBody(m), 10);
+    const page = Math.min(g.bestPage - 1, pages.length - 1);
+    g.bestPage = page + 1; // clamp
+    pages[page].forEach((l, i) => drawText(ctx, l, 8, 20 + i * 10, C.INK));
+    const more = page < pages.length - 1;
+    drawText(ctx, more ? 'A: MORE  B: BACK' : 'A/B: BACK', 8, 126, C.DARK);
+    if (pages.length > 1) drawTextRight(ctx, `${page + 1}/${pages.length}`, 150, 126, C.DARK);
   }
 }
 
@@ -413,7 +440,7 @@ function renderShop(g: Game, ctx: CanvasRenderingContext2D) {
   g.renderWorld(ctx);
   const shop = SHOPS[g.shopId];
   drawText(ctx, shop.name, 4, 2, C.INK);
-  drawText(ctx, `CROWNS ${g.player.crowns}`, 96, 2, C.INK);
+  drawTextRight(ctx, `COIN ${g.player.crowns}`, 154, 2, C.INK);
 
   if (g.shopTab === 0) {
     drawWindow(ctx, 2, 12, 156, 46);
@@ -427,47 +454,46 @@ function renderShop(g: Game, ctx: CanvasRenderingContext2D) {
     return;
   }
 
-  drawWindow(ctx, 2, 12, 156, 80);
+  drawWindow(ctx, 2, 12, 156, 84);
   if (g.shopTab === 1) {
     const entries = shopEntries(g, g.shopId);
     if (entries.length === 0) drawText(ctx, 'Sold out of everything useful.', 8, 18, C.INK);
     entries.slice(0, 6).forEach((e, i) => {
-      const y = 18 + i * 12;
-      const mat = e.mats ? ` +${e.mats[1]} ${ITEMS[e.mats[0]].name.split(' ')[0]}` : '';
-      drawText(ctx, `${e.label}${mat}`.slice(0, 24), 14, y, C.INK);
+      const y = 18 + i * 11;
+      drawText(ctx, e.label.slice(0, 23), 14, y, C.INK);
       if (i === g.shopIdx) drawCursor(ctx, 6, y, C.INK);
     });
-    const y = 18 + Math.min(6, entries.length) * 12;
+    const y = 18 + Math.min(6, entries.length) * 11;
     drawText(ctx, 'BACK', 14, y, C.INK);
     if (g.shopIdx >= entries.length) drawCursor(ctx, 6, y, C.INK);
   } else {
     const list = sellList(g, g.shopId);
     if (list.length === 0) drawText(ctx, 'Nothing they would buy.', 8, 18, C.INK);
     list.slice(0, 6).forEach((e, i) => {
-      const y = 18 + i * 12;
-      drawText(ctx, `${e.label} =${e.sell}c`.slice(0, 24), 14, y, C.INK);
+      const y = 18 + i * 11;
+      drawText(ctx, `${e.label} =${e.sell}c`.slice(0, 23), 14, y, C.INK);
       if (i === g.shopIdx) drawCursor(ctx, 6, y, C.INK);
     });
-    const y = 18 + Math.min(6, list.length) * 12;
+    const y = 18 + Math.min(6, list.length) * 11;
     drawText(ctx, 'BACK', 14, y, C.INK);
     if (g.shopIdx >= list.length) drawCursor(ctx, 6, y, C.INK);
   }
 
   // desc
-  drawWindow(ctx, 2, 94, 156, 48);
+  drawWindow(ctx, 2, 98, 156, 44);
   if (g.shopTab === 1) {
     const entries = shopEntries(g, g.shopId);
     const e = entries[g.shopIdx];
     if (e) {
       const lines = wrapText(e.desc, 144);
-      lines.slice(0, 3).forEach((l, i) => drawText(ctx, l, 8, 100 + i * 10, C.INK));
+      lines.slice(0, 3).forEach((l, i) => drawText(ctx, l, 8, 104 + i * 10, C.INK));
     }
   } else {
     const list = sellList(g, g.shopId);
     const e = list[g.shopIdx];
-    if (e) drawText(ctx, `Sells for ${e.sell} crowns.`, 8, 100, C.INK);
+    if (e) drawText(ctx, `Sells for ${e.sell} crowns.`, 8, 104, C.INK);
   }
-  drawText(ctx, 'B: back', 108, 134, C.DARK);
+  drawText(ctx, 'B: back', 108, 133, C.DARK);
 }
 
 // ---------------- notice board ----------------
@@ -513,7 +539,7 @@ function renderBoard(g: Game, ctx: CanvasRenderingContext2D) {
   if (g.boardIdx >= entries.length) drawCursor(ctx, 6, y, C.INK);
   drawWindow(ctx, 2, 114, 156, 28);
   drawText(ctx, 'A: read   B: back', 8, 122, C.INK);
-  drawText(ctx, 'Nail it. Take it. Survive it.', 8, 132, C.DARK);
+  drawText(ctx, 'Nail it. Take it. Live.', 8, 132, C.DARK);
 }
 
 // ---------------- pointer (mouse) for overlay modes ----------------
@@ -532,7 +558,7 @@ export function pointerOverlay(g: Game, x: number, y: number, btn: 'a' | 'b') {
   switch (g.mode) {
     case 'menu': {
       for (let i = 0; i < MENU_ITEMS.length; i++) {
-        if (x >= 92 && x <= 156 && rowHit(y, 10 + i * 11)) {
+        if (x >= 86 && x <= 156 && rowHit(y, 10 + i * 11)) {
           if (g.menuIdx === i) { J.add('a'); } else { g.menuIdx = i; audio.sfx('blip'); }
           return;
         }
@@ -598,12 +624,12 @@ export function pointerOverlay(g: Game, x: number, y: number, btn: 'a' | 'b') {
       const entries = g.shopTab === 1 ? shopEntries(g, g.shopId) : sellList(g, g.shopId).map((e) => ({ ...e }));
       const n = entries.length;
       for (let i = 0; i < Math.min(6, n); i++) {
-        if (x >= 2 && x <= 158 && rowHit(y, 18 + i * 12)) {
+        if (x >= 2 && x <= 158 && rowHit(y, 18 + i * 11)) {
           if (g.shopIdx === i) { J.add('a'); } else { g.shopIdx = i; audio.sfx('blip'); }
           return;
         }
       }
-      const backY = 18 + Math.min(6, n) * 12;
+      const backY = 18 + Math.min(6, n) * 11;
       if (x >= 2 && x <= 158 && rowHit(y, backY)) {
         if (g.shopIdx >= n) { J.add('a'); } else { g.shopIdx = n; audio.sfx('blip'); }
       }
@@ -663,21 +689,23 @@ function renderEnding(g: Game, ctx: CanvasRenderingContext2D) {
     drawTitleText(ctx, 'THE CHRONICLE', SCREEN_W / 2, 12, 1, C.LIGHT);
     const totalKills = Object.values(g.kills).reduce((a, b) => a + b, 0);
     const done = Object.values(g.quests).filter((q) => q.done).length;
+    const totalQuests = Object.keys(QUESTS).length;
     drawText(ctx, `LEVEL REACHED   ${p.lvl}`, 14, 34, C.PAPER);
     drawText(ctx, `MONSTERS SLAIN  ${totalKills}`, 14, 48, C.PAPER);
-    drawText(ctx, `CONTRACTS DONE  ${done}/6`, 14, 62, C.PAPER);
+    drawText(ctx, `CONTRACTS DONE  ${done}/${totalQuests}`, 14, 62, C.PAPER);
     drawText(ctx, `CROWNS EARNED   ${p.crowns}`, 14, 76, C.PAPER);
     let moral = 'The graves still weep.';
     if (g.flags.wraithPeace) moral = 'The widow found peace.';
     else if (g.flags.wraithDestroy) moral = 'The wraith was destroyed.';
     drawText(ctx, 'AND IN THE END...', 14, 94, C.LIGHT);
-    drawText(ctx, moral, 14, 108, C.PAPER);
+    drawText(ctx, moral, Math.round((SCREEN_W - textWidth(moral)) / 2), 108, C.PAPER);
   } else {
-    drawTitleText(ctx, 'MONSTER SLAYER', SCREEN_W / 2, 40, 2, C.PAPER);
-    drawTitleText(ctx, 'GREEN EDITION', SCREEN_W / 2, 62, 1, C.LIGHT);
+    drawTitleText(ctx, 'MONSTER', SCREEN_W / 2, 32, 2, C.PAPER);
+    drawTitleText(ctx, 'SLAYER', SCREEN_W / 2, 50, 2, C.PAPER);
+    drawTitleText(ctx, 'GREEN EDITION', SCREEN_W / 2, 72, 1, C.LIGHT);
     drawText(ctx, 'THE END', 58, 90, C.PAPER);
-    drawText(ctx, 'Thank you for playing.', 26, 108, C.LIGHT);
-    drawText(ctx, '- SERPENTSOFT 1273 -', 16, 122, C.DARK);
+    drawText(ctx, 'Thank you for playing.', 26, 106, C.LIGHT);
+    drawText(ctx, '- SERPENTSOFT 1273 -', 16, 120, C.DARK);
   }
   if (Math.floor(g.time / 400) % 2 === 0) drawText(ctx, '▼', 146, 132, C.LIGHT);
 }

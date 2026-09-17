@@ -58,30 +58,30 @@ async function pressKey(page, btn, ms = 100) {
 // -------- dialog helpers --------
 // Completes the current dialog text. If the node has choices, stops there
 // (returns 'choosing') instead of pressing A (which would auto-select).
+// Pagination-aware: presses A through every page of the current node.
 async function advDialog(page, { typeMs = null, timeout = 15000 } = {}) {
   try {
     await page.waitForFunction(() => !!window.__game.dialog, null, { timeout, polling: 40 });
   } catch { return false; }
-  const info = await page.evaluate(() => {
-    const d = window.__game.dialog;
-    if (!d) return null;
-    return {
-      len: (d.node.text || '').length,
-      hasChoices: !!(d.node.choices && d.node.choices.length),
-      choosing: !!d.choosing,
-    };
-  });
-  if (!info) return false;
-  if (info.choosing) return 'choosing';
-  const wait = typeMs !== null ? typeMs : Math.min(1500, 350 + info.len * 14);
-  await sleep(wait);
-  await page.evaluate(() => { if (window.__game.dialog) window.__game.dialog.charIdx = 1e9; });
-  if (info.hasChoices) { await sleep(260); return 'choosing'; }
-  await sleep(230);
-  await page.evaluate(() => window.__game.press('a'));
-  await sleep(120);
-  await page.evaluate(() => window.__game.release('a'));
-  await sleep(140);
+  for (let i = 0; i < 24; i++) {
+    const st = await page.evaluate(() => {
+      const d = window.__game.dialog;
+      if (!d) return 'gone';
+      return d.choosing ? 'choosing' : 'text';
+    });
+    if (st === 'gone') return true;
+    if (st === 'choosing') return 'choosing';
+    const len = await page.evaluate(() =>
+      window.__game.dialog ? (window.__game.dialog.node.text || '').length : 0);
+    const wait = typeMs !== null ? typeMs : Math.min(1200, 250 + len * 8);
+    await sleep(wait);
+    await page.evaluate(() => { if (window.__game.dialog) window.__game.dialog.charIdx = 1e9; });
+    await sleep(220);
+    await page.evaluate(() => window.__game.press('a'));
+    await sleep(120);
+    await page.evaluate(() => window.__game.release('a'));
+    await sleep(150);
+  }
   return true;
 }
 

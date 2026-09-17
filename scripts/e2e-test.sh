@@ -49,17 +49,36 @@ waitdlg() { # wait until a dialog object exists
   return 1
 }
 
-adv() { # complete text + advance
+adv() { # complete text + advance through ALL paginated pages
   waitdlg || return 0
-  q "window.__game.dialog && (window.__game.dialog.charIdx=99999)" >/dev/null
-  sleep 0.25
-  tap a 0.3
+  local t=0
+  while [ $t -lt 12 ]; do
+    q "window.__game.dialog && (window.__game.dialog.charIdx=99999)" >/dev/null
+    sleep 0.15
+    tap a 0.25
+    R=$(q "window.__game.dialog ? (window.__game.dialog.choosing ? 'choosing' : 'text') : 'gone'")
+    case "$R" in
+      '"gone"'|'"choosing"') return 0 ;;
+    esac
+    t=$((t+1))
+  done
 }
 
-choose() { # choose <idx>
+choose() { # choose <idx> — drain paginated text first, then pick
   waitdlg || return 1
   q "window.__game.dialog && (window.__game.dialog.charIdx=99999)" >/dev/null
-  waitchoose
+  local t=0
+  while [ $t -lt 12 ]; do
+    R=$(q "window.__game.dialog ? (window.__game.dialog.choosing ? 'choosing' : 'text') : 'gone'")
+    case "$R" in
+      '"choosing"') break ;;
+      '"gone"') return 1 ;;
+    esac
+    tap a 0.25
+    q "window.__game.dialog && (window.__game.dialog.charIdx=99999)" >/dev/null
+    sleep 0.15
+    t=$((t+1))
+  done
   q "window.__game.dialog && (window.__game.dialog.choiceIdx=$1)" >/dev/null
   sleep 0.2
   tap a 0.3
@@ -220,7 +239,14 @@ R=$(q "'lesshen=' + window.__game.flags.leshenDone + ' mode=' + window.__game.mo
 check "leshenDone" 'lesshen=true' "$R"
 check "map music restored" 'track=cave' "$R"
 tap a 0.4   # finish notice text
-tap a 0.4   # close notice -> ending
+for i in $(seq 1 8); do  # drain paginated notice -> ending
+  R=$(q "window.__game.mode")
+  echo "$R" | grep -q '"ending"' && break
+  tap a 0.35
+  sleep 0.15
+  q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
+  sleep 0.1
+done
 sleep 0.3
 R=$(q "window.__game.mode + ' ' + window.__audio.currentTrack")
 check "ending reached" 'ending ending' "$R"
@@ -307,6 +333,34 @@ R=$(q "window.__game.mode + ' ' + window.__game.player.skillPoints + ' ' + windo
 check "vitality trained" 'skills 1 35' "$R"
 tap b 0.2    # back to menu
 
+echo "=== dialog pagination ==="
+resetscene
+q "window.__game.startNotice('The year is 1273. The war has burned the Northern kingdoms, and the roads crawl with everything war leaves behind. Only witchers walk toward the monsters.'); 'ok'" >/dev/null
+sleep 0.4
+R=$(q "window.__game.dialog.page")
+check "notice page 1" '0' "$R"
+q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
+sleep 0.15
+tap a 0.3
+R=$(q "window.__game.dialog ? window.__game.dialog.page : 'gone'")
+check "long notice paginates to page 2" '1' "$R"
+for i in $(seq 1 4); do adv; done
+R=$(q "window.__game.mode"); check "notice drains to world" '"world"' "$R"
+
+echo "=== bestiary pagination ==="
+resetscene
+q "window.__game.mode='world'; window.__game.bestiary.drowner=true; window.__game.mode='bestiary'; window.__game.bestIdx=0; window.__game.bestPage=0; 'ok'" >/dev/null
+sleep 0.3
+tap a 0.3
+R=$(q "window.__game.bestPage"); check "bestiary detail page 1" '1' "$R"
+tap a 0.3
+R=$(q "window.__game.bestPage"); check "bestiary detail page 2" '2' "$R"
+tap a 0.3
+R=$(q "window.__game.bestPage"); check "bestiary wraps to page 1" '1' "$R"
+tap b 0.3
+R=$(q "window.__game.bestPage"); check "bestiary back to list" '0' "$R"
+tap b 0.3
+
 echo "=== mouse & pointer controls ==="
 resetscene
 q "window.__game.mode='world'; window.__game.switchMap('village', 10, 8, 'down'); window.__game.player.x=10; window.__game.player.y=8; 'ok'" >/dev/null
@@ -323,16 +377,28 @@ q "window.__game.pointerClick(80, 56, 'a'); 'click'" >/dev/null   # bram at (5,3
 sleep 2.5
 R=$(q "window.__game.mode + '|' + (window.__game.dialog ? window.__game.dialog.node.speaker : 'none')")
 check "click NPC opens dialog" 'dialog.*ELDER BRAM' "$R"
-# click to advance dialog: intro0 shows 2 choices at y=64,76 -> click choice 0
-q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
-sleep 0.2
+# click to advance dialog: intro0 is multi-page — click through pages until choices appear
+for i in $(seq 1 6); do
+  q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
+  sleep 0.15
+  R=$(q "window.__game.dialog ? (window.__game.dialog.choosing ? 'choosing' : 'text') : 'gone'")
+  [ "$R" = '"choosing"' ] && break
+  q "window.__game.pointerClick(80, 120, 'a'); 'page'" >/dev/null
+  sleep 0.3
+done
+# choices render at rows y=64,76 — click choice 0
 q "window.__game.pointerClick(80, 66, 'a'); 'choice'" >/dev/null
 sleep 0.6
 R=$(q "window.__game.flags.metElder")
 check "click picks choice" 'true' "$R"
-q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
-q "window.__game.pointerClick(80, 120, 'a'); 'adv'" >/dev/null
-sleep 0.5
+# click through any remaining pages/nodes until the dialog closes
+for i in $(seq 1 8); do
+  R=$(q "window.__game.dialog ? 'yes' : 'no'")
+  [ "$R" = '"no"' ] && break
+  q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
+  q "window.__game.pointerClick(80, 120, 'a'); 'adv'" >/dev/null
+  sleep 0.35
+done
 R=$(q "window.__game.mode"); check "click advances dialog" '"world"' "$R"
 # wheel navigation in menu
 q "window.__game.mode='menu'; window.__game.menuIdx=0; 'ok'" >/dev/null

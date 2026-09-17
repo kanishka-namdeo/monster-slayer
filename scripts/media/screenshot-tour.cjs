@@ -75,9 +75,26 @@ async function enterWorld(page, prep) {
   await sleep(300);
   await pressKey(page, 'a', 120);
   await page.waitForFunction(() => window.__game.mode === 'dialog', null, { timeout: 8000, polling: 50 });
-  await page.evaluate(() => { if (window.__game.dialog) window.__game.dialog.charIdx = 1e9; });
-  await page.waitForFunction(() => !!(window.__game.dialog && window.__game.dialog.choosing), null, { timeout: 8000, polling: 40 });
+  // intro0 spans multiple pages — press A until the choices appear
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => { if (window.__game.dialog) window.__game.dialog.charIdx = 1e9; });
+    const st = await page.evaluate(() =>
+      window.__game.dialog ? (window.__game.dialog.choosing ? 'choosing' : 'text') : 'gone');
+    if (st === 'choosing') break;
+    await pressKey(page, 'a', 120);
+  }
+  await page.waitForFunction(() => !!(window.__game.dialog && window.__game.dialog.choosing), null, { timeout: 4000, polling: 40 });
   await snap(page, '05-elder-choice', { wait: 250 });
+
+  // ---------- 5b. dialog page 2 (pagination) ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.startNotice('The pass is quiet... Caravan\'s pooled one hundred fifty crowns. Take them, witcher. And this - my father\'s whetstone. His steel always sang after.');
+    g.dialog.charIdx = 1e9;
+    g.dialog.page = 1; // second page with ▼ marker
+  });
+  await snap(page, '30-dialog-page2', { wait: 300 });
+  await page.evaluate(() => { window.__game.dialog = null; window.__game.mode = 'world'; });
 
   // ---------- 6. herbalist shop ----------
   await page.evaluate(() => {
@@ -110,6 +127,18 @@ async function enterWorld(page, prep) {
     g.bagIdx = -1; // stats page
   });
   await snap(page, '08-stats', { wait: 300 });
+
+  // ---------- 8a. stats worst case: SCALE armor + every oil active ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    const p = g.player;
+    p.lvl = 10; p.xp = 1950; p.hp = 90; p.maxHp = 90; p.sta = 30; p.maxSta = 30;
+    p.atk = 15; p.def = 11; p.crowns = 9999; p.tox = 9; p.skillPoints = 0;
+    p.swordLvl = 2; p.armorLvl = 2;
+    p.oil = { specter: 5, necro: 5, beast: 5, insectoid: 5 };
+    g.bagIdx = -1;
+  });
+  await snap(page, '29-stats-full', { wait: 300 });
 
   // ---------- 8b. training screen ----------
   await page.evaluate(() => {
@@ -148,6 +177,14 @@ async function enterWorld(page, prep) {
   });
   await snap(page, '26-new-bestiary', { wait: 300 });
 
+  // ---------- 10c. bestiary detail page 2 (lore pagination) ----------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.bestIdx = 3; // barghest
+    g.mode = 'bestiary'; g.bestPage = 2;
+  });
+  await snap(page, '31-bestiary-page2', { wait: 300 });
+
   // ---------- 11-13. battle scenes ----------
   await page.evaluate(() => {
     const g = window.__game;
@@ -167,6 +204,13 @@ async function enterWorld(page, prep) {
     b.phase = 'sign'; b.subIdx = 0;
   });
   await snap(page, '12-battle-signs', { wait: 250 });
+
+  // fight submenu (sword choice — was the worst text cutoff)
+  await page.evaluate(() => {
+    const b = window.__game.battle;
+    b.phase = 'fight'; b.subIdx = 0;
+  });
+  await snap(page, '28-battle-fight', { wait: 250 });
 
   // IGNI action shot (frozen flash frame)
   await page.evaluate(() => {

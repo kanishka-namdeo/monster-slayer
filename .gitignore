@@ -51,3 +51,4 @@ Caddyfile
 /scripts/shots
 /scripts/media/out
 tool-results/
+scripts/audit-build/

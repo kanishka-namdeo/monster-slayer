@@ -14,8 +14,11 @@ import type { DlgNode, DlgChoice } from './dialogue';
 import { audio } from './audio';
 import { Battle } from './battle';
 import { drawWindow, drawDarkWindow, drawCursor, drawTitleText } from './render';
-import { drawText, wrapText } from './font';
+import { drawText, wrapText, paginateLines, textWidth } from './font';
 import { updateOverlayMode, renderOverlayMode, pointerOverlay } from './engineMenus';
+
+/** wrap width for dialog text: 23 chars from x=8, leaving room for the ▼ marker */
+const DIALOG_WRAP_PX = 138;
 
 export type Mode =
   | 'boot' | 'title' | 'creation' | 'intro' | 'world' | 'dialog' | 'board' | 'menu'
@@ -102,6 +105,7 @@ export class Game {
     choiceIdx: number;
     choosing: boolean;
     notice: boolean;
+    page: number;
   } | null = null;
 
   constructor() {
@@ -294,7 +298,7 @@ export class Game {
       const cy = 96 - ch - 2;
       for (let i = 0; i < n; i++) {
         const ry = cy + 6 + i * 12;
-        if (x >= 50 && x <= 158 && y >= ry - 2 && y <= ry + 9) {
+        if (x >= 14 && x <= 156 && y >= ry - 2 && y <= ry + 9) {
           d.choiceIdx = i;
           this.just.add('a');
           return;
@@ -507,7 +511,7 @@ export class Game {
     const tree = DIALOGUES[treeId];
     const node = tree?.[nodeId];
     if (!node) { this.dialog = null; this.finishDialog(); return; }
-    this.dialog = { tree: treeId, nodeId, node, charIdx: 0, choiceIdx: 0, choosing: false, notice: false };
+    this.dialog = { tree: treeId, nodeId, node, charIdx: 0, choiceIdx: 0, choosing: false, notice: false, page: 0 };
     this.runAction(node.action);
     const m: string = this.mode;
     if (m !== 'dialog' && m !== 'battle' && m !== 'shop' && m !== 'board' && m !== 'ending') {
@@ -519,7 +523,7 @@ export class Game {
     const node: DlgNode = { text, choices, next: null };
     DIALOGUES.__notice = { start: node };
     this.afterDialogEnd = onEnd ?? null;
-    this.dialog = { tree: '__notice', nodeId: 'start', node, charIdx: 0, choiceIdx: 0, choosing: false, notice: true };
+    this.dialog = { tree: '__notice', nodeId: 'start', node, charIdx: 0, choiceIdx: 0, choosing: false, notice: true, page: 0 };
     this.mode = 'dialog';
   }
 
@@ -531,19 +535,35 @@ export class Game {
     if (cb) cb();
   }
 
+  /** Wrap a dialog node's text into pages that fit the dialog box.
+   *  Layout: box (2,96,156,48); speaker line + 3 text lines, or 4 text lines. */
+  private dialogPages(node: DlgNode): { pages: string[][]; perPage: number } {
+    const perPage = node.speaker ? 3 : 4;
+    const lines = wrapText(node.text ?? '', DIALOG_WRAP_PX);
+    return { pages: paginateLines(lines, perPage), perPage };
+  }
+
   updateDialog(dt: number) {
     const d = this.dialog;
     if (!d || !d.node) { this.finishDialog(); return; }
     const node = d.node;
-    const text = node.text ?? '';
+    const { pages } = this.dialogPages(node);
+    const pageText = (pages[d.page] ?? []).join(' ');
     const J = this.just;
 
     if (!d.choosing) {
-      if (d.charIdx < text.length) {
+      if (d.charIdx < pageText.length) {
         const before = Math.floor(d.charIdx);
-        d.charIdx = Math.min(text.length, d.charIdx + Math.max(1, Math.round(dt / 1000 * 30)));
+        d.charIdx = Math.min(pageText.length, d.charIdx + Math.max(1, Math.round(dt / 1000 * 30)));
         if (Math.floor(d.charIdx) > before && Math.floor(d.charIdx) % 2 === 0) audio.sfx('text');
-        if (J.has('a') || J.has('b')) d.charIdx = text.length;
+        if (J.has('a') || J.has('b')) d.charIdx = pageText.length;
+      } else if (d.page < pages.length - 1) {
+        // more pages follow: A or B flips to the next page
+        if (J.has('a') || J.has('b')) {
+          audio.sfx('blip');
+          d.page++;
+          d.charIdx = 0;
+        }
       } else if (node.choices && node.choices.length > 0) {
         d.choosing = true;
         d.choiceIdx = 0;
@@ -590,23 +610,24 @@ export class Game {
     if (!d || !d.node) return;
     const node = d.node;
     // world behind
-    if (!d.notice) this.renderWorld(ctx);
-    else this.renderWorld(ctx);
+    this.renderWorld(ctx);
 
-    // dialog box
+    // dialog box (bottom of screen, 4 text lines or speaker + 3)
     const boxY = 96;
-    drawWindow(ctx, 2, boxY, 156, 46);
-    const shown = (node.text ?? '').slice(0, Math.floor(d.charIdx));
-    const lines = wrapText(shown, 146);
+    drawWindow(ctx, 2, boxY, 156, 48);
+    const { pages } = this.dialogPages(node);
+    const pageLines = pages[Math.min(d.page, pages.length - 1)] ?? [];
+    const shown = pageLines.join(' ').slice(0, Math.floor(d.charIdx));
+    const shownLines = wrapText(shown, DIALOG_WRAP_PX);
     let ty = boxY + 5;
     if (node.speaker) {
       drawText(ctx, node.speaker, 8, ty, C.INK);
       ty += 11;
     }
-    lines.slice(0, 3).forEach((l, i) => drawText(ctx, l, 8, ty + i * 11, C.INK));
-    const done = d.charIdx >= (node.text ?? '').length;
-    if (done && !d.choosing && Math.floor(this.time / 300) % 2 === 0) {
-      drawText(ctx, '▼', 146, boxY + 36, C.INK);
+    shownLines.forEach((l, i) => drawText(ctx, l, 8, ty + i * 11, C.INK));
+    const pageDone = d.charIdx >= pageLines.join(' ').length;
+    if (pageDone && !d.choosing && Math.floor(this.time / 300) % 2 === 0) {
+      drawText(ctx, '▼', 149, boxY + 39, C.INK);
     }
 
     // choices
@@ -615,11 +636,11 @@ export class Game {
       const n = choices.length;
       const ch = 12 * n + 12;
       const cy = 96 - ch - 2;
-      drawWindow(ctx, 50, cy, 108, ch);
+      drawWindow(ctx, 14, cy, 142, ch);
       choices.forEach((c, i) => {
         const y = cy + 6 + i * 12;
-        drawText(ctx, c.label.slice(0, 16), 62, y, C.INK);
-        if (i === d.choiceIdx) drawCursor(ctx, 54, y, C.INK);
+        drawText(ctx, c.label.slice(0, 21), 28, y, C.INK);
+        if (i === d.choiceIdx) drawCursor(ctx, 20, y, C.INK);
       });
     }
   }
@@ -1109,7 +1130,7 @@ export class Game {
     if (this.mapBannerT > 0) {
       const a = Math.min(1, this.mapBannerT / 400);
       ctx.globalAlpha = a;
-      drawDarkWindow(ctx, 2, 2, Math.min(156, wrapText(def.name, 140).length ? def.name.length * 6 + 14 : 60), 16);
+      drawDarkWindow(ctx, 2, 2, Math.min(156, textWidth(def.name) + 14), 16);
       drawText(ctx, def.name, 8, 6, C.PAPER);
       ctx.globalAlpha = 1;
     }
@@ -1265,16 +1286,17 @@ export class Game {
     const listY = 40;
     SCHOOLS.forEach((s, i) => {
       const y = listY + i * 11;
-      drawText(ctx, s.name, 36, y, i === this.creationIdx ? C.INK : C.DARK);
-      if (i === this.creationIdx) drawCursor(ctx, 26, y, C.INK);
+      const sel = i === this.creationIdx;
+      drawText(ctx, s.name, 36, y, sel ? C.PAPER : C.DARK);
+      if (sel) drawCursor(ctx, 26, y, C.PAPER);
     });
     const sel = SCHOOLS[this.creationIdx];
     drawDarkWindow(ctx, 2, 100, 156, 42);
-    wrapText(sel.blurb, 150).forEach((line, i) => {
-      drawText(ctx, line, 6, 106 + i * 10, C.PAPER);
+    wrapText(sel.blurb, 144).slice(0, 4).forEach((line, i) => {
+      drawText(ctx, line, 6, 104 + i * 9, C.PAPER);
     });
     if (Math.floor(this.time / 400) % 2 === 0) {
-      drawText(ctx, 'A: TRAIN  B: BACK', 34, 90, C.LIGHT);
+      drawText(ctx, 'A: CHOOSE  B: BACK', 26, 92, C.LIGHT);
     }
   }
 
@@ -1378,10 +1400,11 @@ export class Game {
   renderIntro(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = C.INK;
     ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+    const scName = schoolById(this.player.school).name;
     const pages = [
       'The year is 1273. The war has burned the Northern kingdoms, and the roads crawl with everything war leaves behind.',
       'Only witchers walk toward the monsters. Mutants of dead Schools, two swords on their backs and none dug for them yet.',
-      'You are VESK of the School of the Serpent. Your medallion hums. Hollow Creek has posted work.',
+      `You are VESK of the School of the ${scName}. Your medallion hums. Hollow Creek has posted work.`,
     ];
     const text = pages[Math.min(this.introPage, pages.length - 1)];
     const shown = text.slice(0, Math.floor(this.introChar));

@@ -713,7 +713,7 @@ export const BOARD_ENTRIES: BoardEntry[] = [
   },
   {
     id: 'b_lights',
-    label: 'DO NOT FOLLOW THE LIGHTS',
+    label: 'FOLLOW NO LIGHTS',
     text: 'If you see lanterns moving in Crookback Bog, they are not lanterns. This notice is paid for by the family of ODD.',
     cond: '',
   },

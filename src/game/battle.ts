@@ -5,8 +5,8 @@ import { MONSTERS, SIGNS, ITEMS, xpForLevel, schoolById } from './data';
 import type { MonType } from './data';
 import { MONSTER_GFX } from './monstersGfx';
 import { PLAYER } from './sprites';
-import { drawWindow, drawBar, drawCursor } from './render';
-import { drawText, wrapText } from './font';
+import { drawWindow, drawBar, drawCursor, drawTextRight } from './render';
+import { drawText, wrapText, textWidth } from './font';
 import { C } from './constants';
 import { audio } from './audio';
 
@@ -89,7 +89,7 @@ export class Battle {
   constructor(public host: BattleHost, monId: string, lvl: number) {
     const def = MONSTERS[monId];
     this.monId = monId;
-    this.monName = def.name;
+    this.monName = def.battleName ?? def.name;
     this.monLvl = lvl;
     // scale stats by level delta over base level assumption (base lvl ~ stats given)
     const lvScale = 1 + Math.max(0, lvl - 4) * 0.08;
@@ -402,7 +402,7 @@ export class Battle {
     if (this.phase === 'menu') {
       if (x >= 76 && x <= 158 && y >= 100 && y <= 142) {
         const row = y < 121 ? 0 : 1;
-        const col = x < 124 ? 0 : 1;
+        const col = x < 116 ? 0 : 1;
         const idx = row * 2 + col;
         if (this.menuIdx === idx) J.add('a');
         else { this.menuIdx = idx; audio.sfx('blip'); }
@@ -411,7 +411,7 @@ export class Battle {
     }
     if (this.phase === 'fight') {
       for (let i = 0; i < 2; i++) {
-        const ry = 107 + i * 13;
+        const ry = 107 + i * 15;
         if (x >= 2 && x <= 158 && y >= ry - 3 && y <= ry + 9) {
           if (this.subIdx === i) J.add('a');
           else { this.subIdx = i; audio.sfx('blip'); }
@@ -421,21 +421,23 @@ export class Battle {
       return;
     }
     if (this.phase === 'sign') {
-      const n = SIGNS.length + 1;
-      for (let i = 0; i < n; i++) {
-        const ry = 105 + i * 9;
-        if (x >= 2 && x <= 158 && y >= ry - 3 && y <= ry + 9) {
-          if (this.subIdx === i) J.add('a');
-          else { this.subIdx = i; audio.sfx('blip'); }
-          return;
-        }
+      // 2x2 grid: IGNI/AARD top, QUEN/AXII bottom, BACK last row
+      if (y >= 104 && y <= 131 && x >= 2 && x <= 158) {
+        const idx = (y >= 115 ? 2 : 0) + (x >= 76 ? 1 : 0);
+        if (this.subIdx === idx) J.add('a');
+        else { this.subIdx = idx; audio.sfx('blip'); }
+        return;
+      }
+      if (y >= 131 && y <= 142 && x >= 2 && x <= 158) {
+        if (this.subIdx >= SIGNS.length) J.add('a');
+        else { this.subIdx = SIGNS.length; audio.sfx('blip'); }
       }
       return;
     }
     if (this.phase === 'item') {
       const list = this.battleItemList();
-      const n = list.length + 1;
-      for (let i = 0; i < Math.min(3, n); i++) {
+      const n = Math.min(3, list.length) + 1; // visible item rows + BACK
+      for (let i = 0; i < n; i++) {
         const ry = 105 + i * 9;
         if (x >= 2 && x <= 158 && y >= ry - 3 && y <= ry + 9) {
           if (this.itemIdx === i) J.add('a');
@@ -487,8 +489,10 @@ export class Battle {
 
     if (this.phase === 'sign') {
       const n = SIGNS.length + 1;
-      if (press('up')) { this.subIdx = (this.subIdx + n - 1) % n; audio.sfx('blip'); }
-      if (press('down')) { this.subIdx = (this.subIdx + 1) % n; audio.sfx('blip'); }
+      if (press('up')) { this.subIdx = (this.subIdx + n - 2) % n; audio.sfx('blip'); }
+      if (press('down')) { this.subIdx = (this.subIdx + 2) % n; audio.sfx('blip'); }
+      if (press('left')) { this.subIdx = (this.subIdx + n - 1) % n; audio.sfx('blip'); }
+      if (press('right')) { this.subIdx = (this.subIdx + 1) % n; audio.sfx('blip'); }
       if (press('b')) { this.phase = 'menu'; audio.sfx('cancel'); return; }
       if (press('a')) {
         if (this.subIdx >= SIGNS.length) { this.phase = 'menu'; audio.sfx('cancel'); return; }
@@ -633,22 +637,24 @@ export class Battle {
       ctx.globalAlpha = 1;
     }
 
-    // enemy info box
-    drawWindow(ctx, 4, 4, 76, 26);
-    drawText(ctx, this.monName.slice(0, 12), 8, 9, C.INK);
-    drawText(ctx, `L${this.monLvl}`, 66, 9, C.INK);
-    drawBar(ctx, 8, 18, 68, this.monHp / this.monMaxHp, 'HP');
+    // enemy info box (name left, level right-aligned; they never collide)
+    drawWindow(ctx, 4, 4, 92, 26);
+    const lvlTxt = `L${this.monLvl}`;
+    const lvlX = 90 - textWidth(lvlTxt);
+    const nameMax = Math.max(4, Math.floor((lvlX - 8 - 4) / 6));
+    drawText(ctx, this.monName.slice(0, nameMax), 8, 9, C.INK);
+    drawTextRight(ctx, lvlTxt, 90, 9, C.INK);
+    drawBar(ctx, 8, 19, 80, this.monHp / this.monMaxHp, 'HP');
 
-    // player info box
-    drawWindow(ctx, 80, 66, 76, 30);
-    drawText(ctx, 'VESK', 84, 71, C.INK);
-    drawText(ctx, `L${this.plvl}`, 140, 71, C.INK);
-    drawBar(ctx, 90, 80, 60, this.php / this.pmaxHp, 'HP');
-    drawBar(ctx, 90, 88 - 3 + 3, 60, this.psta / this.pmaxSta);
-    drawText(ctx, 'STA', 84, 85, C.INK);
-    if (this.quenTurns > 0) drawText(ctx, 'QUEN', 84, 90, C.DARK);
-    if (this.poison > 0) drawText(ctx, 'PSN', 120, 90, C.DARK);
-    if (this.ptox > 6) drawText(ctx, 'TOX', 140, 90, C.INK);
+    // player info box (labels left of bars, status row inside the frame)
+    drawWindow(ctx, 80, 56, 76, 40);
+    drawText(ctx, 'VESK', 84, 59, C.INK);
+    drawTextRight(ctx, `L${this.plvl}`, 150, 59, C.INK);
+    drawBar(ctx, 84, 68, 66, this.php / this.pmaxHp, 'HP');
+    drawBar(ctx, 84, 78, 66, this.psta / this.pmaxSta, 'STA');
+    if (this.quenTurns > 0) drawText(ctx, 'QUEN', 84, 87, C.DARK);
+    if (this.poison > 0) drawText(ctx, 'PSN', 114, 87, C.DARK);
+    if (this.ptox > 6) drawText(ctx, 'TOX', 134, 87, C.INK);
 
     // bottom UI
     if (this.phase === 'menu') {
@@ -657,7 +663,7 @@ export class Battle {
       lines.slice(0, 3).forEach((l, i) => drawText(ctx, l, 7, 106 + i * 10, C.INK));
       drawWindow(ctx, 76, 100, 82, 42);
       const items = ['FIGHT', 'ITEM', 'SIGN', 'RUN'];
-      const pos = [[84, 107], [128, 107], [84, 125], [128, 125]];
+      const pos = [[80, 107], [124, 107], [80, 125], [124, 125]];
       items.forEach((it, i) => {
         drawText(ctx, it, pos[i][0] + 8, pos[i][1], C.INK);
         if (this.menuIdx === i) drawCursor(ctx, pos[i][0], pos[i][1], C.INK);
@@ -666,22 +672,23 @@ export class Battle {
       // submenu full width
       drawWindow(ctx, 2, 100, 156, 42);
       if (this.phase === 'fight') {
-        const items = ['STEEL SWORD - for beasts of flesh', 'SILVER SWORD - for monsters'];
+        const items = ['STEEL SWORD - beasts', 'SILVER SWORD - monsters'];
         items.forEach((it, i) => {
-          drawText(ctx, it, 12, 107 + i * 13, C.INK);
-          if (this.subIdx === i) drawCursor(ctx, 5, 107 + i * 13, C.INK);
+          drawText(ctx, it, 12, 107 + i * 15, C.INK);
+          if (this.subIdx === i) drawCursor(ctx, 5, 107 + i * 15, C.INK);
         });
-        drawText(ctx, 'B: back', 100, 132, C.DARK);
+        drawText(ctx, 'B: back', 108, 132, C.DARK);
       } else if (this.phase === 'sign') {
+        // 2x2 sign grid + BACK, all inside the window
+        const pos: [number, number][] = [[12, 108], [80, 108], [12, 121], [80, 121]];
         SIGNS.forEach((s, i) => {
-          const y = 105 + i * 9;
           const label = `${s.name} (${s.cost})`;
-          drawText(ctx, label, 12, y, this.psta >= s.cost ? C.INK : C.DARK);
-          if (this.subIdx === i) drawCursor(ctx, 5, y, C.INK);
+          drawText(ctx, label, pos[i][0] + 8, pos[i][1], this.psta >= s.cost ? C.INK : C.DARK);
+          if (this.subIdx === i) drawCursor(ctx, pos[i][0], pos[i][1], C.INK);
         });
-        const y = 105 + SIGNS.length * 9;
-        drawText(ctx, 'BACK', 12, y, C.INK);
-        if (this.subIdx === SIGNS.length) drawCursor(ctx, 5, y, C.INK);
+        drawText(ctx, 'BACK', 20, 133, C.INK);
+        if (this.subIdx >= SIGNS.length) drawCursor(ctx, 12, 133, C.INK);
+        drawText(ctx, 'B: back', 108, 133, C.DARK);
       } else {
         const list = this.battleItemList();
         if (list.length === 0) {
@@ -698,13 +705,13 @@ export class Battle {
         drawText(ctx, 'B: back', 108, 132, C.DARK);
       }
     } else {
-      // message box
+      // message box (4 lines, wrap leaves room for the ▼ marker)
       drawWindow(ctx, 2, 100, 156, 42);
       const shown = this.curMsg.slice(0, Math.floor(this.charIdx));
-      const lines = wrapText(shown, 146);
-      lines.slice(0, 3).forEach((l, i) => drawText(ctx, l, 8, 106 + i * 11, C.INK));
+      const lines = wrapText(shown, 138);
+      lines.slice(0, 4).forEach((l, i) => drawText(ctx, l, 8, 103 + i * 10, C.INK));
       if (this.charIdx >= this.curMsg.length && this.msgs.length === 1 && Math.floor(this.time / 300) % 2 === 0) {
-        drawText(ctx, '▼', 146, 132, C.INK);
+        drawText(ctx, '▼', 149, 133, C.INK);
       }
     }
 

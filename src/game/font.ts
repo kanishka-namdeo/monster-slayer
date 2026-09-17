@@ -172,3 +172,11 @@ export function wrapText(text: string, maxPx: number): string[] {
 export function hasGlyph(ch: string): boolean {
   return !!F[ch];
 }
+
+/** Split already-wrapped lines into pages of at most `perPage` lines. */
+export function paginateLines(lns: string[], perPage: number): string[][] {
+  if (lns.length === 0) return [[]];
+  const pages: string[][] = [];
+  for (let i = 0; i < lns.length; i += perPage) pages.push(lns.slice(i, i + perPage));
+  return pages;
+}

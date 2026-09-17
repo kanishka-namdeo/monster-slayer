@@ -31,23 +31,35 @@ export function drawCursor(ctx: CanvasRenderingContext2D, x: number, y: number, 
   drawText(ctx, '►', x, y, color);
 }
 
+/** Right-aligned single line of text; `rightX` is the last pixel column used. */
+export function drawTextRight(ctx: CanvasRenderingContext2D, text: string, rightX: number, y: number, color: string = PAL[0]) {
+  drawText(ctx, text, rightX - textWidth(text), y, color);
+}
+
 export function drawContinue(ctx: CanvasRenderingContext2D, x: number, y: number, visible: boolean) {
   if (visible) drawText(ctx, '▼', x, y, C.INK);
 }
 
-/** HP bar with frame. Returns nothing. */
+/** HP bar with frame. Label is drawn to the LEFT of the bar, vertically
+ *  centered, so glyphs are never overdrawn by the bar fill. */
 export function drawBar(
   ctx: CanvasRenderingContext2D, x: number, y: number, w: number, ratio: number,
   label?: string,
 ) {
-  if (label) drawText(ctx, label, x, y - 3, C.INK);
-  px(ctx, x, y, w, 7, C.INK);
-  px(ctx, x + 1, y + 1, w - 2, 5, C.PAPER);
+  let bx = x;
+  let bw = w;
+  if (label) {
+    drawText(ctx, label, x, y, C.INK);
+    bx = x + textWidth(label) + 4;
+    bw = w - (bx - x);
+  }
+  px(ctx, bx, y, bw, 7, C.INK);
+  px(ctx, bx + 1, y + 1, bw - 2, 5, C.PAPER);
   const r = Math.max(0, Math.min(1, ratio));
-  const fw = Math.round((w - 4) * r);
+  const fw = Math.round((bw - 4) * r);
   if (fw > 0) {
     const color = r > 0.5 ? C.DARK : r > 0.25 ? C.LIGHT : C.INK;
-    px(ctx, x + 2, y + 2, fw, 3, color);
+    px(ctx, bx + 2, y + 2, fw, 3, color);
   }
 }
 
