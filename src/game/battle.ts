@@ -393,6 +393,60 @@ export class Battle {
 
   // ---------------- update ----------------
 
+  // ---------------- pointer (mouse) ----------------
+  pointerClick(x: number, y: number, btn: 'a' | 'b', input: InputState) {
+    const J = input.just;
+    if (this.phase === 'intro') { this.introT += 999; return; }
+    if (btn === 'b') { J.add('b'); return; }
+    if (this.phase === 'msg') { J.add('a'); return; }
+    if (this.phase === 'menu') {
+      if (x >= 76 && x <= 158 && y >= 100 && y <= 142) {
+        const row = y < 121 ? 0 : 1;
+        const col = x < 124 ? 0 : 1;
+        const idx = row * 2 + col;
+        if (this.menuIdx === idx) J.add('a');
+        else { this.menuIdx = idx; audio.sfx('blip'); }
+      }
+      return;
+    }
+    if (this.phase === 'fight') {
+      for (let i = 0; i < 2; i++) {
+        const ry = 107 + i * 13;
+        if (x >= 2 && x <= 158 && y >= ry - 3 && y <= ry + 9) {
+          if (this.subIdx === i) J.add('a');
+          else { this.subIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      return;
+    }
+    if (this.phase === 'sign') {
+      const n = SIGNS.length + 1;
+      for (let i = 0; i < n; i++) {
+        const ry = 105 + i * 9;
+        if (x >= 2 && x <= 158 && y >= ry - 3 && y <= ry + 9) {
+          if (this.subIdx === i) J.add('a');
+          else { this.subIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      return;
+    }
+    if (this.phase === 'item') {
+      const list = this.battleItemList();
+      const n = list.length + 1;
+      for (let i = 0; i < Math.min(3, n); i++) {
+        const ry = 105 + i * 9;
+        if (x >= 2 && x <= 158 && y >= ry - 3 && y <= ry + 9) {
+          if (this.itemIdx === i) J.add('a');
+          else { this.itemIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      return;
+    }
+  }
+
   update(dt: number, input: InputState) {
     this.time += dt;
     this.tick += dt;

@@ -53,10 +53,11 @@ export const TOX_WARN = 6;
 // Controls shown in UI
 export const KEY_HINTS: [string, string][] = [
   ['Arrows / WASD', 'Move'],
-  ['Z / SPACE', 'A - Talk / Confirm'],
-  ['X', 'B - Cancel / Hold: Run'],
+  ['Z / SPACE / Click', 'A - Talk / Confirm'],
+  ['X / Right-click', 'B - Cancel / Hold: Run'],
   ['ENTER', 'START - Menu'],
-  ['SHIFT', 'SELECT - Sound on/off'],
+  ['SHIFT / M', 'SELECT - Sound on/off'],
+  ['Mouse', 'Click: walk & talk · Wheel: browse'],
 ];
 
 export const SAVE_KEY = 'monsterslayer-save-v1';

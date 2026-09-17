@@ -516,6 +516,122 @@ function renderBoard(g: Game, ctx: CanvasRenderingContext2D) {
   drawText(ctx, 'Nail it. Take it. Survive it.', 8, 132, C.DARK);
 }
 
+// ---------------- pointer (mouse) for overlay modes ----------------
+function rowHit(y: number, ry: number, pad = 3): boolean {
+  return y >= ry - pad && y <= ry + 9;
+}
+
+/** click in logical 160x144 coords on an overlay screen (menu/bag/quests/...) */
+export function pointerOverlay(g: Game, x: number, y: number, btn: 'a' | 'b') {
+  const J = g.just;
+  if (btn === 'b') {
+    // B backs out of every overlay
+    if (g.mode !== 'ending') J.add('b');
+    return;
+  }
+  switch (g.mode) {
+    case 'menu': {
+      for (let i = 0; i < MENU_ITEMS.length; i++) {
+        if (x >= 92 && x <= 156 && rowHit(y, 10 + i * 11)) {
+          if (g.menuIdx === i) { J.add('a'); } else { g.menuIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      return;
+    }
+    case 'bag': {
+      if (g.bagIdx === -1) { J.add('b'); return; } // stats page: click = back
+      const list = invList(g);
+      const start = Math.max(0, Math.min(g.bagIdx - 4, list.length - 7));
+      for (let i = 0; i < Math.min(7, list.length - start); i++) {
+        if (x >= 2 && x <= 158 && rowHit(y, 8 + i * 11)) {
+          const idx = start + i;
+          if (g.bagIdx === idx) { J.add('a'); } else { g.bagIdx = idx; audio.sfx('blip'); }
+          return;
+        }
+      }
+      return;
+    }
+    case 'quests': {
+      const list = questList(g);
+      for (let i = 0; i < Math.min(4, list.length); i++) {
+        if (x >= 2 && x <= 158 && rowHit(y, 8 + i * 12)) {
+          if (g.questIdx === i) { J.add('a'); } else { g.questIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      return;
+    }
+    case 'bestiary': {
+      if (g.bestPage > 0) { J.add('b'); return; } // detail page: click = back
+      const list = bestList(g);
+      for (let i = 0; i < Math.min(3, list.length); i++) {
+        if (x >= 2 && x <= 158 && rowHit(y, 22 + i * 11)) {
+          if (g.bestIdx === i) { J.add('a'); } else { g.bestIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      return;
+    }
+    case 'skills': {
+      for (let i = 0; i < SKILL_OPTIONS.length; i++) {
+        if (x >= 8 && x <= 100 && rowHit(y, 40 + i * 14, 4)) {
+          if (g.skillsIdx === i) { J.add('a'); } else { g.skillsIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      if (x >= 8 && x <= 100 && rowHit(y, 40 + SKILL_OPTIONS.length * 14, 4)) {
+        if (g.skillsIdx === SKILL_OPTIONS.length) { J.add('a'); } else { g.skillsIdx = SKILL_OPTIONS.length; audio.sfx('blip'); }
+      }
+      return;
+    }
+    case 'shop': {
+      if (g.shopTab === 0) {
+        for (let i = 0; i < 3; i++) {
+          if (x >= 2 && x <= 74 && rowHit(y, 18 + i * 12)) {
+            if (g.shopIdx === i) { J.add('a'); } else { g.shopIdx = i; audio.sfx('blip'); }
+            return;
+          }
+        }
+        return;
+      }
+      const entries = g.shopTab === 1 ? shopEntries(g, g.shopId) : sellList(g, g.shopId).map((e) => ({ ...e }));
+      const n = entries.length;
+      for (let i = 0; i < Math.min(6, n); i++) {
+        if (x >= 2 && x <= 158 && rowHit(y, 18 + i * 12)) {
+          if (g.shopIdx === i) { J.add('a'); } else { g.shopIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      const backY = 18 + Math.min(6, n) * 12;
+      if (x >= 2 && x <= 158 && rowHit(y, backY)) {
+        if (g.shopIdx >= n) { J.add('a'); } else { g.shopIdx = n; audio.sfx('blip'); }
+      }
+      return;
+    }
+    case 'board': {
+      const entries = boardList(g);
+      const n = entries.length;
+      for (let i = 0; i < Math.min(6, n); i++) {
+        if (x >= 2 && x <= 158 && rowHit(y, 22 + i * 12)) {
+          if (g.boardIdx === i) { J.add('a'); } else { g.boardIdx = i; audio.sfx('blip'); }
+          return;
+        }
+      }
+      const closeY = 22 + Math.min(6, n) * 12;
+      if (x >= 2 && x <= 158 && rowHit(y, closeY)) {
+        if (g.boardIdx >= n) { J.add('a'); } else { g.boardIdx = n; audio.sfx('blip'); }
+      }
+      return;
+    }
+    case 'ending':
+      J.add('a');
+      return;
+    default:
+      return;
+  }
+}
+
 // ---------------- ending ----------------
 function updateEnding(g: Game) {
   const J = g.just;

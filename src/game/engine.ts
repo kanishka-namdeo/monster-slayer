@@ -15,7 +15,7 @@ import { audio } from './audio';
 import { Battle } from './battle';
 import { drawWindow, drawDarkWindow, drawCursor, drawTitleText } from './render';
 import { drawText, wrapText } from './font';
-import { updateOverlayMode, renderOverlayMode } from './engineMenus';
+import { updateOverlayMode, renderOverlayMode, pointerOverlay } from './engineMenus';
 
 export type Mode =
   | 'boot' | 'title' | 'creation' | 'intro' | 'world' | 'dialog' | 'board' | 'menu'
@@ -122,6 +122,189 @@ export class Game {
     this.held.delete(btn);
   }
 
+  // ================= pointer / mouse input =================
+  pointer = { x: -1, y: -1, inside: false };
+  private walkPath: Array<'up' | 'down' | 'left' | 'right'> = [];
+  private walkInteract = false;
+  private autoDir: string | null = null;
+
+  setPointer(x: number, y: number, inside: boolean) {
+    this.pointer.x = x; this.pointer.y = y; this.pointer.inside = inside;
+  }
+
+  wheel(dy: number) {
+    if (dy !== 0) this.just.add(dy < 0 ? 'up' : 'down');
+  }
+
+  cancelAutoWalk() {
+    if (this.autoDir) { this.held.delete(this.autoDir); this.autoDir = null; }
+    this.walkPath = [];
+    this.walkInteract = false;
+  }
+
+  /** logical (160x144) camera origin — shared by render + pointer math */
+  camera(): { camX: number; camY: number } {
+    const def = this.mapDef;
+    const mapW = def.rows[0].length * TILE;
+    const mapH = def.rows.length * TILE;
+    const pp = this.playerPixel();
+    let camX = Math.round(pp.x - (SCREEN_W - TILE) / 2);
+    let camY = Math.round(pp.y - (SCREEN_H - TILE) / 2);
+    camX = Math.max(0, Math.min(mapW - SCREEN_W, camX));
+    camY = Math.max(0, Math.min(mapH - SCREEN_H, camY));
+    if (mapW < SCREEN_W) camX = -((SCREEN_W - mapW) / 2);
+    if (mapH < SCREEN_H) camY = -((SCREEN_H - mapH) / 2);
+    return { camX: Math.round(camX), camY: Math.round(camY) };
+  }
+
+  /** BFS path to a walkable goal tile (goal may hold an NPC); null if unreachable */
+  private planPath(tx: number, ty: number): Array<'up' | 'down' | 'left' | 'right'> | null {
+    const def = this.mapDef;
+    const start = { x: this.player.x, y: this.player.y };
+    if (start.x === tx && start.y === ty) return [];
+    const W = def.rows[0].length;
+    const H = def.rows.length;
+    const key = (x: number, y: number) => `${x},${y}`;
+    const prev = new Map<string, { x: number; y: number }>();
+    const seen = new Set([key(start.x, start.y)]);
+    const q: { x: number; y: number }[] = [start];
+    while (q.length > 0) {
+      const cur = q.shift()!;
+      if (cur.x === tx && cur.y === ty) {
+        const dirs: Array<'up' | 'down' | 'left' | 'right'> = [];
+        let c = cur;
+        while (!(c.x === start.x && c.y === start.y)) {
+          const pt = prev.get(key(c.x, c.y))!;
+          dirs.unshift(pt.x < c.x ? 'right' : pt.x > c.x ? 'left' : pt.y < c.y ? 'down' : 'up');
+          c = pt;
+        }
+        return dirs;
+      }
+      const nbrs = [[0, -1], [0, 1], [-1, 0], [1, 0]] as const;
+      for (const [dx, dy] of nbrs) {
+        const nx = cur.x + dx;
+        const ny = cur.y + dy;
+        if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+        const k = key(nx, ny);
+        if (seen.has(k)) continue;
+        if (isBlocked(def, nx, ny)) continue;
+        if (this.npcAt(nx, ny) && !(nx === tx && ny === ty)) continue;
+        seen.add(k);
+        prev.set(k, cur);
+        q.push({ x: nx, y: ny });
+      }
+    }
+    return null;
+  }
+
+  /** click in logical screen coords (160x144) */
+  pointerClick(x: number, y: number, btn: 'a' | 'b') {
+    switch (this.mode) {
+      case 'title': this.titlePointer(x, y, btn); break;
+      case 'creation': this.creationPointer(x, y, btn); break;
+      case 'intro':
+      case 'ending':
+      case 'gameover':
+        if (btn === 'a') this.just.add('a');
+        break;
+      case 'world': this.worldPointer(x, y, btn); break;
+      case 'dialog': this.dialogPointer(x, y, btn); break;
+      case 'battle': this.battle?.pointerClick(x, y, btn, this.input); break;
+      default: pointerOverlay(this, x, y, btn); break;
+    }
+  }
+
+  private titlePointer(x: number, y: number, btn: 'a' | 'b') {
+    if (!this.titleStarted) {
+      if (btn === 'a') this.just.add('a');
+      return;
+    }
+    const hasSave = this.hasSave();
+    const n = hasSave ? 2 : 1;
+    for (let i = 0; i < n; i++) {
+      const ry = 120 + i * 11;
+      if (x >= 46 && x <= 116 && y >= ry - 2 && y <= ry + 8) {
+        this.titleIdx = i;
+        if (btn === 'a') this.just.add('a');
+        return;
+      }
+    }
+  }
+
+  private creationPointer(x: number, y: number, btn: 'a' | 'b') {
+    if (btn === 'b') { this.just.add('b'); return; }
+    for (let i = 0; i < SCHOOLS.length; i++) {
+      const ry = 40 + i * 11;
+      if (x >= 22 && x <= 96 && y >= ry - 2 && y <= ry + 8) {
+        this.creationIdx = i;
+        if (btn === 'a') this.just.add('a');
+        return;
+      }
+    }
+  }
+
+  private worldPointer(x: number, y: number, btn: 'a' | 'b') {
+    if (btn === 'b') {
+      this.cancelAutoWalk();
+      return; // B is a hold-to-run key; clicks don't map
+    }
+    const { camX, camY } = this.camera();
+    const tx = Math.floor((x + camX) / TILE);
+    const ty = Math.floor((y + camY) / TILE);
+    const def = this.mapDef;
+    const W = def.rows[0].length;
+    const H = def.rows.length;
+    if (tx < 0 || ty < 0 || tx >= W || ty >= H) return;
+    this.cancelAutoWalk();
+    // NPC click: walk adjacent, then talk
+    const npc = this.npcAt(tx, ty);
+    if (npc) {
+      const path = this.planPath(tx, ty);
+      if (path) {
+        this.walkPath = path.slice(0, -1);
+        this.walkInteract = true;
+        audio.sfx('blip');
+      }
+      return;
+    }
+    // blocked tile: just face it
+    if (isBlocked(def, tx, ty) || (tx === this.player.x && ty === this.player.y)) {
+      const dx = tx - this.player.x;
+      const dy = ty - this.player.y;
+      if (Math.abs(dx) >= Math.abs(dy)) this.player.dir = dx > 0 ? 'right' : 'left';
+      else this.player.dir = dy > 0 ? 'down' : 'up';
+      return;
+    }
+    const path = this.planPath(tx, ty);
+    if (path && path.length > 0) {
+      this.walkPath = path;
+      this.walkInteract = false;
+      audio.sfx('blip');
+    }
+  }
+
+  private dialogPointer(x: number, y: number, btn: 'a' | 'b') {
+    const d = this.dialog;
+    if (!d) return;
+    if (btn === 'b') { this.just.add('b'); return; }
+    if (d.choosing && d.node?.choices) {
+      const choices = d.node.choices.filter((c) => this.checkCond(c.cond));
+      const n = choices.length;
+      const ch = 12 * n + 12;
+      const cy = 96 - ch - 2;
+      for (let i = 0; i < n; i++) {
+        const ry = cy + 6 + i * 12;
+        if (x >= 50 && x <= 158 && y >= ry - 2 && y <= ry + 9) {
+          d.choiceIdx = i;
+          this.just.add('a');
+          return;
+        }
+      }
+      return;
+    }
+    this.just.add('a');
+  }
+
   get input() {
     return { held: this.held, just: this.just };
   }
@@ -150,6 +333,7 @@ export class Game {
   }
 
   switchMap(to: string, tx: number, ty: number, dir?: string) {
+    this.cancelAutoWalk();
     this.map = to;
     this.player.x = tx; this.player.y = ty;
     if (dir) this.player.dir = dir as PlayerState['dir'];
@@ -308,6 +492,7 @@ export class Game {
 
   // ================= dialog =================
   startDialog(treeId: string) {
+    this.cancelAutoWalk();
     const tree = DIALOGUES[treeId];
     if (!tree) return;
     let entry = '';
@@ -441,6 +626,7 @@ export class Game {
 
   // ================= battle glue =================
   startBattle(monId: string, lvl: number, boss = false) {
+    this.cancelAutoWalk();
     this.bestiary[monId] = true;
     this.dialog = null;
     this.mode = 'battle';
@@ -615,6 +801,17 @@ export class Game {
   updateWorld(dt: number) {
     const p = this.player;
     const J = this.just;
+
+    // auto-walk (mouse click-to-move)
+    if (this.autoDir && this.moving) { this.held.delete(this.autoDir); this.autoDir = null; }
+    if (!this.moving && this.walkPath.length > 0) {
+      const dir = this.walkPath.shift()!;
+      this.autoDir = dir;
+      this.held.add(dir);
+    } else if (!this.moving && this.walkPath.length === 0 && this.walkInteract) {
+      this.walkInteract = false;
+      this.just.add('a');
+    }
 
     // select toggle
     if (J.has('select')) {
@@ -846,15 +1043,8 @@ export class Game {
 
   renderWorld(ctx: CanvasRenderingContext2D) {
     const def = this.mapDef;
-    const mapW = def.rows[0].length * TILE;
-    const mapH = def.rows.length * TILE;
     const pp = this.playerPixel();
-    let camX = Math.round(pp.x - (SCREEN_W - TILE) / 2);
-    let camY = Math.round(pp.y - (SCREEN_H - TILE) / 2);
-    camX = Math.max(0, Math.min(mapW - SCREEN_W, camX));
-    camY = Math.max(0, Math.min(mapH - SCREEN_H, camY));
-    if (mapW < SCREEN_W) camX = -((SCREEN_W - mapW) / 2);
-    if (mapH < SCREEN_H) camY = -((SCREEN_H - mapH) / 2);
+    const { camX, camY } = this.camera();
 
     ctx.fillStyle = C.INK;
     ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
@@ -930,6 +1120,23 @@ export class Game {
       ctx.globalAlpha = a;
       drawText(ctx, 'Your medallion hums...', 4, SCREEN_H - 12, C.INK);
       ctx.globalAlpha = 1;
+    }
+
+    // mouse hover: blinking tile cursor (world mode only)
+    if (this.pointer.inside && this.mode === 'world') {
+      const htx = Math.floor((this.pointer.x + camX) / TILE);
+      const hty = Math.floor((this.pointer.y + camY) / TILE);
+      const hx = htx * TILE - camX;
+      const hy = hty * TILE - camY;
+      if (hx >= 0 && hy >= 0 && hx < SCREEN_W - TILE && hy < SCREEN_H - TILE) {
+        ctx.globalAlpha = Math.floor(this.time / 250) % 2 === 0 ? 0.9 : 0.45;
+        ctx.fillStyle = C.PAPER;
+        ctx.fillRect(hx, hy, TILE, 1);
+        ctx.fillRect(hx, hy + TILE - 1, TILE, 1);
+        ctx.fillRect(hx, hy, 1, TILE);
+        ctx.fillRect(hx + TILE - 1, hy, 1, TILE);
+        ctx.globalAlpha = 1;
+      }
     }
   }
 

@@ -12,6 +12,7 @@ const KEYMAP: Record<string, string> = {
   x: 'b', X: 'b', Escape: 'b', Backspace: 'b',
   Enter: 'start',
   Shift: 'select',
+  m: 'select', M: 'select', // M toggles sound, same as SELECT
 };
 
 function DPadButton({
@@ -58,6 +59,7 @@ export default function Home() {
       const btn = KEYMAP[e.key];
       if (btn) {
         e.preventDefault();
+        game.cancelAutoWalk(); // real keypress overrides mouse pathing
         game.press(btn);
         if (btn === 'select') setSoundOn(audio.enabled);
       }
@@ -89,6 +91,7 @@ export default function Home() {
   }, []);
 
   const press = useCallback((b: string) => {
+    gameRef.current?.cancelAutoWalk();
     gameRef.current?.press(b);
     if (b === 'select') setSoundOn(audio.enabled);
   }, []);
@@ -103,6 +106,40 @@ export default function Home() {
     onPointerCancel: () => release(b),
     onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
   });
+
+  // ---- mouse / pointer on the game canvas ----
+  const gameCoords = (e: { clientX: number; clientY: number; currentTarget: EventTarget & HTMLCanvasElement }) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = Math.floor(((e.clientX - r.left) / r.width) * 160);
+    const y = Math.floor(((e.clientY - r.top) / r.height) * 144);
+    return { x: Math.max(0, Math.min(159, x)), y: Math.max(0, Math.min(143, y)) };
+  };
+
+  const onCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const { x, y } = gameCoords(e);
+    gameRef.current?.pointerClick(x, y, 'a');
+  };
+
+  const onCanvasContext = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const { x, y } = gameCoords(e);
+    gameRef.current?.pointerClick(x, y, 'b');
+  };
+
+  const onCanvasMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const { x, y } = gameCoords(e);
+    gameRef.current?.setPointer(x, y, true);
+  };
+
+  const onCanvasLeave = () => {
+    gameRef.current?.setPointer(-1, -1, false);
+  };
+
+  const onCanvasWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    gameRef.current?.wheel(e.deltaY);
+  };
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-zinc-950 text-zinc-200 py-8 px-4"
@@ -137,9 +174,14 @@ export default function Home() {
                 ref={canvasRef}
                 width={160}
                 height={144}
-                className="block w-full h-auto"
+                className="block w-full h-auto cursor-crosshair touch-none"
                 style={{ imageRendering: 'pixelated', aspectRatio: '160 / 144' }}
-                aria-label="Monster Slayer game screen"
+                aria-label="Monster Slayer game screen — click to move and interact, right-click to cancel"
+                onClick={onCanvasClick}
+                onContextMenu={onCanvasContext}
+                onPointerMove={onCanvasMove}
+                onPointerLeave={onCanvasLeave}
+                onWheel={onCanvasWheel}
               />
             </div>
             <div className="flex justify-between items-center mt-2">
@@ -230,9 +272,10 @@ export default function Home() {
         <h2 className="text-xs font-bold tracking-widest text-zinc-400 mb-3">WITCHER&apos;S MANUAL</h2>
         <ul className="space-y-1.5 text-[11px] text-zinc-400">
           <li><b className="text-zinc-200">Arrows / WASD</b> &mdash; move &middot; <b className="text-zinc-200">hold B</b> to run</li>
-          <li><b className="text-zinc-200">Z / Space</b> &mdash; A: talk, confirm, read the board</li>
-          <li><b className="text-zinc-200">X</b> &mdash; B: cancel &middot; <b className="text-zinc-200">Enter</b> &mdash; START: menu</li>
-          <li><b className="text-zinc-200">Shift</b> &mdash; SELECT: sound on/off</li>
+          <li><b className="text-zinc-200">Z / Space / Click</b> &mdash; A: talk, confirm, read the board</li>
+          <li><b className="text-zinc-200">X / Right-click</b> &mdash; B: cancel &middot; <b className="text-zinc-200">Enter</b> &mdash; START: menu</li>
+          <li><b className="text-zinc-200">Shift / M</b> &mdash; SELECT: sound on/off</li>
+          <li><b className="text-zinc-200">Mouse</b> &mdash; click to walk, click an NPC to talk, scroll to browse lists</li>
         </ul>
         <div className="mt-3 pt-3 border-t border-zinc-800 text-[11px] text-zinc-500 leading-relaxed">
           Take contracts from the notice board. Steel cuts beasts, silver cuts monsters.

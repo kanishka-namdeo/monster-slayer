@@ -307,5 +307,55 @@ R=$(q "window.__game.mode + ' ' + window.__game.player.skillPoints + ' ' + windo
 check "vitality trained" 'skills 1 35' "$R"
 tap b 0.2    # back to menu
 
+echo "=== mouse & pointer controls ==="
+resetscene
+q "window.__game.mode='world'; window.__game.switchMap('village', 10, 8, 'down'); window.__game.player.x=10; window.__game.player.y=8; 'ok'" >/dev/null
+sleep 0.3
+# click-to-move: village, player at (10,8), camera (88,60) -> click screen (112,124) = tile (12,11)
+q "window.__game.setPointer(112, 124, true); window.__game.pointerClick(112, 124, 'a'); 'clicked'" >/dev/null
+sleep 2.5
+R=$(q "window.__game.player.x + ',' + window.__game.player.y")
+check "click-to-move walks" '1[0-2],1[01]' "$R"
+# click NPC (bram is in elder map): switch and click kettle-style via pointer
+q "window.__game.switchMap('elder', 5, 5, 'up'); 'ok'" >/dev/null
+sleep 0.4
+q "window.__game.pointerClick(80, 56, 'a'); 'click'" >/dev/null   # bram at (5,3): screen center (80,56)
+sleep 2.5
+R=$(q "window.__game.mode + '|' + (window.__game.dialog ? window.__game.dialog.node.speaker : 'none')")
+check "click NPC opens dialog" 'dialog.*ELDER BRAM' "$R"
+# click to advance dialog: intro0 shows 2 choices at y=64,76 -> click choice 0
+q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
+sleep 0.2
+q "window.__game.pointerClick(80, 66, 'a'); 'choice'" >/dev/null
+sleep 0.6
+R=$(q "window.__game.flags.metElder")
+check "click picks choice" 'true' "$R"
+q "window.__game.dialog && (window.__game.dialog.charIdx=99999); 'ok'" >/dev/null
+q "window.__game.pointerClick(80, 120, 'a'); 'adv'" >/dev/null
+sleep 0.5
+R=$(q "window.__game.mode"); check "click advances dialog" '"world"' "$R"
+# wheel navigation in menu
+q "window.__game.mode='menu'; window.__game.menuIdx=0; 'ok'" >/dev/null
+q "window.__game.wheel(120); 'scroll'" >/dev/null
+sleep 0.4
+R=$(q "window.__game.menuIdx")
+check "wheel scrolls menu" '1' "$R"
+# right-click backs out of menu
+q "window.__game.pointerClick(80, 80, 'b'); 'rc'" >/dev/null
+sleep 0.4
+R=$(q "window.__game.mode"); check "right-click cancels menu" '"world"' "$R"
+# battle menu click
+q "window.__game.mode='world'; window.__game.startBattle('drowner', 3)" >/dev/null
+sleep 1.5
+q "window.__game.battle.phase='menu'; 'ok'" >/dev/null
+q "window.__game.pointerClick(100, 110, 'a'); 'fight'" >/dev/null   # FIGHT quadrant
+sleep 0.4
+q "window.__game.pointerClick(30, 110, 'a'); 'steel'" >/dev/null   # first sword option
+sleep 1.5
+R=$(q "window.__game.mode + '|' + (window.__game.battle ? window.__game.battle.phase : 'ended')")
+check "battle click attacks" '.' "$R"
+q "window.__game.battle && window.__game.debugWinBattle()" >/dev/null
+waitmode world 60 || true
+
 echo ""
 echo "RESULT: $PASS passed, $FAIL failed"
