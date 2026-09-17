@@ -366,8 +366,11 @@ function buildTiles() {
     g.fillRect(0, 7, 16, 1);
     g.fillStyle = PAL[3];                   // beam pegs
     g.fillRect(3, 7, 1, 1); g.fillRect(12, 7, 1, 1);
-    g.fillStyle = PAL[0];                  // plinth
-    g.fillRect(0, 15, 16, 1);
+    g.fillStyle = PAL[1];                  // stone base course
+    g.fillRect(0, 14, 16, 1);
+    g.fillStyle = PAL[0];                  // stone joints...
+    g.fillRect(3, 14, 1, 1); g.fillRect(11, 14, 1, 1);
+    g.fillRect(0, 15, 16, 1);              // ...and ink plinth
     if (extra) extra(g);
     return cv;
   };

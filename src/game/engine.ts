@@ -1111,6 +1111,9 @@ export class Game {
     const y1 = Math.min(def.rows.length - 1, y0 + Math.ceil(SCREEN_H / TILE) + 1);
     const isWater = (c: string) => c === '~' || c === 'o';
     const isGrassFamily = (c: string) => c === '.' || c === ',';
+    // exterior building tiles (facades). Interiors use '#' intwall which is
+    // already dark-banded, so they are deliberately excluded.
+    const isFacade = (c: string | undefined) => !!c && 'WwDJjHh'.includes(c);
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
         const ch = tileAt(def, tx, ty);
@@ -1147,9 +1150,11 @@ export class Game {
           if (land(tx, ty + 1)) ctx.fillRect(sx + 9 - fo % 5, sy + 13, 2, 1);
           if (land(tx - 1, ty)) ctx.fillRect(sx + 1, sy + 4 + fo % 6, 1, 2);
           if (land(tx + 1, ty)) ctx.fillRect(sx + 13, sy + 8 - fo % 5, 1, 2);
-        } else if (ch === 'r') {
+        } else if (ch === 'r' || ch === 'e') {
           // roof ridge: ink cap + paper highlight along the topmost thatch row,
-          // ink edges where the roof block meets non-roof tiles
+          // ink edges where the roof/eave block meets non-roof tiles. The eave
+          // tile's lower half is wall plaster — without the side edges its
+          // silhouette dissolves into the grass beside the building.
           const roofish = (ax: number, ay: number) => {
             const t = tileAt(def, ax, ay);
             return t === 'r' || t === 'e' || t === 'C';
@@ -1162,6 +1167,18 @@ export class Game {
           }
           if (!roofish(tx - 1, ty)) { ctx.fillStyle = C.INK; ctx.fillRect(sx, sy, 1, 16); }
           if (!roofish(tx + 1, ty)) { ctx.fillStyle = C.INK; ctx.fillRect(sx + 15, sy, 1, 16); }
+        } else if (isFacade(ch)) {
+          // facade silhouette: the plaster is the same shade as the grass it
+          // sits on, so ink columns are drawn wherever a wall-family tile
+          // meets open ground — this is what keeps houses reading as solid
+          // objects instead of fading into the lawn
+          const building = (ax: number, ay: number) => {
+            const t = tileAt(def, ax, ay);
+            return t !== undefined && (isFacade(t) || t === 'e' || t === 'r' || t === 'C');
+          };
+          ctx.fillStyle = C.INK;
+          if (!building(tx - 1, ty)) ctx.fillRect(sx, sy, 1, 16);
+          if (!building(tx + 1, ty)) ctx.fillRect(sx + 15, sy, 1, 16);
         } else if (ch === 'p' || ch === 'm') {
           // ragged path/mud edges where they meet grass
           const grassy = (ax: number, ay: number) => isGrassFamily(tileAt(def, ax, ay) ?? '');
@@ -1171,6 +1188,16 @@ export class Game {
           if (grassy(tx, ty + 1)) { ctx.fillRect(sx + 4 + j % 5, sy + 15, 1, 1); ctx.fillRect(sx + 12 - j % 6, sy + 15, 1, 1); }
           if (grassy(tx - 1, ty)) { ctx.fillRect(sx, sy + 3 + j % 6, 1, 1); }
           if (grassy(tx + 1, ty)) { ctx.fillRect(sx + 15, sy + 8 - j % 5, 1, 1); }
+        }
+
+        // facade ground shadow: buildings cast a 1px shadow line onto the tile
+        // below them — together with the stone base + plinth this grounds the
+        // wall bottom against light grass (runs for every tile whose upper
+        // neighbor is a facade tile; building interiors above are excluded)
+        const aboveCh = ty > 0 ? tileAt(def, tx, ty - 1) : undefined;
+        if (isFacade(aboveCh) && !isFacade(ch) && ch !== 'e' && ch !== 'r' && ch !== 'C') {
+          ctx.fillStyle = C.DARK;
+          ctx.fillRect(sx, sy, 16, 1);
         }
       }
     }
