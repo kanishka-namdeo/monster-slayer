@@ -229,5 +229,62 @@ echo "=== save exists ==="
 R=$(q "localStorage.getItem('monsterslayer-save-v1') ? 'saved' : 'missing'")
 check "save" 'saved' "$R"
 
+echo "=== northern reaches: regions ==="
+resetscene
+q "window.__game.switchMap('fangs', 9, 13, 'down')" >/dev/null
+R=$(q "window.__game.map + ' ' + window.__game.mapDef.name + ' ' + window.__audio.currentTrack")
+check "fangtooth reached" 'fangs Fangtooth' "$R"
+q "window.__game.switchMap('bog', 2, 6, 'right')" >/dev/null
+R=$(q "window.__game.map + ' ' + window.__game.mapDef.name + ' ' + window.__audio.currentTrack")
+check "crookback reached" 'bog Crookback' "$R"
+q "window.__game.switchMap('ruins', 8, 12, 'up')" >/dev/null
+R=$(q "window.__game.map + ' ' + window.__game.mapDef.name + ' ' + window.__audio.currentTrack")
+check "kaer serpen reached" 'ruins Kaer' "$R"
+
+echo "=== northern reaches: monsters & oil ==="
+q "window.__game.mode='world'" >/dev/null
+q "window.__game.startBattle('endrega', 6)" >/dev/null
+R=$(q "window.__game.battle ? window.__game.battle.monId + ' ' + window.__game.battle.monType : 'none'")
+check "endrega battle" 'endrega INSECTOID' "$R"
+q "window.__game.inv.insectoil=1; window.__game.battle.useItemBattle('insectoil'); 'ok'" >/dev/null
+sleep 0.5
+R=$(q "window.__game.player.oil.insectoid")
+check "insectoid oil coats blade" '8' "$R"
+q "window.__game.debugWinBattle()" >/dev/null
+waitmode world 60 || true
+R=$(q "window.__game.mode + ' ' + window.__audio.currentTrack")
+check "post-battle world music" 'world' "$R"
+
+echo "=== northern reaches: bosses ==="
+q "window.__game.mode='world'; window.__game.quests.q_griffin.active=true; 'ok'" >/dev/null
+q "window.__game.startBattle('griffin', 9, true)" >/dev/null
+R=$(q "window.__game.battle ? window.__game.battle.monId : 'none'"); check "griffin boss" 'griffin' "$R"
+R=$(q "window.__audio.currentTrack"); check "griffin boss music" '"boss"' "$R"
+q "window.__game.debugWinBattle()" >/dev/null
+waitmode world 60 || true
+R=$(q "window.__game.flags.griffinDone"); check "griffin slain flag" 'true' "$R"
+adv # close victory notice if any
+
+q "window.__game.mode='world'; window.__game.flags.leshanDone=true; window.__game.quests.q_katakan.active=true; window.__game.player.oil.specter=8; 'ok'" >/dev/null
+q "window.__game.startBattle('katakan', 10, true)" >/dev/null
+R=$(q "window.__game.battle ? window.__game.battle.monId : 'none'"); check "katakan boss" 'katakan' "$R"
+q "window.__game.debugWinBattle()" >/dev/null
+waitmode world 60 || true
+R=$(q "window.__game.flags.katakanDone"); check "katakan slain flag" 'true' "$R"
+
+echo "=== northern reaches: npcs & board ==="
+resetscene
+q "window.__game.switchMap('bog', 12, 8, 'up')" >/dev/null
+q "window.__game.startDialog('kettle')" >/dev/null; sleep 0.2
+R=$(q "window.__game.dialog ? window.__game.dialog.node.speaker : 'none'")
+check "kettle speaks" 'OLD KETTLE' "$R"
+q "window.__game.dialog=null; window.__game.mode='world'" >/dev/null
+q "window.__game.switchMap('ruins', 5, 11, 'up')" >/dev/null
+q "window.__game.startDialog('shade')" >/dev/null; sleep 0.2
+R=$(q "window.__game.dialog ? window.__game.dialog.node.speaker : 'none'")
+check "shade speaks" 'PALE WITCHER' "$R"
+R=$(q "Object.keys(window.__game.quests).length")
+check "quests registered" '1[2-9]' "$R"
+
 echo ""
 echo "RESULT: $PASS passed, $FAIL failed"

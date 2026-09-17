@@ -27,7 +27,7 @@ export interface PlayerState {
   atk: number; def: number; lvl: number; xp: number;
   crowns: number; tox: number;
   swordLvl: number; armorLvl: number;
-  oil: { specter: number; necro: number; beast: number };
+  oil: { specter: number; necro: number; beast: number; insectoid: number };
 }
 
 export interface QuestState { active: boolean; done: boolean; count: number }
@@ -61,7 +61,7 @@ export class Game {
     atk: BASE_STATS.atk, def: BASE_STATS.def,
     lvl: 1, xp: 0, crowns: 25, tox: 0,
     swordLvl: 0, armorLvl: 0,
-    oil: { specter: 0, necro: 0, beast: 0 },
+    oil: { specter: 0, necro: 0, beast: 0, insectoid: 0 },
   };
   moving = false;
   moveT = 0;
@@ -137,12 +137,12 @@ export class Game {
   }
 
   applyMapOverrides() {
-    // thorns gate
+    // thorns gate (north-west gap leads to Fangtooth Pass)
     const forest = MAPS.forest;
     if (this.flags.thornsCleared) {
-      forest.rows[0] = 'vvvvvvvvppvvvvvvvvvv';
+      forest.rows[0] = 'vvppvvvvppvvvvvvvvvv';
     } else {
-      forest.rows[0] = 'vvvvvvvvzzvvvvvvvvvv';
+      forest.rows[0] = 'vvppvvvvzzvvvvvvvvvv';
     }
   }
 
@@ -199,6 +199,23 @@ export class Game {
       case 'q_herbsActive': return !!q.q_herbs?.active;
       case 'q_herbsDone': return !!q.q_herbs?.done;
       case 'herbsReady': return (this.inv.foolleaf ?? 0) >= 3;
+      // Northern Reaches
+      case 'q_passActive': return !!q.q_pass?.active;
+      case 'q_passDone': return !!q.q_pass?.done;
+      case 'barghestsReady': return (this.kills.barghest ?? 0) >= 3;
+      case 'q_nekkersActive': return !!q.q_nekkers?.active;
+      case 'q_nekkersDone': return !!q.q_nekkers?.done;
+      case 'nekkersReady': return (this.kills.nekker ?? 0) >= 4;
+      case 'q_fogActive': return !!q.q_fog?.active;
+      case 'q_fogDone': return !!q.q_fog?.done;
+      case 'fogReady': return (this.kills.foglet ?? 0) >= 2;
+      case 'q_griffinActive': return !!q.q_griffin?.active;
+      case 'q_griffinDone': return !!q.q_griffin?.done;
+      case 'q_arachasActive': return !!q.q_arachas?.active;
+      case 'q_arachasDone': return !!q.q_arachas?.done;
+      case 'q_katakanActive': return !!q.q_katakan?.active;
+      case 'q_katakanDone': return !!q.q_katakan?.done;
+      case 'leshanDone': return !!this.flags.leshanDone;
       case 'contractsDone': return !!(q.q_drowners?.done && q.q_wolves?.done && q.q_wraith?.done);
       case 'mainStarted': return !!this.flags.mainStarted;
       case 'hasLocket': return (this.inv.locket ?? 0) > 0;
@@ -253,7 +270,11 @@ export class Game {
           break;
         }
         case 'heal': this.player.hp = this.player.maxHp; this.player.sta = this.player.maxSta; break;
-        case 'battle': this.startBattle(a, a === 'werewolf' ? 8 : a === 'leshen' ? 10 : 7, true); break;
+        case 'battle': {
+          const lvl = a === 'werewolf' ? 8 : a === 'leshen' ? 10 : a === 'griffin' ? 9 : a === 'arachas' ? 9 : a === 'katakan' ? 10 : 7;
+          this.startBattle(a, lvl, true);
+          break;
+        }
         case 'board': this.mode = 'board'; this.boardIdx = 0; break;
         case 'end': this.afterDialogEnd = () => { this.mode = 'ending'; this.endingPage = 0; this.endingT = 0; audio.playMusic('ending'); }; break;
         case 'save': this.save(); break;
@@ -461,6 +482,27 @@ export class Game {
     if (monId === 'wolf' && this.quests.q_wolves.active) {
       note = `Contract: ${(this.kills.wolf ?? 0) >= 4 ? '4' : this.kills.wolf}/4 wolves.`;
     }
+    if (monId === 'barghest' && this.quests.q_pass.active) {
+      note = `Contract: ${(this.kills.barghest ?? 0) >= 3 ? '3' : this.kills.barghest}/3 barghests.`;
+    }
+    if (monId === 'nekker' && this.quests.q_nekkers.active) {
+      note = `Contract: ${(this.kills.nekker ?? 0) >= 4 ? '4' : this.kills.nekker}/4 nekkers.`;
+    }
+    if (monId === 'foglet' && this.quests.q_fog.active) {
+      note = `Contract: ${(this.kills.foglet ?? 0) >= 2 ? '2' : this.kills.foglet}/2 foglets.`;
+    }
+    if (monId === 'griffin') {
+      this.flags.griffinDone = true;
+      note = 'The royal griffin falls from the ridge. The pass belongs to the carts again. Woy will want to hear this.';
+    }
+    if (monId === 'arachas') {
+      this.flags.arachasDone = true;
+      note = 'The Mother of the Bog is still at last. The reeds stand straighter. Old Kettle owes you coin.';
+    }
+    if (monId === 'katakan') {
+      this.flags.katakanDone = true;
+      note = 'The katakan crumbles to ash and old coins. Kaer Serpen breathes again. The pale witcher is waiting.';
+    }
     if (monId === 'werewolf') {
       this.flags.werewolfDone = true;
       note = 'The cursed hunter is free of the moon. The path to the shrine is open.';
@@ -518,11 +560,13 @@ export class Game {
       Object.assign(this.player, d.player);
       this.flags = d.flags ?? {};
       this.quests = d.quests ?? this.quests;
+      for (const q of Object.keys(QUESTS)) if (!this.quests[q]) this.quests[q] = { active: false, done: false, count: 0 };
       this.inv = d.inv ?? {};
       this.bestiary = d.bestiary ?? {};
       this.kills = d.kills ?? {};
       this.collected = d.collected ?? {};
       this.moving = false;
+      if (this.player.oil && this.player.oil.insectoid === undefined) this.player.oil.insectoid = 0;
       this.loadNpcs(this.map);
       this.applyMapOverrides();
       this.mode = 'world';
@@ -543,7 +587,7 @@ export class Game {
       atk: BASE_STATS.atk, def: BASE_STATS.def,
       lvl: 1, xp: 0, crowns: 25, tox: 0,
       swordLvl: 0, armorLvl: 0,
-      oil: { specter: 0, necro: 0, beast: 0 },
+      oil: { specter: 0, necro: 0, beast: 0, insectoid: 0 },
     };
     this.flags = {};
     this.inv = { swallow: 1 };
@@ -719,6 +763,24 @@ export class Game {
       }
       if (this.flags.werewolfDone && !this.flags.leshenDone && ((p.x === 7 && p.y === 10) || (p.x === 8 && p.y === 10))) {
         this.startDialog('leshintro');
+        return;
+      }
+    }
+    if (this.map === 'fangs') {
+      if (this.quests.q_griffin?.active && !this.flags.griffinDone && p.y <= 2 && p.x >= 9 && p.x <= 10) {
+        this.startDialog('griffinintro');
+        return;
+      }
+    }
+    if (this.map === 'bog') {
+      if (this.quests.q_arachas?.active && !this.flags.arachasDone && p.y <= 3 && p.x >= 16) {
+        this.startDialog('arachasintro');
+        return;
+      }
+    }
+    if (this.map === 'ruins') {
+      if (this.quests.q_katakan?.active && !this.flags.katakanDone && p.y <= 5 && p.x >= 8 && p.x <= 9) {
+        this.startDialog('katakanintro');
         return;
       }
     }

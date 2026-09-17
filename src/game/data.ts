@@ -2,7 +2,7 @@
 // Game data: monsters, signs, items, shops, quests
 // ============================================================
 
-export type MonType = 'NECROPHAGE' | 'SPECTER' | 'BEAST' | 'CURSED';
+export type MonType = 'NECROPHAGE' | 'SPECTER' | 'BEAST' | 'CURSED' | 'INSECTOID';
 
 export interface MonMove {
   name: string;
@@ -98,6 +98,101 @@ export const MONSTERS: Record<string, MonsterDef> = {
     ],
     lore: 'Old as the forest itself. It wears a skull of a stag and speaks in crows. The source of Hollow Creek\'s rot - the reason you came.',
   },
+  // ------- Northern Reaches bestiary -------
+  nekker: {
+    id: 'nekker', name: 'NEKKER', type: 'NECROPHAGE',
+    hp: 24, atk: 7, def: 1, xp: 16,
+    moves: [
+      { name: 'SCRATCH', mult: 1.0, weight: 6 },
+      { name: 'SWARM BITE', mult: 0.9, weight: 3 },
+      { name: 'SHRIEK', mult: 0, effect: 'atkup', weight: 2 },
+    ],
+    drop: { item: 'nekkerheart', chance: 0.6 },
+    lore: 'Small, black, and never alone. Nekkers nest in the deep mire and mark prey with mud shrines. Where there is one, there are ten. Necrophage - oil and silver serve.',
+  },
+  endrega: {
+    id: 'endrega', name: 'ENDREGA', type: 'INSECTOID',
+    hp: 28, atk: 8, def: 3, xp: 20,
+    moves: [
+      { name: 'MANDIBLES', mult: 1.0, weight: 6 },
+      { name: 'VENOM SPIT', mult: 0.8, effect: 'poison', weight: 3 },
+    ],
+    drop: { item: 'endregavenom', chance: 0.6 },
+    lore: 'Oviparous horror of the Oldewood - a man-sized wasp-worm that spits venom and guards cocooned eggs. INSECTOID OIL cracks its chitin.',
+  },
+  foglet: {
+    id: 'foglet', name: 'FOGLET', type: 'NECROPHAGE',
+    hp: 26, atk: 8, def: 2, xp: 22,
+    moves: [
+      { name: 'MIST CLAW', mult: 1.0, weight: 5 },
+      { name: 'DAZZLING LIGHT', mult: 0, effect: 'defdown', weight: 3 },
+    ],
+    drop: { item: 'foglettear', chance: 0.6 },
+    lore: 'It wears the mist like a cloak and the lantern light it carries is a lie. Travelers walk toward the glow and meet the claws behind it. Necrophage - burn the mist with IGNI.',
+  },
+  noonwraith: {
+    id: 'noonwraith', name: 'NOONWRAITH', type: 'SPECTER',
+    hp: 30, atk: 9, def: 2, xp: 26, immuneToPlain: true,
+    moves: [
+      { name: 'SCORCHING TOUCH', mult: 1.0, weight: 5 },
+      { name: 'SOLAR FLARE', mult: 1.3, weight: 2 },
+      { name: 'SHRILL CRY', mult: 0.6, effect: 'atkdown', weight: 2 },
+    ],
+    drop: { item: 'ectoplasm', chance: 0.7 },
+    lore: 'A bride who danced until the sun killed her. At high noon she burns brightest over open fields. A specter - only SPECTER OIL can cut her light.',
+  },
+  rotfiend: {
+    id: 'rotfiend', name: 'ROTFIEND', type: 'NECROPHAGE',
+    hp: 26, atk: 8, def: 2, xp: 20,
+    moves: [
+      { name: 'REND', mult: 1.0, weight: 6 },
+      { name: 'GAS BURST', mult: 0.9, effect: 'poison', weight: 2 },
+      { name: 'TETANUS', mult: 0.7, effect: 'defdown', weight: 2 },
+    ],
+    drop: { item: 'rotfiendblood', chance: 0.6 },
+    lore: 'Battlefield carrion-eaters, bloated with grave gas. Wounds fester fast - and when a rotfiend dies, it bursts. Keep your distance, mind your cures.',
+  },
+  barghest: {
+    id: 'barghest', name: 'BARGHEST', type: 'BEAST',
+    hp: 24, atk: 8, def: 1, xp: 17,
+    moves: [
+      { name: 'SAVAGE BITE', mult: 1.0, weight: 6 },
+      { name: 'GNAW', mult: 0.9, weight: 3 },
+      { name: 'HOWL', mult: 0, effect: 'atkup', weight: 2 },
+    ],
+    drop: { item: 'shadowpelt', chance: 0.6 },
+    lore: 'Black hounds that run the high passes with embers for eyes. Long teeth, no fear, endless stamina. Beasts of flesh - steel and beast oil serve best.',
+  },
+  arachas: {
+    id: 'arachas', name: 'ARACHAS', type: 'INSECTOID',
+    hp: 90, atk: 12, def: 5, xp: 90, boss: true,
+    moves: [
+      { name: 'POUNCE', mult: 1.1, weight: 5 },
+      { name: 'VENOM DRENCH', mult: 0.9, effect: 'poison', weight: 3 },
+      { name: 'SPIN WEB', mult: 0.6, effect: 'stun', weight: 2 },
+    ],
+    lore: 'The mother of the bog - an armored spider grown vast on nekker meat, camouflaged in corpses and moss. Its venom melts leather. INSECTOID OIL, then fire.',
+  },
+  griffin: {
+    id: 'griffin', name: 'ROYAL GRIFFIN', type: 'BEAST',
+    hp: 85, atk: 13, def: 4, xp: 100, boss: true,
+    moves: [
+      { name: 'TALON DIVE', mult: 1.2, weight: 5 },
+      { name: 'WING GUST', mult: 0.8, effect: 'defdown', weight: 3 },
+      { name: 'SCREECH', mult: 0, effect: 'atkup', weight: 2 },
+    ],
+    lore: 'A royal griffin nesting over Fangtooth Pass. Her mate was shot by trappers; now she takes caravans, horses, and men in mourning. Steel and AARD - never let her dive twice.',
+  },
+  katakan: {
+    id: 'katakan', name: 'KATAKAN', type: 'SPECTER',
+    hp: 100, atk: 14, def: 5, xp: 130, boss: true, immuneToPlain: true,
+    moves: [
+      { name: 'SHADOW CLAW', mult: 1.1, weight: 5 },
+      { name: 'NIGHT TERROR', mult: 1.4, weight: 2 },
+      { name: 'BLOOD LEECH', mult: 0.8, effect: 'heal', weight: 2 },
+    ],
+    lore: 'A higher vampire that nested where the Serpent School fell. It wears the faces of the witchers it drank. Only SPECTER OIL bites it - and it bites back at night.',
+  },
 };
 
 export const MON_TYPES_INFO: Record<MonType, string> = {
@@ -105,6 +200,7 @@ export const MON_TYPES_INFO: Record<MonType, string> = {
   SPECTER: 'Only SPECTER OIL can cut them.',
   BEAST: 'STEEL works best. Beast oil +50%.',
   CURSED: 'Weak to SILVER. IGNI burns the curse.',
+  INSECTOID: 'Chitin cracks to INSECTOID OIL. Fire works.',
 };
 
 // ---------------- SIGNS ----------------
@@ -137,10 +233,16 @@ export const ITEMS: Record<string, ItemDef> = {
   specteroil:{ id: 'specteroil', name: 'SPECTER OIL', kind: 'oil', desc: 'Coats blade: can cut specters, +50% dmg. 8 fights.', price: 25, sell: 12 },
   necrooil:  { id: 'necrooil', name: 'NECROPHAGE OIL', kind: 'oil', desc: 'Coats blade: +50% vs necrophages. 8 fights.', price: 18, sell: 9 },
   beastoil:  { id: 'beastoil', name: 'BEAST OIL', kind: 'oil', desc: 'Coats blade: +50% vs beasts. 8 fights.', price: 18, sell: 9 },
+  insectoil:{ id: 'insectoil', name: 'INSECTOID OIL', kind: 'oil', desc: 'Coats blade: +50% vs insectoids. 8 fights.', price: 22, sell: 11 },
   drownertongue: { id: 'drownertongue', name: 'DROWNER TONGUE', kind: 'part', desc: 'Alchemical reagent. Smiths buy it.', price: 0, sell: 5 },
   ghoulblood:    { id: 'ghoulblood', name: 'GHOUL BLOOD', kind: 'part', desc: 'Thick and reeking. Smiths buy it.', price: 0, sell: 8 },
   wolfpelt:      { id: 'wolfpelt', name: 'WOLF PELT', kind: 'part', desc: 'Warm, heavy hide. Smiths buy it.', price: 0, sell: 7 },
   ectoplasm:     { id: 'ectoplasm', name: 'ECTOPLASM', kind: 'part', desc: 'Wraith residue. Herbalists covet it.', price: 0, sell: 15 },
+  nekkerheart:   { id: 'nekkerheart', name: 'NEKKER HEART', kind: 'part', desc: 'Still beating, they say. Alchemists pay well.', price: 0, sell: 6 },
+  endregavenom:  { id: 'endregavenom', name: 'ENDREGA VENOM', kind: 'part', desc: 'Potent toxin in a cracked gland.', price: 0, sell: 9 },
+  foglettear:    { id: 'foglettear', name: 'FOGLET TEAR', kind: 'part', desc: 'Weeps cold mist. Very rare.', price: 0, sell: 8 },
+  rotfiendblood: { id: 'rotfiendblood', name: 'ROTFIEND BLOOD', kind: 'part', desc: 'Corrosive. Bottle it fast.', price: 0, sell: 7 },
+  shadowpelt:    { id: 'shadowpelt', name: 'SHADOW PELT', kind: 'part', desc: 'Pelt of the ember-eyed hound. Warm to touch.', price: 0, sell: 8 },
   foolleaf:      { id: 'foolleaf', name: "FOOL'S LEAF", kind: 'part', desc: 'Bitter herb from the mire.', price: 0, sell: 4 },
   locket:        { id: 'locket', name: 'SILVER LOCKET', kind: 'quest', desc: "A widow's keepsake, cold to touch.", price: 0, sell: 0 },
 };
@@ -161,6 +263,8 @@ export const SHOPS: Record<string, { name: string; stock: ShopEntry[]; buysKinds
     stock: [
       { item: 'sword1', once: true, mats: ['drownertongue', 3] },
       { item: 'armor1', once: true, mats: ['wolfpelt', 2] },
+      { item: 'sword2', once: true, mats: ['endregavenom', 2], reqFlag: 'owned_sword1' },
+      { item: 'armor2', once: true, mats: ['shadowpelt', 2], reqFlag: 'owned_armor1' },
     ],
   },
   mira: {
@@ -175,12 +279,24 @@ export const SHOPS: Record<string, { name: string; stock: ShopEntry[]; buysKinds
       { item: 'beastoil' },
     ],
   },
+  kettle: {
+    name: "KETTLE'S HOLLOW",
+    buysKinds: ['potion', 'oil', 'part'],
+    stock: [
+      { item: 'swallow' },
+      { item: 'honey' },
+      { item: 'necrooil' },
+      { item: 'insectoil' },
+    ],
+  },
 };
 
 // special shop entries resolved as gear
 export const GEAR = {
   sword1: { name: 'REFORGE SILVER +1', desc: 'Attack +3. Needs 3 drowner tongues.', price: 80, stat: 'atk', amount: 3 },
   armor1: { name: 'LEATHER ARMOR', desc: 'Defense +2. Needs 2 wolf pelts.', price: 60, stat: 'def', amount: 2 },
+  sword2: { name: 'SERPENT STEEL', desc: 'Attack +3 more. Needs 2 endrega venom.', price: 120, stat: 'atk', amount: 3 },
+  armor2: { name: 'SCALE HAUBERK', desc: 'Defense +2 more. Needs 2 shadow pelts.', price: 100, stat: 'def', amount: 2 },
 };
 
 // ---------------- QUESTS ----------------
@@ -224,6 +340,37 @@ export const QUESTS: Record<string, QuestDef> = {
     id: 'q_main', title: 'ROOT OF EVIL', kind: 'story',
     desc: 'The forest heart rots. A Leshen has claimed the old shrine past the thorns. End it.',
     reward: 'the serpentine path',
+  },
+  // ------- Northern Reaches contracts -------
+  q_pass: {
+    id: 'q_pass', title: 'WINGS OVER THE PASS', kind: 'hunt',
+    desc: 'Barghests run down carts on Fangtooth Pass. Cull 3 for the caravan master.',
+    target: 'barghest', count: 3, reward: '90 crowns',
+  },
+  q_nekkers: {
+    id: 'q_nekkers', title: 'LITTLE HORRORS', kind: 'hunt',
+    desc: 'Nekkers nest by Crookback Bog. Cull 4 before they carry off a child.',
+    target: 'nekker', count: 4, reward: '75 crowns',
+  },
+  q_fog: {
+    id: 'q_fog', title: 'TEETH IN THE MIST', kind: 'hunt',
+    desc: 'Foglets lure travelers with false lantern light in the bog. Banish 2.',
+    target: 'foglet', count: 2, reward: '80 crowns',
+  },
+  q_griffin: {
+    id: 'q_griffin', title: 'THE ROYAL GRIFFIN', kind: 'story',
+    desc: 'A griffin mourns her dead mate over Fangtooth Pass and takes caravans for it. Her eyrie waits up the north ridge.',
+    reward: '150 crowns',
+  },
+  q_arachas: {
+    id: 'q_arachas', title: 'MOTHER OF THE BOG', kind: 'story',
+    desc: 'Something armored and patient has been eating the bog\'s nekkers. Kettle fears it has finished the small ones.',
+    reward: '120 crowns',
+  },
+  q_katakan: {
+    id: 'q_katakan', title: "THE SERPENT'S COIL", kind: 'story',
+    desc: 'In ruined Kaer Serpen something wears the faces of dead witchers. End the School\'s shame.',
+    reward: '250 crowns',
   },
 };
 

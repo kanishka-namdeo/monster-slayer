@@ -21,7 +21,7 @@ export interface BattleHost {
     hp: number; maxHp: number; sta: number; maxSta: number;
     atk: number; def: number; lvl: number; xp: number; tox: number;
     swordLvl: number; armorLvl: number;
-    oil: { specter: number; necro: number; beast: number };
+    oil: { specter: number; necro: number; beast: number; insectoid: number };
   };
   countKill(id: string): void;
   giveItem(id: string, n: number): void;
@@ -36,6 +36,15 @@ const APPEAR: Record<string, string> = {
   wraith: 'The air freezes... A WRAITH weeps awake!',
   werewolf: 'A WEREWOLF bares its yellowed fangs!',
   leshen: 'The LESHEN speaks in a murder of crows!',
+  nekker: 'A NEKKER shrieks - and the reeds answer!',
+  endrega: 'An ENDREGA rears, mandibles dripping!',
+  foglet: 'A false lantern gutters... A FOGLET steps out of the mist!',
+  noonwraith: 'The sun dims. A NOONWRAITH burns where the bride fell!',
+  rotfiend: 'A ROTFIEND waddles close, bloated with grave gas!',
+  barghest: 'A BARGHEST lopes down the scree, embers for eyes!',
+  arachas: 'The bone-wall unfolds! The ARACHAS was the nest!',
+  griffin: 'Wings like torn sailcloth! The ROYAL GRIFFIN dives!',
+  katakan: 'The KATAKAN smiles with a dead witcher\'s face!',
 };
 
 interface Msg {
@@ -106,7 +115,7 @@ export class Battle {
   get oilActive(): boolean {
     const t = this.monType;
     const o = this.host.player.oil;
-    return (t === 'NECROPHAGE' && o.necro > 0) || (t === 'SPECTER' && o.specter > 0) || (t === 'BEAST' && o.beast > 0);
+    return (t === 'NECROPHAGE' && o.necro > 0) || (t === 'SPECTER' && o.specter > 0) || (t === 'BEAST' && o.beast > 0) || (t === 'INSECTOID' && o.insectoid > 0);
   }
 
   variance() {
@@ -135,10 +144,11 @@ export class Battle {
     if (this.monType === 'NECROPHAGE' && m.oil.necro > 0) mult *= 1.5;
     if (this.monType === 'SPECTER' && m.oil.specter > 0) mult *= 1.5;
     if (this.monType === 'BEAST' && m.oil.beast > 0) mult *= 1.5;
+    if (this.monType === 'INSECTOID' && m.oil.insectoid > 0) mult *= 1.5;
 
     this.msgs.push({ text: sword === 'steel' ? 'You draw STEEL!' : 'You draw SILVER!' });
     if (this.immune && this.monType === 'SPECTER' && m.oil.specter === 0) {
-      this.msgs.push({ text: 'The blade passes through the wraith! It needs SPECTER OIL!', anim: 'monhit', sfx: 'cancel' });
+      this.msgs.push({ text: `The blade passes through the ${this.monName}! It needs SPECTER OIL!`, anim: 'monhit', sfx: 'cancel' });
       this.afterQueue = 'monTurn';
       this.flush();
       return;
@@ -215,6 +225,7 @@ export class Battle {
       if (id === 'specteroil') this.host.player.oil.specter = 8;
       if (id === 'necrooil') this.host.player.oil.necro = 8;
       if (id === 'beastoil') this.host.player.oil.beast = 8;
+      if (id === 'insectoil') this.host.player.oil.insectoid = 8;
       this.host.inv[id]--;
       this.msgs.push({ text: `You coat your blade: ${it.name}!`, sfx: 'shield' });
     }
@@ -511,6 +522,7 @@ export class Battle {
       p.oil.specter = Math.max(0, p.oil.specter - 1);
       p.oil.necro = Math.max(0, p.oil.necro - 1);
       p.oil.beast = Math.max(0, p.oil.beast - 1);
+      p.oil.insectoid = Math.max(0, p.oil.insectoid - 1);
     }
     this.host.onBattleEnd(result, this.monId);
   }

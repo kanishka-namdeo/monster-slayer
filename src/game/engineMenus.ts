@@ -254,7 +254,8 @@ function shopEntries(g: Game, shopId: string): { key: string; label: string; des
   const out: { key: string; label: string; desc: string; price: number; mats?: [string, number]; gear?: string }[] = [];
   for (const s of shop.stock) {
     if (s.once && g.flags[`owned_${s.item}`]) continue;
-    if (s.item === 'sword1' || s.item === 'armor1') {
+    if (s.reqFlag && !g.flags[s.reqFlag]) continue;
+    if (GEAR[s.item]) {
       const gr = GEAR[s.item];
       out.push({
         key: s.item,
@@ -321,8 +322,8 @@ function updateShop(g: Game) {
         g.inv[mid] = (g.inv[mid] ?? 0) - mn;
         if (g.inv[mid] <= 0) delete g.inv[mid];
       }
-      if (e.gear === 'sword1') { p.swordLvl = 1; g.flags.owned_sword1 = true; }
-      if (e.gear === 'armor1') { p.armorLvl = 1; g.flags.owned_armor1 = true; }
+      if (e.gear === 'sword1' || e.gear === 'sword2') { p.swordLvl = e.gear === 'sword2' ? 2 : 1; g.flags.owned_sword1 = true; g.flags.owned_sword2 = true; }
+      if (e.gear === 'armor1' || e.gear === 'armor2') { p.armorLvl = e.gear === 'armor2' ? 2 : 1; g.flags.owned_armor1 = true; g.flags.owned_armor2 = true; }
       if (!e.gear) g.inv[e.key] = (g.inv[e.key] ?? 0) + 1;
       audio.sfx('coin');
       g.startNotice(e.gear ? 'Torv hammers the steel. It sings a new, sharper song.' : `Bought: ${ITEMS[e.key].name}.`);

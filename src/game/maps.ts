@@ -53,7 +53,7 @@ export interface MapDef {
   dark?: boolean; // graveyard tint
 }
 
-const BLOCKED = new Set('TPfWwreuALKsctBbGgSz qL o~v#C'.split('').filter(c => c !== ' '));
+const BLOCKED = new Set('TPfWwreuALKsctBbGgSz qL o~v#CMYA'.split('').filter(c => c !== ' '));
 
 export function tileAt(map: MapDef, x: number, y: number): string {
   if (y < 0 || y >= map.rows.length) return 'v';
@@ -68,7 +68,7 @@ export function isBlocked(map: MapDef, x: number, y: number): boolean {
 }
 
 export function isEncounterTile(t: string): boolean {
-  return t === 'R' || t === 'n';
+  return t === 'R' || t === 'n' || t === 'i';
 }
 
 // ------------------------------------------------------------
@@ -229,7 +229,7 @@ export const MAPS: Record<string, MapDef> = {
       'v.RRRR....oooo..RRRv',
       'v..RR.....oooo...RRv',
       'voo....m......oo...v',
-      'vooo..mmmm....ooo..v',
+      'vooo..mmmm....ooo...',
       'v.oo..mRRm......oo.v',
       'v.....mRRm....oo...v',
       'v..RR.mmm..RR..o...v',
@@ -241,6 +241,7 @@ export const MAPS: Record<string, MapDef> = {
     ],
     warps: [
       { x: 0, y: 12, to: 'village', tx: 22, ty: 9, dir: 'left' },
+      { x: 19, y: 5, to: 'bog', tx: 2, ty: 6, dir: 'right' },
     ],
     npcs: [
       { id: 'fisher', x: 3, y: 11, sprite: 'fisher', dialogue: 'fisher' },
@@ -262,7 +263,7 @@ export const MAPS: Record<string, MapDef> = {
     name: 'Oldewood',
     music: 'forest',
     rows: [
-      'vvvvvvvvzzvvvvvvvvvv',
+      'vvppvvvvzzvvvvvvvvvv',
       'vPP..PP....PP..PPPPv',
       'vP..nn..PP..nn..PP.v',
       'v..nnnn....nnnn....v',
@@ -281,6 +282,8 @@ export const MAPS: Record<string, MapDef> = {
       { x: 10, y: 13, to: 'village', tx: 10, ty: 1, dir: 'down' },
       { x: 11, y: 13, to: 'village', tx: 11, ty: 1, dir: 'down' },
       { x: 19, y: 6, to: 'graveyard', tx: 2, ty: 9, dir: 'right' },
+      { x: 2, y: 0, to: 'fangs', tx: 9, ty: 13, dir: 'up' },
+      { x: 3, y: 0, to: 'fangs', tx: 10, ty: 13, dir: 'up' },
       { x: 8, y: 0, to: 'deepforest', tx: 4, ty: 11, dir: 'up', requires: 'thornsCleared' },
       { x: 9, y: 0, to: 'deepforest', tx: 5, ty: 11, dir: 'up', requires: 'thornsCleared' },
     ],
@@ -290,6 +293,7 @@ export const MAPS: Record<string, MapDef> = {
       { monster: 'wolf', weight: 5, min: 3, max: 5 },
       { monster: 'ghoul', weight: 3, min: 3, max: 5 },
       { monster: 'drowner', weight: 2, min: 2, max: 4 },
+      { monster: 'noonwraith', weight: 1, min: 6, max: 8 },
     ],
   },
 
@@ -356,6 +360,120 @@ export const MAPS: Record<string, MapDef> = {
       { monster: 'ghoul', weight: 3, min: 5, max: 7 },
       { monster: 'wolf', weight: 3, min: 5, max: 7 },
       { monster: 'waterhag', weight: 3, min: 5, max: 7 },
+    ],
+  },
+
+  // ================= FANGTOOTH PASS =================
+  fangs: {
+    name: 'Fangtooth Pass',
+    music: 'mountain',
+    rows: [
+      'vvvvvvvvvppvvvvvvvvv',
+      'vMMMMMMM.pp.MMMMMMMv',
+      'vM.i.i...pp...i.i.Mv',
+      'vM.i.....pp.....i.Mv',
+      'v..qq.i..pp..i.qq..v',
+      'v.i......pp......i.v',
+      'vM..qq...pp...qq..Mv',
+      'vM.i.....pp.....i.Mv',
+      'v..P..,..pp..,..P..v',
+      'v.i..q...pp...q..i.v',
+      'vM...i...pp...i...Mv',
+      'vM..P.i..pp..i.P..Mv',
+      'v.i......pp......i.v',
+      'vqq.i....pp....i.qqv',
+      'vvvvvvvvvppvvvvvvvvv',
+    ],
+    warps: [
+      { x: 9, y: 14, to: 'forest', tx: 2, ty: 1, dir: 'down' },
+      { x: 10, y: 14, to: 'forest', tx: 3, ty: 1, dir: 'down' },
+      { x: 9, y: 0, to: 'ruins', tx: 8, ty: 11, dir: 'up' },
+      { x: 10, y: 0, to: 'ruins', tx: 9, ty: 11, dir: 'up' },
+    ],
+    npcs: [
+      { id: 'woy', x: 5, y: 8, sprite: 'trapper', dialogue: 'trapper' },
+    ],
+    pickups: [],
+    encounters: [
+      { monster: 'barghest', weight: 4, min: 5, max: 7 },
+      { monster: 'endrega', weight: 3, min: 5, max: 8 },
+      { monster: 'wolf', weight: 2, min: 5, max: 7 },
+    ],
+  },
+
+  // ================= CROOKBACK BOG =================
+  bog: {
+    name: 'Crookback Bog',
+    music: 'swamp',
+    rows: [
+      'vvvvvvvvvvvvvvvvvvvv',
+      'v.RRR..oo..RRR..RR.v',
+      'vRR..ooo...oo..RRR.v',
+      'vR...oo..RR...o....v',
+      'v.RR....oo...mmm..Rv',
+      'v..o..RR....mm...RRv',
+      '..RR.....LL......R.v',
+      'v..o..RR....mm...RRv',
+      'v.RR....oo...mmm..Rv',
+      'vR...oo..RR...o....v',
+      'vRR..ooo...oo..RRR.v',
+      'v.RRR..oo..RRR..RR.v',
+      'vvvvvvvvvvvvvvvvvvvv',
+    ],
+    warps: [
+      { x: 0, y: 6, to: 'swamp', tx: 18, ty: 5, dir: 'left' },
+      { x: 1, y: 6, to: 'swamp', tx: 18, ty: 5, dir: 'left' },
+    ],
+    npcs: [
+      { id: 'kettle', x: 12, y: 6, sprite: 'kettle', dialogue: 'kettle', wander: 1 },
+    ],
+    pickups: [
+      { id: 'bog1', x: 15, y: 3, item: 'foolleaf' },
+      { id: 'bog2', x: 3, y: 9, item: 'foolleaf' },
+    ],
+    encounters: [
+      { monster: 'nekker', weight: 4, min: 5, max: 8 },
+      { monster: 'foglet', weight: 3, min: 6, max: 8 },
+      { monster: 'drowner', weight: 2, min: 5, max: 7 },
+      { monster: 'waterhag', weight: 2, min: 6, max: 8 },
+    ],
+  },
+
+  // ================= KAER SERPEN =================
+  ruins: {
+    name: 'Kaer Serpen',
+    music: 'ruins',
+    dark: true,
+    rows: [
+      'vvvvvvvvvvvvvvvvvv',
+      'vYYYAYYYY..YYYYAYv',
+      'vYyy...yy..yy...Yv',
+      'vYy..YYy....yY..Yv',
+      'v....YY..SS..YY..v',
+      'v..y........y....v',
+      'vYY...g..x..g..YYv',
+      'v..y..YY....YY..yv',
+      'v....yy....yy....v',
+      'vYY............YYv',
+      'v..y..YY....YY..yv',
+      'v....yy.xx.yy....v',
+      'vYYY..........YYYv',
+      'vvvvvvvvppvvvvvvvv',
+    ],
+    warps: [
+      { x: 8, y: 13, to: 'fangs', tx: 9, ty: 1, dir: 'down' },
+      { x: 9, y: 13, to: 'fangs', tx: 10, ty: 1, dir: 'down' },
+    ],
+    npcs: [
+      { id: 'shade', x: 5, y: 10, sprite: 'shade', dialogue: 'shade' },
+    ],
+    pickups: [
+      { id: 'keep1', x: 8, y: 9, item: 'ectoplasm' },
+    ],
+    encounters: [
+      { monster: 'rotfiend', weight: 4, min: 7, max: 9 },
+      { monster: 'wraith', weight: 3, min: 7, max: 9 },
+      { monster: 'endrega', weight: 2, min: 7, max: 9 },
     ],
   },
 };
