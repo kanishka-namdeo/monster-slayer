@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.smogon.com",
+    "name": "Gen 4's HP Bar Speed is Very Competitively Relevant",
+    "snippet": "Aug 16, 2022 — To fix this, the damage per each pixel (or percent, whichever is easier to implement) would need to be sent. It would look something like this:. Read more",
+    "host_name": "www.smogon.com",
+    "rank": 0,
+    "date": "Aug 16, 2022",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.pokecommunity.com",
+    "name": "In Battle: HP subtracts all damage at once, speed of exp bar +",
+    "snippet": "Sep 24, 2012 — Where do I make it so that the HP bar subtracts all the damage done at once when damage is done? Where can I make the Exp increase faster? Is it ... Read more",
+    "host_name": "www.pokecommunity.com",
+    "rank": 1,
+    "date": "Sep 24, 2012",
+    "favicon": ""
+  },
+  {
+    "url": "https://gamefaqs.gamespot.com",
+    "name": "HP bars not falling as slow as Gen IV? - Pokemon Black Version",
+    "snippet": "May 16, 2010 — Now all they gotta do to maximize speed is to have the \" Pokemon used Attack!\" message , the animation , and the HP falling occur simutaneously. Read more",
+    "host_name": "gamefaqs.gamespot.com",
+    "rank": 2,
+    "date": "May 16, 2010",
+    "favicon": ""
+  },
+  {
+    "url": "https://forums.rpgmakerweb.com",
+    "name": "slow hp bar animation",
+    "snippet": "Oct 23, 2020 — When an enemy inflict damage to the actor I don't want the bar to go down directly to the inflicted value, but to go down slowly in order to ...",
+    "host_name": "forums.rpgmakerweb.com",
+    "rank": 3,
+    "date": "Oct 23, 2020",
+    "favicon": ""
+  },
+  {
+    "url": "https://bulbapedia.bulbagarden.net",
+    "name": "List of battle glitches in Generation I - Bulbapedia",
+    "snippet": "If Bide deals damage to a Pokémon under Fly or Dig, the game will reveal its sprite early. This also causes a small animation glitch with Dig where it appears ... Read more",
+    "host_name": "bulbapedia.bulbagarden.net",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

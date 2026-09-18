@@ -1,0 +1,23 @@
+[
+ "new game mode=intro",
+ "inv={\"swallow\":1,\"thunder\":1,\"honey\":1,\"necrooil\":1}",
+ "A: drowner battle started",
+ "A: attack burst done",
+ "A: turn2 awaitMenu=menu",
+ "A: igni burst done",
+ "A: after igni awaitMenu=menu",
+ "A: item awaitMenu=menu",
+ "A: battle ended mode=world",
+ "A: rewards={\"xp\":12,\"lvl\":1,\"crowns\":25,\"hp\":30,\"kills\":{\"drowner\":1},\"inv\":{\"swallow\":1,\"thunder\":1,\"honey\":1,\"necrooil\":1,\"drownertongue\":1},\"mode\":\"world\"}",
+ "B: leshen battle started, music=finalboss",
+ "B: attack burst done",
+ "B: aard burst done",
+ "B: moves seen: [\"LESHEN uses BARK FIST!\",\"LESHEN uses BARK FIST!\",\"LESHEN uses ROOT GRASP!\",\"LESHEN uses ROOT GRASP!\",\"LESHEN uses ROOT GRASP!\",\"LESHEN uses CALL OF WOODS! Regenerates 18!\",\"LESHEN uses ROOT GRASP!\",\"LESHEN uses BARK FIST!\",\"LESHEN uses CALL OF WOODS! Regenerates 18!\",\"LESHEN uses CALL OF WOODS! Regenerates 18!\",\"LESHEN uses BARK FIST!\",\"LESHEN uses CALL OF WOODS! Regenerates 18!\",\"LESHEN uses CALL OF WOODS! Regenerates 18!\",\"LESHEN uses BARK FIST!\",\"LESHEN uses ROOT GRASP!\"]",
+ "B: battle ended mode=dialog",
+ "C: endrega battle started",
+ "C: poison=0 php=139",
+ "D: after defeat mode=gameover",
+ "D: gameover state={\"mode\":\"gameover\",\"gameoverT\":1633}",
+ "D: after A on gameover mode=dialog",
+ "D: after START on gameover mode=dialog"
+]

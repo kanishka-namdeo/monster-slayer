@@ -1,0 +1,29 @@
+[
+  {
+    "url": "https://gbstudiocentral.com",
+    "name": "Let's Build an RPG | Quest 1-1: Battle System Player Turn",
+    "snippet": "Sep 23, 2024 — In this series, we will cover how to use GB Studio's built-in events to create a basic RPG system that you can expand on for your own game.",
+    "host_name": "gbstudiocentral.com",
+    "rank": 0,
+    "date": "Sep 23, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://lazydevs.itch.io",
+    "name": "Let's Build an RPG! A GB Studio Tutorial Series by Lazy Dev",
+    "snippet": "Sep 23, 2024 — In these articles, we'll learn how to build a basic RPG battle system and other core mechanics that you can use to expand into your own game.",
+    "host_name": "lazydevs.itch.io",
+    "rank": 1,
+    "date": "Sep 23, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://marcosecchi.github.io",
+    "name": "GB Studio | resources",
+    "snippet": "GB Studio – A Free GameBoy Open Source JRPG Game Engine by Gamefromscratch ; Make a real GameBoy game easy & user friendly by MortMort ; GB Studio Tutorials by ... Read more",
+    "host_name": "marcosecchi.github.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  }
+]

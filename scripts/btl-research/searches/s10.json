@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://pokemow.com",
+    "name": "Pokémon Gen IV Trainer AI",
+    "snippet": "An in-depth explanation of the trainer AI move selection procedure \"No AI \" means that moves and targets are selected purely at random. Doubles AI is always",
+    "host_name": "pokemow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://essentialsdocs.fandom.com",
+    "name": "Battle AI - Essentials Docs Wiki - Fandom",
+    "snippet": "The AI makes decisions from the point of view of the trainer , not an individual Pokémon . Two Pokémon owned by the same trainer will have their actions ... Read more",
+    "host_name": "essentialsdocs.fandom.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gist.github.com",
+    "name": "Generation 4 Pokemon Trainer Move Selection AI",
+    "snippet": "This document aims to be a comprehensive reference to players for how the generation 4 trainer AI behaves in battle. Each NPC trainer is assigned a set of ... Read more",
+    "host_name": "gist.github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gamedev.stackexchange.com",
+    "name": "Pokemon Artificial Intelligence [closed]",
+    "snippet": "Feb 14, 2017 — Closed. This question needs to be more focused. It is not currently accepting answers.             Want to improve this question? Guide the asker to update ...",
+    "host_name": "gamedev.stackexchange.com",
+    "rank": 3,
+    "date": "Feb 14, 2017",
+    "favicon": ""
+  },
+  {
+    "url": "https://bulbagarden.net",
+    "name": "NPC Trainers' AI (Switching)",
+    "snippet": "Jul 23, 2014 — Do NPC Trainers have the AI necessary to switch their Pokemon to a more effective one? I know regular Trainers don't, and even if they did, ... Read more",
+    "host_name": "bulbagarden.net",
+    "rank": 4,
+    "date": "Jul 23, 2014",
+    "favicon": ""
+  },
+  {
+    "url": "https://gamefaqs.gamespot.com",
+    "name": "AI - Pokemon Red Version Walkthrough & Guide - GameFAQs",
+    "snippet": "Aug 30, 2026 — Special Trainer AI behaviour . Many of the Trainer classes throughout the game have special behaviour that causes them to perform actions ... Read more",
+    "host_name": "gamefaqs.gamespot.com",
+    "rank": 5,
+    "date": "Aug 30, 2026",
+    "favicon": ""
+  }
+]

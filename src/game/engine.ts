@@ -91,6 +91,7 @@ export class Game {
   titleIdx = 0; titleT = 0; titleStarted = false;
   endingPage = 0; endingT = 0;
   gameoverT = 0;
+  gameoverMon = '';   // the beast that felled you (gameover screen)
   mapBannerT = 0;
   medallionT = 0;
   fadeT = 0; fadeDir = 0; fadeCb: (() => void) | null = null;
@@ -684,6 +685,7 @@ export class Game {
     if (!b) return false;
     b.monHp = 1;
     b.msgs = [];
+    b.monFirst = false;   // dev hook: the witcher strikes now
     b.playerAttack('silver');
     return true;
   }
@@ -693,9 +695,9 @@ export class Game {
   }
 
   onBattleEnd(result: 'victory' | 'defeat' | 'fled', monId: string) {
-    const b = this.battle;
     this.battle = null;
     if (result === 'defeat') {
+      this.gameoverMon = monId;
       this.mode = 'gameover';
       this.gameoverT = 0;
       audio.playMusic('gameover');
@@ -1049,7 +1051,6 @@ export class Game {
         let pick = table[0];
         for (const e of table) { roll -= e.weight; if (roll <= 0) { pick = e; break; } }
         const lvl = pick.min + Math.floor(Math.random() * (pick.max - pick.min + 1));
-        audio.sfx('encounter');
         this.startBattle(pick.monster, lvl);
       }
     }
@@ -1585,9 +1586,26 @@ export class Game {
     ctx.fillStyle = C.INK;
     ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
     const t = Math.min(1, this.gameoverT / 500);
+    // frame deco
+    ctx.fillStyle = C.DARK;
+    ctx.fillRect(0, 0, SCREEN_W, 4);
+    ctx.fillRect(0, SCREEN_H - 4, SCREEN_W, 4);
     ctx.globalAlpha = t;
-    drawText(ctx, 'You black out...', 46, 60, C.PAPER);
+    drawTitleText(ctx, 'GAME OVER', SCREEN_W / 2, 12, 2, C.PAPER);
     ctx.globalAlpha = 1;
-    if (this.gameoverT > 1500) drawText(ctx, 'The world smells of iron.', 24, 80, C.DARK);
+    // the beast that felled you looms over the fallen witcher
+    const spr = MONSTER_GFX[this.gameoverMon];
+    if (spr && this.gameoverT > 350) {
+      ctx.globalAlpha = Math.min(0.85, (this.gameoverT - 350) / 700);
+      ctx.imageSmoothingEnabled = false;
+      const sy = 42 - Math.min(6, Math.floor(this.gameoverT / 150));
+      ctx.drawImage(spr, Math.round(SCREEN_W / 2 - spr.width / 2), sy);
+      ctx.globalAlpha = 1;
+    }
+    if (this.gameoverT > 900) drawText(ctx, 'You black out...', 33, 90, C.PAPER);
+    if (this.gameoverT > 1500) drawText(ctx, 'The world smells of iron.', 6, 106, C.LIGHT);
+    if (this.gameoverT > 2200 && Math.floor(this.gameoverT / 400) % 2 === 0) {
+      drawText(ctx, 'PRESS A', 60, 124, C.LIGHT);
+    }
   }
 }

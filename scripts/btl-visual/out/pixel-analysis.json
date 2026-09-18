@@ -1,0 +1,249 @@
+[
+ {
+  "a": "043_C_monatk_00.png",
+  "b": "044_C_monatk_01.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "a": "044_C_monatk_01.png",
+  "b": "045_C_monatk_02.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "a": "045_C_monatk_02.png",
+  "b": "046_C_monatk_03.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "a": "046_C_monatk_03.png",
+  "b": "047_C_monatk_04.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "a": "047_C_monatk_04.png",
+  "b": "048_C_monatk_05.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "a": "039_C_menu.png",
+  "b": "045_C_monatk_02.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "a": "201_A2_hit_00.png",
+  "b": "207_A2_drain_00.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 468,
+  "total": 1845,
+  "pct": 25.37
+ },
+ {
+  "a": "201_A2_hit_00.png",
+  "b": "204_A2_hit_03.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 468,
+  "total": 1845,
+  "pct": 25.37
+ },
+ {
+  "a": "043_C_monatk_00.png",
+  "b": "046_C_monatk_03.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 396,
+  "total": 1845,
+  "pct": 21.46
+ },
+ {
+  "a": "016_B_menu_boss.png",
+  "b": "018_B_igni_flash_01.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 18,
+  "total": 486,
+  "pct": 3.7
+ },
+ {
+  "a": "016_B_menu_boss.png",
+  "b": "019_B_igni_flash_02.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 18,
+  "total": 486,
+  "pct": 3.7
+ },
+ {
+  "a": "016_B_menu_boss.png",
+  "b": "018_B_igni_flash_01.png",
+  "region": [
+   0,
+   31,
+   96,
+   51
+  ],
+  "changed": 2037,
+  "total": 2037,
+  "pct": 100
+ },
+ {
+  "a": "016_B_menu_boss.png",
+  "b": "018_B_igni_flash_01.png",
+  "region": [
+   110,
+   4,
+   157,
+   51
+  ],
+  "changed": 1448,
+  "total": 2304,
+  "pct": 62.85
+ },
+ {
+  "a": "017_B_igni_flash_00.png",
+  "b": "019_B_igni_flash_02.png",
+  "region": [
+   0,
+   31,
+   96,
+   51
+  ],
+  "changed": 0,
+  "total": 2037,
+  "pct": 0
+ },
+ {
+  "a": "050_C_quen_cast_00.png",
+  "b": "052_C_quen_cast_02.png",
+  "region": [
+   2,
+   0,
+   157,
+   99
+  ],
+  "changed": 0,
+  "total": 15600,
+  "pct": 0
+ },
+ {
+  "a": "054_C_item_swallow_00.png",
+  "b": "056_C_item_swallow_02.png",
+  "region": [
+   2,
+   0,
+   157,
+   99
+  ],
+  "changed": 0,
+  "total": 15600,
+  "pct": 0
+ },
+ {
+  "a": "031_B_axii_00.png",
+  "b": "033_B_axii_02.png",
+  "region": [
+   2,
+   0,
+   157,
+   99
+  ],
+  "changed": 0,
+  "total": 15600,
+  "pct": 0
+ },
+ {
+  "a": "221_A2_faint_04.png",
+  "b": "222_A2_victory_msg_collapse.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 26,
+  "total": 3024,
+  "pct": 0.86
+ },
+ {
+  "a": "044_C_monatk_01.png",
+  "b": "045_C_monatk_02.png",
+  "region": [
+   0,
+   0,
+   159,
+   143
+  ],
+  "changed": 75,
+  "total": 23040,
+  "pct": 0.33
+ }
+]

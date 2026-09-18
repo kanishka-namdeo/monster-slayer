@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "DARKENED yes; PARTICLES yes; Text box changed from menu to \"IGNI! A to\"; Status text changed from \"STA\" to \"ROT\".",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1789686294,
+  "id": "20260918070446fbb7f4c5b55741f4",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20260918070446fbb7f4c5b55741f4",
+  "usage": {
+    "completion_tokens": 35,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 678,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 713
+  }
+}

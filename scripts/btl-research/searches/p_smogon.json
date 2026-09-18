@@ -1,0 +1,29 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "external": {},
+    "html": "<html><head><link rel=\"stylesheet\" href=\"/__assets/basic-page-ZFKTQPTY.css\">\n    </head><body><header>\n    <img src=\"/__assets/zracknel-beta-ISPHLNTA.svg\">\n    </header>\n    <main>\n    <h1>Page not found.</h1><p>Couldn't find what you're looking for.</p>\n    </main>\n    </body></html>",
+    "httpStatus": 404,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "",
+    "url": "https://www.smogon.com/ingame-guides/rby-mechanics-guide",
+    "usage": {
+      "measuredTokens": 0,
+      "outputTokens": 0,
+      "scaledTokens": 91,
+      "tokens": 91
+    },
+    "warning": "Target URL returned error 404: Not Found"
+  },
+  "meta": {
+    "usage": {
+      "measuredTokens": 0,
+      "outputTokens": 0,
+      "scaledTokens": 91,
+      "tokens": 91
+    }
+  },
+  "status": 20000
+}

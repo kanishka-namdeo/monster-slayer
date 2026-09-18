@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://gist.github.com",
+    "name": "Generation 4 Pokemon Trainer Move Selection AI",
+    "snippet": "This document aims to be a comprehensive reference to players for how the generation 4 trainer AI behaves in battle. AI will initialize the \" score \" of all of ...",
+    "host_name": "gist.github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com",
+    "name": "pokered/engine/battle/trainer_ai.asm at master",
+    "snippet": "Disassembly of Pokémon Red/Blue. Contribute to pret / pokered development ・ nemyTrainerChooseMoves: init temporary move selection array. enemy moves ld ・ ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gamefaqs.gamespot.com",
+    "name": "AI - Pokemon Red Version Walkthrough & Guide - GameFAQs",
+    "snippet": "Aug 30, 2026 — This section will break down the different AI behaviours. https:// github .com/ pret / pokered . If a moveslot is empty or the move in that slot is ...",
+    "host_name": "gamefaqs.gamespot.com",
+    "rank": 2,
+    "date": "Aug 30, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://reverseengineering.stackexchange.com",
+    "name": "How do the AI in Pokemon battles work?",
+    "snippet": "Sep 2, 2018 — Has anyone ever attempted to decompile the code for a Pokemon game and figure out how the battle AI works? e.g. How it decides which move to use, ...",
+    "host_name": "reverseengineering.stackexchange.com",
+    "rank": 3,
+    "date": "Sep 2, 2018",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.resetera.com",
+    "name": "Someone compiled and compared Pokémon Red/Blue AI",
+    "snippet": "Dec 14, 2020 — It's all about comparing AI trainers and figuring out how well they do in their rankings, and sort them based on their Elo ranking.. enemy AI ...",
+    "host_name": "www.resetera.com",
+    "rank": 4,
+    "date": "Dec 14, 2020",
+    "favicon": ""
+  }
+]

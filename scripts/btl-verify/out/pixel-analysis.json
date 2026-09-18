@@ -1,0 +1,674 @@
+[
+ {
+  "tag": "G wolf lunge consecutive",
+  "a": "038_G_mon_lunge_00.png",
+  "b": "039_G_mon_lunge_01.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "tag": "G wolf lunge consecutive",
+  "a": "039_G_mon_lunge_01.png",
+  "b": "040_G_mon_lunge_02.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 514,
+  "total": 3024,
+  "pct": 17
+ },
+ {
+  "tag": "G wolf lunge consecutive",
+  "a": "040_G_mon_lunge_02.png",
+  "b": "041_G_mon_lunge_03.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 506,
+  "total": 3024,
+  "pct": 16.73
+ },
+ {
+  "tag": "G wolf lunge consecutive",
+  "a": "041_G_mon_lunge_03.png",
+  "b": "042_G_mon_lunge_04.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "tag": "G wolf lunge consecutive",
+  "a": "042_G_mon_lunge_04.png",
+  "b": "043_G_mon_lunge_05.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 528,
+  "total": 3024,
+  "pct": 17.46
+ },
+ {
+  "tag": "G wolf lunge frame0 vs strike",
+  "a": "038_G_mon_lunge_00.png",
+  "b": "040_G_mon_lunge_02.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 514,
+  "total": 3024,
+  "pct": 17
+ },
+ {
+  "tag": "G wolf lunge frame0 vs hold(-7px)",
+  "a": "038_G_mon_lunge_00.png",
+  "b": "041_G_mon_lunge_03.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 688,
+  "total": 3024,
+  "pct": 22.75
+ },
+ {
+  "tag": "G control self",
+  "a": "037_G_menu_wolf.png",
+  "b": "037_G_menu_wolf.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "tag": "B drowner counter consecutive",
+  "a": "009_B_monatk_drowner_00.png",
+  "b": "010_B_monatk_drowner_01.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 0,
+  "total": 3024,
+  "pct": 0
+ },
+ {
+  "tag": "B drowner counter consecutive",
+  "a": "010_B_monatk_drowner_01.png",
+  "b": "011_B_monatk_drowner_02.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 734,
+  "total": 3024,
+  "pct": 24.27
+ },
+ {
+  "tag": "B drowner counter consecutive",
+  "a": "011_B_monatk_drowner_02.png",
+  "b": "012_B_monatk_drowner_03.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 564,
+  "total": 3024,
+  "pct": 18.65
+ },
+ {
+  "tag": "B drowner counter vs menu (sprite displacement)",
+  "a": "004_A_menu.png",
+  "b": "010_B_monatk_drowner_01.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 450,
+  "total": 3024,
+  "pct": 14.88
+ },
+ {
+  "tag": "H igni flash vs menu (panel bg strip)",
+  "a": "044_H_menu_boss.png",
+  "b": "046_H_igni_flash_00.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 486,
+  "total": 486,
+  "pct": 100
+ },
+ {
+  "tag": "H igni flash vs menu (panel bg strip)",
+  "a": "044_H_menu_boss.png",
+  "b": "047_H_igni_flash_01.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 486,
+  "total": 486,
+  "pct": 100
+ },
+ {
+  "tag": "H igni flash vs menu (panel bg strip)",
+  "a": "044_H_menu_boss.png",
+  "b": "048_H_igni_flash_02.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 486,
+  "total": 486,
+  "pct": 100
+ },
+ {
+  "tag": "H igni flash vs menu (panel bg strip)",
+  "a": "044_H_menu_boss.png",
+  "b": "049_H_igni_flash_03.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 486,
+  "total": 486,
+  "pct": 100
+ },
+ {
+  "tag": "H igni flash vs menu (panel bg strip)",
+  "a": "044_H_menu_boss.png",
+  "b": "050_H_igni_flash_04.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 486,
+  "total": 486,
+  "pct": 100
+ },
+ {
+  "tag": "H igni flash vs menu (panel bg strip)",
+  "a": "044_H_menu_boss.png",
+  "b": "051_H_igni_flash_05.png",
+  "region": [
+   100,
+   0,
+   108,
+   53
+  ],
+  "changed": 486,
+  "total": 486,
+  "pct": 100
+ },
+ {
+  "tag": "H igni flash vs menu (full panel)",
+  "a": "044_H_menu_boss.png",
+  "b": "047_H_igni_flash_01.png",
+  "region": [
+   100,
+   0,
+   159,
+   53
+  ],
+  "changed": 3221,
+  "total": 3240,
+  "pct": 99.41
+ },
+ {
+  "tag": "H igni flash vs menu (boss sprite + fire)",
+  "a": "044_H_menu_boss.png",
+  "b": "047_H_igni_flash_01.png",
+  "region": [
+   110,
+   4,
+   157,
+   51
+  ],
+  "changed": 2288,
+  "total": 2304,
+  "pct": 99.31
+ },
+ {
+  "tag": "D quen cast consecutive",
+  "a": "017_D_quen_cast_00.png",
+  "b": "018_D_quen_cast_01.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 0,
+  "total": 1845,
+  "pct": 0
+ },
+ {
+  "tag": "D quen cast consecutive",
+  "a": "018_D_quen_cast_01.png",
+  "b": "019_D_quen_cast_02.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 0,
+  "total": 1845,
+  "pct": 0
+ },
+ {
+  "tag": "D quen cast consecutive",
+  "a": "019_D_quen_cast_02.png",
+  "b": "020_D_quen_cast_03.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 0,
+  "total": 1845,
+  "pct": 0
+ },
+ {
+  "tag": "D quen persist_1 vs plain menu (brackets?)",
+  "a": "004_A_menu.png",
+  "b": "021_D_quen_persist_1.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 40,
+  "total": 1845,
+  "pct": 2.17
+ },
+ {
+  "tag": "D quen persist_2 vs plain menu (brackets?)",
+  "a": "004_A_menu.png",
+  "b": "022_D_quen_persist_2.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 40,
+  "total": 1845,
+  "pct": 2.17
+ },
+ {
+  "tag": "D quen blink persist_1 vs 2",
+  "a": "021_D_quen_persist_1.png",
+  "b": "022_D_quen_persist_2.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 0,
+  "total": 1845,
+  "pct": 0
+ },
+ {
+  "tag": "E axii orbit consecutive",
+  "a": "025_E_axii_orbit_00.png",
+  "b": "026_E_axii_orbit_01.png",
+  "region": [
+   104,
+   14,
+   159,
+   36
+  ],
+  "changed": 21,
+  "total": 1288,
+  "pct": 1.63
+ },
+ {
+  "tag": "E axii orbit consecutive",
+  "a": "026_E_axii_orbit_01.png",
+  "b": "027_E_axii_orbit_02.png",
+  "region": [
+   104,
+   14,
+   159,
+   36
+  ],
+  "changed": 14,
+  "total": 1288,
+  "pct": 1.09
+ },
+ {
+  "tag": "E axii orbit consecutive",
+  "a": "027_E_axii_orbit_02.png",
+  "b": "028_E_axii_orbit_03.png",
+  "region": [
+   104,
+   14,
+   159,
+   36
+  ],
+  "changed": 14,
+  "total": 1288,
+  "pct": 1.09
+ },
+ {
+  "tag": "F heal sparkle consecutive",
+  "a": "031_F_heal_00.png",
+  "b": "032_F_heal_01.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 28,
+  "total": 1845,
+  "pct": 1.52
+ },
+ {
+  "tag": "F heal sparkle consecutive",
+  "a": "032_F_heal_01.png",
+  "b": "033_F_heal_02.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 0,
+  "total": 1845,
+  "pct": 0
+ },
+ {
+  "tag": "F heal sparkle consecutive",
+  "a": "033_F_heal_02.png",
+  "b": "034_F_heal_03.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 68,
+  "total": 1845,
+  "pct": 3.69
+ },
+ {
+  "tag": "F heal sparkle consecutive",
+  "a": "034_F_heal_03.png",
+  "b": "035_F_heal_04.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 27,
+  "total": 1845,
+  "pct": 1.46
+ },
+ {
+  "tag": "J oil glint consecutive",
+  "a": "070_J_oil_glint_00.png",
+  "b": "071_J_oil_glint_01.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 32,
+  "total": 1845,
+  "pct": 1.73
+ },
+ {
+  "tag": "J oil glint consecutive",
+  "a": "071_J_oil_glint_01.png",
+  "b": "072_J_oil_glint_02.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 24,
+  "total": 1845,
+  "pct": 1.3
+ },
+ {
+  "tag": "J oil glint consecutive",
+  "a": "072_J_oil_glint_02.png",
+  "b": "073_J_oil_glint_03.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 16,
+  "total": 1845,
+  "pct": 0.87
+ },
+ {
+  "tag": "A intro t0->t300 full",
+  "a": "000_A_intro_t0.png",
+  "b": "001_A_intro_t300.png",
+  "region": [
+   0,
+   0,
+   159,
+   143
+  ],
+  "changed": 20937,
+  "total": 23040,
+  "pct": 90.87
+ },
+ {
+  "tag": "A intro t300->t600 full",
+  "a": "001_A_intro_t300.png",
+  "b": "002_A_intro_t600.png",
+  "region": [
+   0,
+   0,
+   159,
+   143
+  ],
+  "changed": 1998,
+  "total": 23040,
+  "pct": 8.67
+ },
+ {
+  "tag": "H2 scorched->faint starts",
+  "a": "101_H2_kill_scorched.png",
+  "b": "102_H2_faint_00.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 1552,
+  "total": 3024,
+  "pct": 51.32
+ },
+ {
+  "tag": "H2 scorched->faint end (gone)",
+  "a": "101_H2_kill_scorched.png",
+  "b": "107_H2_faint_05.png",
+  "region": [
+   104,
+   0,
+   159,
+   53
+  ],
+  "changed": 1552,
+  "total": 3024,
+  "pct": 51.32
+ },
+ {
+  "tag": "I player KO sink consecutive",
+  "a": "061_I_player_ko_00.png",
+  "b": "062_I_player_ko_01.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 272,
+  "total": 1845,
+  "pct": 14.74
+ },
+ {
+  "tag": "I player KO sink consecutive",
+  "a": "062_I_player_ko_01.png",
+  "b": "063_I_player_ko_02.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 232,
+  "total": 1845,
+  "pct": 12.57
+ },
+ {
+  "tag": "I player KO sink consecutive",
+  "a": "063_I_player_ko_02.png",
+  "b": "064_I_player_ko_03.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 272,
+  "total": 1845,
+  "pct": 14.74
+ },
+ {
+  "tag": "I player KO sink consecutive",
+  "a": "064_I_player_ko_03.png",
+  "b": "065_I_player_ko_04.png",
+  "region": [
+   8,
+   55,
+   52,
+   95
+  ],
+  "changed": 478,
+  "total": 1845,
+  "pct": 25.91
+ },
+ {
+  "tag": "C item top vs idx3 (scrolled rows)",
+  "a": "013_C_item_top.png",
+  "b": "014_C_item_idx3_a.png",
+  "region": [
+   2,
+   100,
+   158,
+   142
+  ],
+  "changed": 532,
+  "total": 6751,
+  "pct": 7.88
+ },
+ {
+  "tag": "I gameover 300->1300",
+  "a": "066_I_gameover_0300.png",
+  "b": "067_I_gameover_1300.png",
+  "region": [
+   0,
+   0,
+   159,
+   143
+  ],
+  "changed": 1604,
+  "total": 23040,
+  "pct": 6.96
+ },
+ {
+  "tag": "I gameover 1300->2500",
+  "a": "067_I_gameover_1300.png",
+  "b": "068_I_gameover_2500.png",
+  "region": [
+   0,
+   0,
+   159,
+   143
+  ],
+  "changed": 245,
+  "total": 23040,
+  "pct": 1.06
+ },
+ {
+  "tag": "A menu vs F blocked (control)",
+  "a": "004_A_menu.png",
+  "b": "029_F_swallow_blocked.png",
+  "region": [
+   0,
+   0,
+   159,
+   143
+  ],
+  "changed": 1013,
+  "total": 23040,
+  "pct": 4.4
+ }
+]

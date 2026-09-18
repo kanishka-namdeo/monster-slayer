@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.reddit.com/r/gamedev/comments/4xhhlj/best_screenshake_pattern_is_there_an_industry",
+    "name": "Best screen-shake pattern? Is there an industry standard? Some",
+    "snippet": "Aug 13, 2016 · I'm just curious if there is an industry \"best\", or best feeling pattern on how to shake the camera. Some patterns I can think of: given ... Be continuous: Don't use random in your screenshake : r/gamedev Anyones has a list with game \"juice\" effects? If not, we should make ... More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gt3000.medium.com/juice-it-adding-camera-shake-to-your-game-e63e1a16f0a6",
+    "name": "Juice It Good: Adding Camera Shake To Your Game - Medium",
+    "snippet": "May 10, 2021 · Juice It Good: Adding Camera Shake To Your Game Juice or “game feel” is the intangible but tactile feedback associated when playing games.",
+    "host_name": "gt3000.medium.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=AobjNjzZhmo",
+    "name": "Godot Game Juice Tutorial 1: Camera Shake and Frame Freeze",
+    "snippet": "Feb 27, 2019 · In this game design tutorial, Guilherme shows you ways to improve a game's feel, and how to implement camera shake and frame freeze.",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "http://www.davetech.co.uk/gamedevscreenshake",
+    "name": "Analysis of Screenshake Types - Stuff Made By Dave - David Strachan",
+    "snippet": "For platformer and side on games having horizontal only screen shake can be a handy tool, it often gives the feeling of the ground shaking under them so if you ...",
+    "host_name": "www.davetech.co.uk",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=NhJJRqEYZQw",
+    "name": "Add Camera Shake for EXTRA Impact in Your Games - YouTube",
+    "snippet": "May 5, 2026 · Game development is a big, hard, complicated topic. Or at least , it can be! In this series i will take your through making your first game ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://feel-docs.moremountains.com/screen-shakes.html",
+    "name": "Screen Shakes | Feel Documentation",
+    "snippet": "Screen or camera shakes may be the first thing that comes to mind when you think of game feel, and you'll find that FEEL offers plenty of ways to trigger shakes ...",
+    "host_name": "feel-docs.moremountains.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=fn3hIPLbSn8",
+    "name": "Screenshake that doesn't suck - YouTube",
+    "snippet": "Mar 27, 2020 · How to make nice camera shake in Unity. Source code: https://github.com/gasgiant/Camera-Shake Music: https://soundcloud.com/igor_vaiman ...",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=9WBg-KQjsUA",
+    "name": "The different ways SCREEN SHAKE is used in games? - YouTube",
+    "snippet": "Jun 29, 2019 · Screen shake, or camera shake, is a game design techniques used to implement game feel or juice into video games. During game development ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

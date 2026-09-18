@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://github.com",
+    "name": "pokered/engine/battle/core.asm at master",
+    "snippet": "instead, the enemy pic is part of the background and uses the scroll register, while the player's head is a sprite and is slid by changing its X coordinates ... Read more",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forums.rpgmakerweb.com",
+    "name": "hp bar",
+    "snippet": "So I'm using the Yep Battle Engine Core plugin and I noticed that when I use a plugin to give an enemy an HP bar and the enemy's HP is lower than the actor's, ... Read more",
+    "host_name": "forums.rpgmakerweb.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.pokecommunity.com",
+    "name": "Pokered for Dummies - The PokéCommunity Forums",
+    "snippet": "Sep 21, 2014 — Diagonal movement? Custom battle interfaces? New animations ? Follow me? Use your imagination! And we will be covering all that is available to ... Read more",
+    "host_name": "www.pokecommunity.com",
+    "rank": 2,
+    "date": "Sep 21, 2014",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.gdevelop.io",
+    "name": "[Solved] HP bar for enemies - How do I?",
+    "snippet": "Nov 28, 2019 — I need a way to show the HP of the enemies in my game. Enemies need 5 hits to die. I created an animation separate from an HP bar .",
+    "host_name": "forum.gdevelop.io",
+    "rank": 3,
+    "date": "Nov 28, 2019",
+    "favicon": ""
+  },
+  {
+    "url": "https://himeworks.com",
+    "name": "Creating Simple HP Bars",
+    "snippet": "Mar 18, 2015 — In this tutorial I will show you how to write some HP Bars from scratch. By scratch, I mean with the default project of course, ... Read more",
+    "host_name": "himeworks.com",
+    "rank": 4,
+    "date": "Mar 18, 2015",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.gamemaker.io",
+    "name": "Help with health bar and lives - GML Visual",
+    "snippet": "May 3, 2017 — For drawing health bars I'm currently using a technique where I have a healthbar sprite. This is a simple rectangle with sub images for the ... Read more",
+    "host_name": "forum.gamemaker.io",
+    "rank": 5,
+    "date": "May 3, 2017",
+    "favicon": ""
+  }
+]

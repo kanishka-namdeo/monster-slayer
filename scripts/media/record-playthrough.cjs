@@ -509,6 +509,7 @@ async function prep(page, fn) {
   await chooseOption(page, 0, { browseMs: 800 }); // FIGHT.
   log('WEREWOLF battle');
   await fightBattle(page, [
+    { t: 'sign', v: 'quen' },   // shield first — the werewolf is faster than us now
     { t: 'sign', v: 'igni' },
     { t: 'silver' },
     { t: 'sign', v: 'igni' },
@@ -517,14 +518,21 @@ async function prep(page, fn) {
     { t: 'silver' },
     { t: 'sign', v: 'igni' },
     { t: 'silver' },
+    { t: 'silver' },
   ]);
   await settleAfterBattle(page);
   log(`werewolf aftermath: mode=${await page.evaluate(() => window.__game.mode)} hp=${await page.evaluate(() => window.__game.player.hp)}`);
 
-  // recover from a rare death: respawn happens at the inn after ~2.6s
+  // recover from a rare death: gameover auto-respawns at the inn after ~2.6s
+  // and opens the Petra notice — drain it, then re-enter the deep forest
   if (await page.evaluate(() => window.__game.mode) !== 'world') {
     log('werewolf killed us — recovering');
-    await page.waitForFunction(() => window.__game.mode === 'world', null, { timeout: 12000, polling: 100 });
+    await page.waitForFunction(
+      () => !['gameover', 'battle'].includes(window.__game.mode),
+      null, { timeout: 15000, polling: 100 },
+    );
+    await flushDialog(page, 10, { typeMs: 1200 });
+    await page.waitForFunction(() => window.__game.mode === 'world', null, { timeout: 8000, polling: 100 });
     await prep(page, () => {
       const g = window.__game;
       const p = g.player;
@@ -538,8 +546,8 @@ async function prep(page, fn) {
     await flushDialog(page, 8, { typeMs: 1600 });
     await chooseOption(page, 0, { browseMs: 800 }); // FIGHT. (retry)
     await fightBattle(page, [
-      { t: 'sign', v: 'igni' }, { t: 'silver' }, { t: 'sign', v: 'igni' },
-      { t: 'silver' }, { t: 'sign', v: 'igni' }, { t: 'silver' },
+      { t: 'sign', v: 'quen' }, { t: 'sign', v: 'igni' }, { t: 'silver' },
+      { t: 'sign', v: 'igni' }, { t: 'silver' }, { t: 'sign', v: 'igni' }, { t: 'silver' },
     ]);
     await settleAfterBattle(page);
   }

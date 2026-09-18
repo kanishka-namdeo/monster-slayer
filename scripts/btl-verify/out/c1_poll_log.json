@@ -1,0 +1,272 @@
+[
+ {
+  "t": 4,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 3,
+  "cur": "IGNI! A torrent of flame!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 308,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 3,
+  "cur": "IGNI! A torrent of flame!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 612,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 3,
+  "cur": "IGNI! A torrent of flame!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 918,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 3,
+  "cur": "IGNI! A torrent of flame!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 1222,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 3,
+  "cur": "IGNI! A torrent of flame!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 1526,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "The curse sears! LESHEN is scorched for 42!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 1830,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "The curse sears! LESHEN is scorched for 42!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 2134,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "The curse sears! LESHEN is scorched for 42!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 2439,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "The curse sears! LESHEN is scorched for 42!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 2742,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "The curse sears! LESHEN is scorched for 42!",
+  "track": "finalboss",
+  "doneResult": null
+ },
+ {
+  "t": 3047,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "LESHEN collapses into the mud!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 3353,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "LESHEN collapses into the mud!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 3656,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "LESHEN collapses into the mud!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 3960,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "LESHEN collapses into the mud!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 4264,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "LESHEN collapses into the mud!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 4568,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "LESHEN collapses into the mud!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 4872,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "You slew the LESHEN!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 5175,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "You slew the LESHEN!",
+  "track": "victory",
+  "doneResult": null
+ },
+ {
+  "t": 5478,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "You slew the LESHEN!",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 5783,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 2,
+  "cur": "You slew the LESHEN!",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 6087,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "+150 XP earned.",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 6390,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "+150 XP earned.",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 6693,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "+150 XP earned.",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 6997,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "+150 XP earned.",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 7301,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "+150 XP earned.",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 7605,
+  "mode": "battle",
+  "phase": "msg",
+  "msgsLeft": 1,
+  "cur": "+150 XP earned.",
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 7909,
+  "mode": "battle",
+  "phase": null,
+  "msgsLeft": null,
+  "cur": null,
+  "track": "",
+  "doneResult": null
+ },
+ {
+  "t": 8214,
+  "mode": "dialog",
+  "phase": null,
+  "msgsLeft": null,
+  "cur": null,
+  "track": "town",
+  "doneResult": null
+ },
+ {
+  "t": 8518,
+  "mode": "dialog",
+  "phase": null,
+  "msgsLeft": null,
+  "cur": null,
+  "track": "town",
+  "doneResult": null
+ },
+ {
+  "t": 8821,
+  "mode": "dialog",
+  "phase": null,
+  "msgsLeft": null,
+  "cur": null,
+  "track": "town",
+  "doneResult": null
+ }
+]

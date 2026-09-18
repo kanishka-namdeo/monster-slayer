@@ -1,0 +1,46 @@
+{
+  "capturedAt": "2026-09-17T21:59:19.755Z",
+  "afterWaitMs": 2000,
+  "state": {
+    "mode": "battle",
+    "phase": "sign",
+    "menuIdx": 2,
+    "subIdx": 0,
+    "itemIdx": 0,
+    "monHp": 0,
+    "monMaxHp": 158,
+    "php": 193,
+    "psta": 51,
+    "dispMonHp": 0,
+    "dispPhp": 193,
+    "curMsg": "LESHEN stares at nothing, hexed.",
+    "charIdx": 32,
+    "msgHold": 150,
+    "curAnim": null,
+    "animT": -13,
+    "shakeT": 0,
+    "introT": 717,
+    "faintT": -13,
+    "monDead": true,
+    "doneResult": null,
+    "nMsgs": 3,
+    "msgsTexts": [
+      "IGNI! A torrent of flame!",
+      "LESHEN is scorched for 12!",
+      "LESHEN collapses into the mud!"
+    ],
+    "afterQueue": "victory",
+    "quenTurns": 0,
+    "poison": 0,
+    "ptox": 0,
+    "monStun": 0,
+    "monHex": 0,
+    "boss": true
+  },
+  "msgs": [
+    "IGNI! A torrent of flame!",
+    "LESHEN is scorched for 12!",
+    "LESHEN collapses into the mud!"
+  ],
+  "curMsg": "LESHEN stares at nothing, hexed."
+}

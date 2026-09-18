@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://gamedev.stackexchange.com",
+    "name": "Help with software design of a turn based combat system",
+    "snippet": "Nov 23, 2021 — I have been working on a RPG where the player is free to wander an open world but when a monster is encountered or on keyboard command the game switches ...",
+    "host_name": "gamedev.stackexchange.com",
+    "rank": 0,
+    "date": "Nov 23, 2021",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.unity.com",
+    "name": "Turn-based Game State Machine",
+    "snippet": "Jun 24, 2017 — Hi all. I'm currently working on a prototype of a turn - based game. (think of any turn - based game with alternating turns). Read more",
+    "host_name": "discussions.unity.com",
+    "rank": 1,
+    "date": "Jun 24, 2017",
+    "favicon": ""
+  },
+  {
+    "url": "https://paths.grasp.study",
+    "name": "Turn-Based Combat State Machine Design - Grasp",
+    "snippet": "This lesson addresses the first and most crucial outcome for this module: Design the architecture for a classic turn-based combat system , including a state ... Read more",
+    "host_name": "paths.grasp.study",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gamedev.net",
+    "name": "Finite State Machine for Turn-Based Games",
+    "snippet": "Sep 20, 2022 — The Finite State Machine decides which state to move into . Most are just sequences so it's one state after another. Instead of messages to ... Read more",
+    "host_name": "gamedev.net",
+    "rank": 3,
+    "date": "Sep 20, 2022",
+    "favicon": ""
+  },
+  {
+    "url": "https://theliquidfire.com",
+    "name": "Tactics RPG State Machine",
+    "snippet": "Jun 1, 2015 — This week we are going to create a State Machine which, over time, will handle all of the states which ultimately control our game's logic. Read more",
+    "host_name": "theliquidfire.com",
+    "rank": 4,
+    "date": "Jun 1, 2015",
+    "favicon": ""
+  },
+  {
+    "url": "https://gameprogrammingpatterns.com",
+    "name": "State · Design Patterns Revisited",
+    "snippet": "Each state machine can then respond to inputs, spawn behavior, and change its state independently of the other machine . When the two sets of states are mostly ...",
+    "host_name": "gameprogrammingpatterns.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

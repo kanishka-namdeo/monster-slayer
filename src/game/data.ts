@@ -20,6 +20,8 @@ export interface MonsterDef {
   hp: number;
   atk: number;
   def: number;
+  /** initiative: monsters at higher spd strike before the witcher */
+  spd?: number;
   xp: number;
   boss?: boolean;
   immuneToPlain?: boolean; // wraith: needs specter oil
@@ -31,7 +33,7 @@ export interface MonsterDef {
 export const MONSTERS: Record<string, MonsterDef> = {
   drowner: {
     id: 'drowner', name: 'DROWNER', type: 'NECROPHAGE',
-    hp: 18, atk: 5, def: 1, xp: 12,
+    hp: 18, atk: 5, def: 1, spd: 5, xp: 12,
     moves: [
       { name: 'LASH', mult: 1.0, weight: 6 },
       { name: 'GRIME SPIT', mult: 0.8, effect: 'atkdown', weight: 3 },
@@ -41,7 +43,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   ghoul: {
     id: 'ghoul', name: 'GHOUL', type: 'NECROPHAGE',
-    hp: 22, atk: 6, def: 2, xp: 15,
+    hp: 22, atk: 6, def: 2, spd: 5, xp: 15,
     moves: [
       { name: 'REND', mult: 1.0, weight: 6 },
       { name: 'FESTERING BITE', mult: 0.9, effect: 'poison', weight: 3 },
@@ -51,7 +53,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   wolf: {
     id: 'wolf', name: 'WOLF', type: 'BEAST',
-    hp: 20, atk: 7, def: 1, xp: 14,
+    hp: 20, atk: 7, def: 1, spd: 9, xp: 14,
     moves: [
       { name: 'BITE', mult: 1.0, weight: 6 },
       { name: 'HOWL', mult: 0, effect: 'atkup', weight: 2 },
@@ -61,7 +63,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   waterhag: {
     id: 'waterhag', name: 'WATER HAG', type: 'NECROPHAGE',
-    hp: 30, atk: 8, def: 3, xp: 22,
+    hp: 30, atk: 8, def: 3, spd: 4, xp: 22,
     moves: [
       { name: 'CLAW', mult: 1.0, weight: 6 },
       { name: 'MIRE GRAB', mult: 1.1, effect: 'defdown', weight: 3 },
@@ -71,7 +73,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   wraith: {
     id: 'wraith', name: 'WRAITH', type: 'SPECTER',
-    hp: 26, atk: 8, def: 2, xp: 25,
+    hp: 26, atk: 8, def: 2, spd: 7, xp: 25,
     immuneToPlain: true,
     moves: [
       { name: 'CHILL TOUCH', mult: 1.0, weight: 6 },
@@ -82,7 +84,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   werewolf: {
     id: 'werewolf', name: 'WEREWOLF', type: 'CURSED',
-    hp: 70, atk: 11, def: 4, xp: 60, boss: true,
+    hp: 70, atk: 11, def: 4, spd: 10, xp: 60, boss: true,
     moves: [
       { name: 'REND', mult: 1.1, weight: 5 },
       { name: 'FRENZY', mult: 1.4, weight: 2 },
@@ -92,7 +94,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   leshen: {
     id: 'leshen', name: 'LESHEN', type: 'CURSED',
-    hp: 120, atk: 13, def: 5, xp: 150, boss: true,
+    hp: 120, atk: 13, def: 5, spd: 6, xp: 150, boss: true,
     moves: [
       { name: 'ROOT GRASP', mult: 1.0, effect: 'stun', weight: 4 },
       { name: 'BARK FIST', mult: 1.2, weight: 5 },
@@ -103,7 +105,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   // ------- Northern Reaches bestiary -------
   nekker: {
     id: 'nekker', name: 'NEKKER', type: 'NECROPHAGE',
-    hp: 24, atk: 7, def: 1, xp: 16,
+    hp: 24, atk: 7, def: 1, spd: 8, xp: 16,
     moves: [
       { name: 'SCRATCH', mult: 1.0, weight: 6 },
       { name: 'SWARM BITE', mult: 0.9, weight: 3 },
@@ -114,7 +116,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   endrega: {
     id: 'endrega', name: 'ENDREGA', type: 'INSECTOID',
-    hp: 28, atk: 8, def: 3, xp: 20,
+    hp: 28, atk: 8, def: 3, spd: 6, xp: 20,
     moves: [
       { name: 'MANDIBLES', mult: 1.0, weight: 6 },
       { name: 'VENOM SPIT', mult: 0.8, effect: 'poison', weight: 3 },
@@ -124,7 +126,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   foglet: {
     id: 'foglet', name: 'FOGLET', type: 'NECROPHAGE',
-    hp: 26, atk: 8, def: 2, xp: 22,
+    hp: 26, atk: 8, def: 2, spd: 6, xp: 22,
     moves: [
       { name: 'MIST CLAW', mult: 1.0, weight: 5 },
       { name: 'DAZZLING LIGHT', mult: 0, effect: 'defdown', weight: 3 },
@@ -134,7 +136,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   noonwraith: {
     id: 'noonwraith', name: 'NOONWRAITH', type: 'SPECTER',
-    hp: 30, atk: 9, def: 2, xp: 26, immuneToPlain: true,
+    hp: 30, atk: 9, def: 2, spd: 7, xp: 26, immuneToPlain: true,
     moves: [
       { name: 'SCORCHING TOUCH', mult: 1.0, weight: 5 },
       { name: 'SOLAR FLARE', mult: 1.3, weight: 2 },
@@ -145,7 +147,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   rotfiend: {
     id: 'rotfiend', name: 'ROTFIEND', type: 'NECROPHAGE',
-    hp: 26, atk: 8, def: 2, xp: 20,
+    hp: 26, atk: 8, def: 2, spd: 5, xp: 20,
     moves: [
       { name: 'REND', mult: 1.0, weight: 6 },
       { name: 'GAS BURST', mult: 0.9, effect: 'poison', weight: 2 },
@@ -156,7 +158,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   barghest: {
     id: 'barghest', name: 'BARGHEST', type: 'BEAST',
-    hp: 24, atk: 8, def: 1, xp: 17,
+    hp: 24, atk: 8, def: 1, spd: 9, xp: 17,
     moves: [
       { name: 'SAVAGE BITE', mult: 1.0, weight: 6 },
       { name: 'GNAW', mult: 0.9, weight: 3 },
@@ -167,7 +169,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   arachas: {
     id: 'arachas', name: 'ARACHAS', type: 'INSECTOID',
-    hp: 90, atk: 12, def: 5, xp: 90, boss: true,
+    hp: 90, atk: 12, def: 5, spd: 5, xp: 90, boss: true,
     moves: [
       { name: 'POUNCE', mult: 1.1, weight: 5 },
       { name: 'VENOM DRENCH', mult: 0.9, effect: 'poison', weight: 3 },
@@ -177,7 +179,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   griffin: {
     id: 'griffin', name: 'ROYAL GRIFFIN', battleName: 'R. GRIFFIN', type: 'BEAST',
-    hp: 85, atk: 13, def: 4, xp: 100, boss: true,
+    hp: 85, atk: 13, def: 4, spd: 11, xp: 100, boss: true,
     moves: [
       { name: 'TALON DIVE', mult: 1.2, weight: 5 },
       { name: 'WING GUST', mult: 0.8, effect: 'defdown', weight: 3 },
@@ -187,7 +189,7 @@ export const MONSTERS: Record<string, MonsterDef> = {
   },
   katakan: {
     id: 'katakan', name: 'KATAKAN', type: 'SPECTER',
-    hp: 100, atk: 14, def: 5, xp: 130, boss: true, immuneToPlain: true,
+    hp: 100, atk: 14, def: 5, spd: 9, xp: 130, boss: true, immuneToPlain: true,
     moves: [
       { name: 'SHADOW CLAW', mult: 1.1, weight: 5 },
       { name: 'NIGHT TERROR', mult: 1.4, weight: 2 },
@@ -198,11 +200,11 @@ export const MONSTERS: Record<string, MonsterDef> = {
 };
 
 export const MON_TYPES_INFO: Record<MonType, string> = {
-  NECROPHAGE: 'Weak to SILVER. Necrophage oil +50%.',
-  SPECTER: 'Only SPECTER OIL can cut them.',
-  BEAST: 'STEEL works best. Beast oil +50%.',
-  CURSED: 'Weak to SILVER. IGNI burns the curse.',
-  INSECTOID: 'Chitin cracks to INSECTOID OIL. Fire works.',
+  NECROPHAGE: 'Silver +25%. Necrophage oil +50%. IGNI sears the dead.',
+  SPECTER: 'Only SPECTER OIL can cut them. Silver +25%.',
+  BEAST: 'Steel +25%. Beast oil +50%.',
+  CURSED: 'Silver +25%. IGNI x1.5 - burns the curse.',
+  INSECTOID: 'Silver +25%. Insectoid oil +50%. IGNI x1.3.',
 };
 
 // ---------------- SIGNS ----------------
@@ -210,7 +212,7 @@ export interface SignDef {
   id: string; name: string; cost: number; desc: string;
 }
 export const SIGNS: SignDef[] = [
-  { id: 'igni', name: 'IGNI', cost: 3, desc: 'Blast of fire. Burns curses.' },
+  { id: 'igni', name: 'IGNI', cost: 3, desc: 'Blast of fire. Burns curses, chitin, dead flesh.' },
   { id: 'aard', name: 'AARD', cost: 3, desc: 'Telekinetic shock. May stun.' },
   { id: 'quen', name: 'QUEN', cost: 4, desc: 'Shield. Blocks damage 3 turns.' },
   { id: 'axii', name: 'AXII', cost: 3, desc: 'Hex. Foe may lose its turn.' },

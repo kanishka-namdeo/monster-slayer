@@ -295,6 +295,49 @@ waitmode world 60 || true
 R=$(q "window.__game.mode + ' ' + window.__audio.currentTrack")
 check "post-battle world music" 'world' "$R"
 
+echo "=== battle: sign finishing blow (softlock regression) ==="
+q "window.__game.mode='world'; window.__game.startBattle('drowner', 1); 'ok'" >/dev/null
+waitbattle
+R=$(q "window.__game.battle ? String(window.__game.battle.monFirst) : 'none'")
+check "player outruns a drowner" 'false' "$R"
+q "window.__game.battle.monHp=1; window.__game.battle.castSign('igni'); 'ok'" >/dev/null
+waitmode world 120 || true
+R=$(q "window.__game.mode")
+check "sign kill flows to victory" '"world"' "$R"
+adv  # close any notice
+
+echo "=== battle: root stun skips the player turn ==="
+q "window.__game.mode='world'; window.__game.startBattle('drowner', 1); 'ok'" >/dev/null
+waitbattle
+q "window.__game.battle.msgs=[]; window.__game.battle.pStun=1; window.__game.battle.roundEnd(); 'ok'" >/dev/null
+sleep 0.3
+R=$(q "window.__game.battle ? window.__game.battle.msgs[0].text : 'none'")
+check "stun skip message" 'tear free' "$R"
+R=$(q "window.__game.battle ? window.__game.battle.afterQueue : 'none'")
+check "stun routes to monster turn" 'monTurn' "$R"
+q "window.__game.battle.msgs=[]; window.__game.debugWinBattle()" >/dev/null
+waitmode world 120 || true
+
+echo "=== battle: a fast wolf strikes first ==="
+q "window.__game.mode='world'; window.__game.startBattle('wolf', 2); 'ok'" >/dev/null
+waitbattle
+R=$(q "window.__game.battle ? String(window.__game.battle.monFirst) : 'none'")
+check "wolf wins initiative" 'true' "$R"
+q "window.__game.debugWinBattle()" >/dev/null
+waitmode world 120 || true
+
+echo "=== battle: swallow blocked at full HP ==="
+q "window.__game.mode='world'; window.__game.inv.swallow=2; window.__game.startBattle('drowner', 1); 'ok'" >/dev/null
+waitbattle
+q "window.__game.battle.msgs=[]; window.__game.battle.useItemBattle('swallow'); 'ok'" >/dev/null
+sleep 0.3
+R=$(q "window.__game.battle ? window.__game.battle.msgs[0].text : 'none'")
+check "full HP swallow refused" 'already whole' "$R"
+R=$(q "window.__game.inv.swallow")
+check "blocked swallow not consumed" '2' "$R"
+q "window.__game.debugWinBattle()" >/dev/null
+waitmode world 120 || true
+
 echo "=== northern reaches: bosses ==="
 q "window.__game.mode='world'; window.__game.quests.q_griffin.active=true; 'ok'" >/dev/null
 q "window.__game.startBattle('griffin', 9, true)" >/dev/null

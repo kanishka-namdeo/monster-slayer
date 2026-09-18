@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://github.com",
+    "name": "Are enemies or a combat system coming? · Issue #85",
+    "snippet": "Apr 27, 2019 — You should be able to customize a sprite to deal damage to a player. It is fully possible to create a form of battle system using triggers and ...",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "Apr 27, 2019",
+    "favicon": ""
+  },
+  {
+    "url": "https://youtu.be",
+    "name": "GB Studio - Basic Turn-Based Battle System Tutorial",
+    "snippet": "A tutorial on creating a basic turn Based Battle System in GB Studio . Spells and Other Actions",
+    "host_name": "youtu.be",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://kalanakila.itch.io",
+    "name": "Turn Based Battle for GB Studio 3.1 by kalanakila - itch.io",
+    "snippet": "Updated Rohan's Turn Based Battle System to GB Studio 3.1. The enemy on the left has menu options you can't back out of, while the enemy on the right has ... Read more",
+    "host_name": "kalanakila.itch.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gbstudiocentral.com",
+    "name": "Let's Build an RPG | Quest 1-2: Enemy Turn, Effects, and",
+    "snippet": "Oct 14, 2024 — In this series, we will cover how to use GB Studio's built-in events to create a basic RPG system that you can expand on for your own game. All ... Read more",
+    "host_name": "gbstudiocentral.com",
+    "rank": 3,
+    "date": "Oct 14, 2024",
+    "favicon": ""
+  }
+]

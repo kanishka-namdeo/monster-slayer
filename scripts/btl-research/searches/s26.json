@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://gamefaqs.gamespot.com",
+    "name": "Pokemon Blue Version - Battle Information Guide - Game Boy",
+    "snippet": "Though technically only the first hit can critical hit , each hit per use will do the same amount of damage. Pin Missile will end immediately if it breaks a ... Read more",
+    "host_name": "gamefaqs.gamespot.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.rpgdl.com",
+    "name": "Pokemon Red/Blue/Yellow",
+    "snippet": "Leech Seed causes the target to lose 1 /16 maxHP after each turn, draining it to the Pokemon . Critical rate: 15% gen 1 crit rates cap at 99.6% (255/256).",
+    "host_name": "www.rpgdl.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gaming.stackexchange.com",
+    "name": "How do Critical Hit attacks work in Pokémon Gen 1?",
+    "snippet": "Jan 20, 2021 — I have been playing the Pokémon games for a very long time, and something I've always wondered about was Critical Hits. What are Critical Hits, and how ...",
+    "host_name": "gaming.stackexchange.com",
+    "rank": 2,
+    "date": "Jan 20, 2021",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.smogon.com",
+    "name": "RBY Mechanics Guide",
+    "snippet": "Critical hit rates are based on a Pokémon's base Speed: the faster the Pokémon , the higher the chance. * 100 / 512. Critical hits will ignore any stat changes ...",
+    "host_name": "www.smogon.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://bulbapedia.bulbagarden.net",
+    "name": "Critical hit - Bulbapedia, the community-driven Pokémon",
+    "snippet": "If a Pokémon with the Sniper Ability gets a critical hit , the damage dealt will be multiplied by an additional factor of 1.5. If Galarian Farfetch'd lands at ... Read more",
+    "host_name": "bulbapedia.bulbagarden.net",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "http://www.pokemonperfect.com",
+    "name": "The Complete RBY Mechanical Differences Guide",
+    "snippet": "Aug 8, 2015 — In RBY the critical hit ratio is based on base Speed rather than having a set ratio. This means that faster Pokemon will critical hit more often ... Read more",
+    "host_name": "www.pokemonperfect.com",
+    "rank": 5,
+    "date": "Aug 8, 2015",
+    "favicon": ""
+  }
+]

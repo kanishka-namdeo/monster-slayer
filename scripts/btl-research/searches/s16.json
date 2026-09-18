@@ -1,0 +1,29 @@
+[
+  {
+    "url": "https://bulbapedia.bulbagarden.net",
+    "name": "Move - Bulbapedia, the community-driven Pokémon",
+    "snippet": "A Pokémon can only know between one and four moves at a time. No single Pokémon can learn every move ; each and every Pokémon has a predetermined set of moves ( ... Read more",
+    "host_name": "bulbapedia.bulbagarden.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://essentialsdocs.fandom.com",
+    "name": "Battle AI - Essentials Docs Wiki - Fandom",
+    "snippet": "The AI considers each move known by the Pokémon in turn and determines a score for it, which is how much it wants to use that move . The default score is 100.",
+    "host_name": "essentialsdocs.fandom.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gist.github.com",
+    "name": "Generation 4 Pokemon Trainer Move Selection AI",
+    "snippet": "If the opponent knows one of the following moves , additional score +1: Earthquake; Earth Power; Fissure. If the opponent has a Ground typing, score +1. Read more",
+    "host_name": "gist.github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  }
+]

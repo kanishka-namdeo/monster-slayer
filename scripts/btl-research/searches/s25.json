@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://edw.is",
+    "name": "How to implement action sequences and cutscenes",
+    "snippet": "Oct 3, 2018 — This post will show ways of implementing actions sequences and cutscenes in video games . The code is written in Lua , but the patterns can be ... Read more",
+    "host_name": "edw.is",
+    "rank": 0,
+    "date": "Oct 3, 2018",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.adventuregamestudio.co.uk",
+    "name": "Good habits for cut-scenes?",
+    "snippet": "May 26, 2025 — a cutscene is a blocking sequence during which the player doesn't have control … blocking walk, speech and animation commands,",
+    "host_name": "www.adventuregamestudio.co.uk",
+    "rank": 1,
+    "date": "May 26, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.unity.com",
+    "name": "Best approach for desiging/programming in-game",
+    "snippet": "Sep 4, 2021 — Another approach, much like yours, would be using a Command Pattern , so instead of using a coroutine, every action becomes a command, and those ...",
+    "host_name": "discussions.unity.com",
+    "rank": 2,
+    "date": "Sep 4, 2021",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com",
+    "name": "I'm making a small game with SDL and Lua #4",
+    "snippet": "I want to make a small top-down adventure game with tiles, NPCs, dialogue etc. I'll also make a small level editor. This time in Lua (I had a 3k+ LoC of C++ ... Read more",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  }
+]

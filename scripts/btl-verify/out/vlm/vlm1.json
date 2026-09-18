@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1. Yes, the witcher stands on a visible light-green ground platform. Yes, the HP and STA bars are left-aligned. No visual glitches are apparent.\n2. Four item rows are visible. Yes, there is a cursor arrow next to the third row (\"INSECTOID OIL\"). No, there are no scroll arrows on the right edge. No text is clipped.\n3. Yes, the enemy HP bar is visibly partially drained (roughly 75-80% full).\n4. No, there is no fire/flash effect or fire particles visible over the enemy area or sprite in this frame.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1789686172,
+  "id": "2026091807024892bbf9e8668e4693",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "2026091807024892bbf9e8668e4693",
+  "usage": {
+    "completion_tokens": 126,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2163,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2289
+  }
+}

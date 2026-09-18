@@ -339,11 +339,16 @@ async function fightBattle(page, script, { turnCap = 30 } = {}) {
     }
 
     if (st.phase === 'sign') {
-      const order = ['igni', 'aard', 'quen', 'axii'];
-      const want = Math.max(0, order.indexOf(pending && pending.v));
-      let pos = st.subIdx;
+      // 2x2 grid + BACK: right=+1, left=-1, down=+2, up=-2 (mod 5)
+      const n = 5;
+      const want = Math.max(0, ['igni', 'aard', 'quen', 'axii'].indexOf(pending && pending.v));
       let guard = 0;
-      while (pos !== want && guard++ < 6) { await pressKey(page, 'down', 90); pos = (pos + 1) % 5; }
+      while (st.subIdx !== want && guard++ < 6) {
+        const diff = (want - st.subIdx + n) % n;
+        const btn = diff === 1 ? 'right' : diff === n - 1 ? 'left' : diff === 2 ? 'down' : 'up';
+        await pressKey(page, btn, 90);
+        st.subIdx = await page.evaluate(() => (window.__game.battle ? window.__game.battle.subIdx : -1));
+      }
       await sleep(120);
       await pressKey(page, 'a', 90);
       await sleep(190);

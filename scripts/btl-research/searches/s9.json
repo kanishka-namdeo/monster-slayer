@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.facebook.com/groups/BoardGameSpotlight/posts/26836144059321363",
+    "name": "Designing simple yet engaging enemy combat AI for Beastward RPG",
+    "snippet": "Mar 7, 2026 · How do you usually handle movement + target selection in turn-based AI? Do you keep scoring unified, or split it per action like I do ...",
+    "host_name": "www.facebook.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/gamedesign/comments/bizkku/how_to_handle_enemy_tells_in_a_turn_based_rpg",
+    "name": "How to handle enemy \"tells\" in a turn based RPG - Reddit",
+    "snippet": "Apr 30, 2019 · So my problem is how do you display a tell in a turn based game? You could have it pseudo turn based, such as the Mario RPG series where you ... How do you integrate enemy \"tells\" in a turn based game? Interesting RPG Turn Based Enemies : r/gamedesign More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://paths.grasp.study/modules/03f94e2d-2f1f-4d3c-aae9-72b3d6a5631f/lessons/9ceef055-8a0f-4375-a2ee-2ab70e9f9f20",
+    "name": "Pattern-Based Enemy AI - Grasp",
+    "snippet": "Design and implement a simple enemy AI system for selecting actions based on predefined patterns or conditions.",
+    "host_name": "paths.grasp.study",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=5Myzkq4aMoM",
+    "name": "Crafting Top-Down Enemy AI and Procedural Generation - YouTube",
+    "snippet": "Jul 24, 2023 · ... rpg-in-unity-enemy-ai-and-generation/ Discover how to bring your top-down RPGs to life in our latest Unity tutorial ... Design', 'Unity ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://amt-lab.org/blog/2026/3/rs-turn-based-game-ai",
+    "name": "Toward Smarter Opponents: Rethinking AI in Turn-Based Games",
+    "snippet": "Jun 22, 2026 · Turn-based games often rely on scripted opponents that are predictable, exploitable, and strategically limited. Through case studies from ...",
+    "host_name": "amt-lab.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.quora.com/How-is-enemy-AI-behavior-logic-handled-in-typical-turn-based-JRPG-games",
+    "name": "How is enemy AI/behavior logic handled in typical turn-based JRPG",
+    "snippet": "Apr 12, 2019 · There are a bunch of different AI sets, the most prominent being Random and Smart. Random AI... selects an attack randomly. There is absolutely ...",
+    "host_name": "www.quora.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gamedev.stackexchange.com/questions/54100/making-enemy-boss-movement-better-than-just-moving-randomly",
+    "name": "Making enemy boss movement better than just moving randomly",
+    "snippet": "Apr 18, 2013 · Often times the movement pattern will change throughout the battle, sometimes based on the boss's health, sometimes based on timers.",
+    "host_name": "gamedev.stackexchange.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forums.rpgmakerweb.com/threads/enemy-ai-design.124200",
+    "name": "Enemy AI Design | RPG Maker Forums",
+    "snippet": "Jul 18, 2020 · If two or more action has target available, pick the action randomly based on the rating like default engine. Then began to calculate the aggro.",
+    "host_name": "forums.rpgmakerweb.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

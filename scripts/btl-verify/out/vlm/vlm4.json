@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**Verdict: Yes.**\n\n*   **GAME OVER Title:** Large, perfectly legible, and high-contrast.\n*   **Monster Silhouette:** Yes, two distinct, blocky humanoid/alien silhouettes are clearly visible in the center, looming behind the text.\n*   **Lower Text & Prompt:** All text (\"You black out....\", \"The world smells of iron.\", \"PRESS A\") is highly readable with excellent contrast against the dark green background. (Note: The \"PRESS A\" prompt appears static in this frame rather than blinking).\n\n**Illegible Content:** None. Every element is crisp and clear.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1789686324,
+  "id": "202609180705223baddb717f49464c",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202609180705223baddb717f49464c",
+  "usage": {
+    "completion_tokens": 130,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 542,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 672
+  }
+}

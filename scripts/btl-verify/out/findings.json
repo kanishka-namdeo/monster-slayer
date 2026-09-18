@@ -1,0 +1,223 @@
+{
+ "meta": {
+  "url": "http://localhost:3000",
+  "viewport": "480x900",
+  "ts": "2026-09-17T23:28:23.074Z"
+ },
+ "check2_lunge": {
+  "verdict": "FIXED",
+  "monFirstAtStart": true,
+  "monFirstAsserted": true,
+  "region": "x100-160 y0-52 (3120 px)",
+  "threshold": ">100 px in >=1 consecutive pair (pre-fix: 0)",
+  "rounds": [
+   {
+    "round": 0,
+    "msgDuring": "WOLF uses BITE!",
+    "maxChangedPx": 544
+   }
+  ],
+  "best": {
+   "round": 0,
+   "msgDuring": "WOLF uses BITE!",
+   "curAnimAtEnd": "playerhit",
+   "maxChangedPx": 544,
+   "pairs": [
+    {
+     "pair": "0->1",
+     "changedPx": 544
+    },
+    {
+     "pair": "1->2",
+     "changedPx": 544
+    },
+    {
+     "pair": "2->3",
+     "changedPx": 0
+    },
+    {
+     "pair": "3->4",
+     "changedPx": 0
+    },
+    {
+     "pair": "4->5",
+     "changedPx": 0
+    }
+   ]
+  }
+ },
+ "check4_itemScroll": {
+  "itemWindow": {
+   "labels": [
+    "SWALLOW x2",
+    "THUNDERBOLT x1",
+    "WHITE HONEY x1",
+    "INSECTOID OIL x1"
+   ],
+   "start": 0,
+   "n": 4
+  },
+  "afterDowns": {
+   "itemIdx": 3,
+   "start": 1,
+   "visible": [
+    "THUNDERBOLT x1",
+    "WHITE HONEY x1",
+    "INSECTOID OIL x1"
+   ],
+   "n": 4,
+   "phase": "item"
+  },
+  "row4InkTextPx": 256,
+  "cursorInkPx_row4": 16,
+  "upArrowDarkPx_shotA": 0,
+  "upArrowDarkPx_shotC": 10,
+  "verdict": "FIXED"
+ },
+ "check5_quenVfx": {
+  "quenTurnsAfter": 3,
+  "region": "x0-60 y50-96 (2760 px)",
+  "base_vs_f100ms": 48,
+  "base_vs_f300ms": 48,
+  "f100_vs_f300": 0,
+  "verdict": "FIXED",
+  "note": "pre-fix: 0 px anywhere on the battlefield (QUEN was a bare text label)"
+ },
+ "check3_igniFlash": {
+  "region": "x100-160 y0-52 PAPER enemy panel (3120 px)",
+  "threshold": ">200 changed px (pre-fix: 0)",
+  "consecutivePairs": [
+   {
+    "pair": "0->1",
+    "changedPx": 3089
+   },
+   {
+    "pair": "1->2",
+    "changedPx": 144
+   },
+   {
+    "pair": "2->3",
+    "changedPx": 144
+   },
+   {
+    "pair": "3->4",
+    "changedPx": 3096
+   },
+   {
+    "pair": "4->5",
+    "changedPx": 0
+   },
+   {
+    "pair": "5->6",
+    "changedPx": 0
+   }
+  ],
+  "maxChangedPx": 3105,
+  "maxChangedPair": "0->2",
+  "curMsgAfter": "IGNI! A torrent of flame!",
+  "verdict": "FIXED"
+ },
+ "check1_softlock": {
+  "preCast": {
+   "mode": "battle",
+   "phase": "msg",
+   "track": "finalboss",
+   "monHp": 158
+  },
+  "trackAtCollapse": "victory",
+  "doneVictoryAtMs": null,
+  "worldSeenAtMs": 8215,
+  "reachedWorld": true,
+  "within10s": true,
+  "modeLogTail": [
+   "creation",
+   "intro",
+   "world",
+   "dialog",
+   "world",
+   "battle",
+   "world",
+   "dialog"
+  ],
+  "pollTail": [
+   {
+    "t": 7301,
+    "mode": "battle",
+    "phase": "msg",
+    "msgsLeft": 1,
+    "cur": "+150 XP earned.",
+    "track": "",
+    "doneResult": null
+   },
+   {
+    "t": 7605,
+    "mode": "battle",
+    "phase": "msg",
+    "msgsLeft": 1,
+    "cur": "+150 XP earned.",
+    "track": "",
+    "doneResult": null
+   },
+   {
+    "t": 7909,
+    "mode": "battle",
+    "phase": null,
+    "msgsLeft": null,
+    "cur": null,
+    "track": "",
+    "doneResult": null
+   },
+   {
+    "t": 8214,
+    "mode": "dialog",
+    "phase": null,
+    "msgsLeft": null,
+    "cur": null,
+    "track": "town",
+    "doneResult": null
+   },
+   {
+    "t": 8518,
+    "mode": "dialog",
+    "phase": null,
+    "msgsLeft": null,
+    "cur": null,
+    "track": "town",
+    "doneResult": null
+   },
+   {
+    "t": 8821,
+    "mode": "dialog",
+    "phase": null,
+    "msgsLeft": null,
+    "cur": null,
+    "track": "town",
+    "doneResult": null
+   }
+  ],
+  "distinctPhases": [
+   "msg",
+   null
+  ],
+  "finalMode": "dialog",
+  "verdict": "FIXED"
+ },
+ "check6_gameover": {
+  "reachedGameover": true,
+  "msToGameover": 7910,
+  "trackAtDetect": "gameover",
+  "actionRetries": 1,
+  "gameoverTAtShot": 2383.2000000000044,
+  "trackAtShot": "inn",
+  "titleBandBrightPx": 548,
+  "spriteBandNonInkPx": 888,
+  "line1BrightPx": 144,
+  "line2BrightPx": 154,
+  "pressABrightPx": 358,
+  "verdict": "FIXED",
+  "respawn": {
+   "mode": "dialog",
+   "track": "inn"
+  }
+ }
+}

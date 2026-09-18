@@ -1,0 +1,29 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "external": {},
+    "html": "<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n<p>The requested URL was not found on this server.</p>\n<hr>\n<address>Apache/2.4.66 Server at edw.is Port 443</address>\n\n</body></html>",
+    "httpStatus": 404,
+    "httpStatusText": "Not Found",
+    "metadata": {},
+    "title": "404 Not Found",
+    "url": "https://edw.is/posts/action-sequences/",
+    "usage": {
+      "measuredTokens": 0,
+      "outputTokens": 0,
+      "scaledTokens": 67,
+      "tokens": 67
+    },
+    "warning": "Target URL returned error 404: Not Found"
+  },
+  "meta": {
+    "usage": {
+      "measuredTokens": 0,
+      "outputTokens": 0,
+      "scaledTokens": 67,
+      "tokens": 67
+    }
+  },
+  "status": 20000
+}

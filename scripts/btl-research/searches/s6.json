@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.reddit.com/r/stunfisk/comments/14yossi/what_if_critical_hits_still_functioned_as_they",
+    "name": "What if critical hits still functioned as they did in Gen 1?",
+    "snippet": "In gen 1, crit chance is calculated as base speed * level / 512, making faster pokemon more likely to crit than others. Example: Dragapult has 142 base ...",
+    "host_name": "www.reddit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=fyJiUciTSow",
+    "name": "The History of Critical Hits in Pokémon",
+    "snippet": "This video will explain how critical hits are calculated, modified, and differences in All generations of Pokemon . Content of this video ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://bulbapedia.bulbagarden.net/wiki/Critical_hit",
+    "name": "Critical hit - Bulbapedia, the community-driven Pokémon",
+    "snippet": "Critical hits deal only 50% more damage, unless the Pokémon has Sniper, in which case it will deal double damage. · Male or gender unknown Pokémon will have the ... Read more",
+    "host_name": "bulbapedia.bulbagarden.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gaming.stackexchange.com/questions/380838/how-do-critical-hit-attacks-work-in-pok%C3%A9mon-gen-1",
+    "name": "How do Critical Hit attacks work in Pokémon Gen 1?",
+    "snippet": "Jan 20, 2021 — I have been playing the Pokémon games for a very long time, and something I've always wondered about was Critical Hits. What are Critical Hits, and how ...",
+    "host_name": "gaming.stackexchange.com",
+    "rank": 3,
+    "date": "Jan 20, 2021",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.dragonflycave.com/mechanics/stat-stages",
+    "name": "Stat Stages",
+    "snippet": "A stat stage is an integer value that starts out at zero but can range from -6 to 6. Each Pokémon in battle has a separate stat stage for each of its stats . Read more",
+    "host_name": "www.dragonflycave.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=KMXFAStVYy0",
+    "name": "How are critical hits calculated in Pokemon Gen 1",
+    "snippet": "A deep dive into how Critical Hit calculations are performed in Pokemon Red, Blue and Yellow. Avatar illustration: Sarina Vail: ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pokemonfireash.fandom.com/wiki/Stat",
+    "name": "Stat | Pokémon Fire Ash Wiki - Fandom",
+    "snippet": "The accuracy rate or accuracy of a Pokémon determines its probability of hitting another Pokémon . The initial value at the start of any battle is 100%. Read more",
+    "host_name": "pokemonfireash.fandom.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.serebii.net/games/criticalhits.shtml",
+    "name": "Serebii.net Games - Critical Hits",
+    "snippet": "Every move that does damage, either physical or special is part of Stage 1 and thus has a 4.17% chance of causing a Critical Hit . However, there are many things ... Read more",
+    "host_name": "www.serebii.net",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

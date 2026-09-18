@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://moonjump.com",
+    "name": "async/await in game loops — is it ever actually safe or am I",
+    "snippet": "Jan 1, 2026 — Been working on a browser-based RPG and I keep getting tempted to use async / await for game logic stuff — loading assets mid-session, ... Read more",
+    "host_name": "moonjump.com",
+    "rank": 0,
+    "date": "Jan 1, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://forums.rpgmakerweb.com",
+    "name": "MV - Bind and async/await: how to sequence long events",
+    "snippet": "Apr 13, 2021 — I've been learning RPG Maker MV scripting and I must say the power of bind and async / await cannot be overstated. Read more",
+    "host_name": "forums.rpgmakerweb.com",
+    "rank": 1,
+    "date": "Apr 13, 2021",
+    "favicon": ""
+  },
+  {
+    "url": "https://sbcgames.io",
+    "name": "Unity-like coroutines in Typescript for Phaser - SBC Games",
+    "snippet": "Jan 8, 2025 — In this tutorial I will show code for providing similar functionality in Phaser. We will use Javascript generator functions and build a small ... Read more",
+    "host_name": "sbcgames.io",
+    "rank": 2,
+    "date": "Jan 8, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://doc.babylonjs.com",
+    "name": "Coroutines",
+    "snippet": "Babylon.js coroutines combine JavaScript generators with Observable s to make it as easy as possible to spread logic across multiple frames. At a high level, ... Read more",
+    "host_name": "doc.babylonjs.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://edw.is",
+    "name": "How to implement action sequences and cutscenes",
+    "snippet": "Oct 3, 2018 — This post will show ways of implementing actions sequences and cutscenes in video games . The code is written in Lua, but the patterns can be ... Read more",
+    "host_name": "edw.is",
+    "rank": 4,
+    "date": "Oct 3, 2018",
+    "favicon": ""
+  }
+]

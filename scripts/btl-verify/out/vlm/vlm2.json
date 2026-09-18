@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1. No, there is no visible fire burst, screen flicker, or particle blocks over the enemy area in Image 1.\n2. Yes, Image 2 clearly shows bracket/corner marks forming a shield around the witcher (Vesk).\n3. Yes, the Leshen is fully visible in Image 3, and it is visibly lower/sinking with a darker shade in Image 4 compared to Image 3.\n4. Under player bars: \"ROT\" (Image 1), \"QUN WEK\" (Image 2), \"QUN PSN\" (Image 5). Next to enemy level: None visible.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1789686231,
+  "id": "202609180703472592bd1fe8e94de5",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202609180703472592bd1fe8e94de5",
+  "usage": {
+    "completion_tokens": 134,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2649,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2783
+  }
+}
